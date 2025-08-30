@@ -72,7 +72,7 @@
                     // Update visual feedback for this slider only
                     var percentage = (value / 10) * 100;
                     $(this).css('background', 'linear-gradient(to right, #667eea 0%, #667eea ' + percentage + '%, #e5e7eb ' + percentage + '%, #e5e7eb 100%)');
-                    // Log for debugging
+                    // Visual update complete
                     // Update total score
                     updateOverallScore();
                 });
@@ -149,10 +149,7 @@
                     alert('Please rate at least one criterion before submitting.');
                     return false;
                 }
-                // Log submission data for debugging
-                $('.mt-score-slider').each(function() {
-                    console.log($(this).attr('name') + ': ' + $(this).val());
-                });
+                // Data validation complete
             });
         }
         // Fix 5: Ensure sliders work after AJAX loads
@@ -222,9 +219,7 @@
         window.MTEvaluationFix = {
             reinitialize: initializeAllFixes,
             checkValues: function() {
-                $('.mt-score-slider').each(function() {
-                    console.log($(this).attr('name') + ': ' + $(this).val());
-                });
+                // Validation function for debugging interface
             }
         };
     });
