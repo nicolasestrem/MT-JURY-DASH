@@ -24,11 +24,13 @@ Three dedicated test accounts have been created for the Mobility Trailblazers te
 - **Email:** `jurytester1@test.local`
 - **Role:** `mt_jury_member`
 - **User ID:** 46
+- **Additional Capabilities:** `read`, `edit_dashboard` (for wp-admin access)
 - **Capabilities:** 
   - View assigned candidates
   - Submit evaluations (5 criteria, 0-10 scale)
   - Access jury dashboard
   - View evaluation progress
+  - Basic WordPress admin access (dashboard only)
 
 ### 3. Jury Admin Tester
 - **Username:** `juryadmintester`
@@ -92,6 +94,10 @@ wp user create testadmin testadmin@test.local \
 wp user create jurytester1 jurytester1@test.local \
   --role=mt_jury_member \
   --user_pass=JuryTest2024!
+
+# Add basic wp-admin capabilities for testing
+wp user add-cap jurytester1 read
+wp user add-cap jurytester1 edit_dashboard
 
 # Create jury admin account
 wp user create juryadmintester juryadmin@test.local \
