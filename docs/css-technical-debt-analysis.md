@@ -178,7 +178,7 @@ Total CSS memory: 5.2MB (217% of normal)
 ```
 Style recalculation:
 - Without !important: 28ms
-- With 3,678 !important: 156ms
+- With 3,846 !important: 156ms
 - Performance degradation: 557%
 
 Layout thrashing events:
@@ -199,7 +199,7 @@ Specificity Score Distribution:
 51-100:  ████ 423 rules (12%)
 101-200: ███ 289 rules (8%)
 201+:    ██ 234 rules (6%)
-!important: █████████████████████████████████ 3,678 (∞)
+!important: █████████████████████████████████ 3,846 (∞)
 ```
 
 ## Dependency Chain Analysis
@@ -325,7 +325,7 @@ npm install -D stylelint specificity-graph css-analyzer
 The CSS architecture has reached a critical tipping point where the cost of maintaining the current system exceeds the cost of complete refactoring by a factor of 3:1. Immediate action is required to prevent complete architectural collapse.
 
 **Critical Metrics:**
-- 3,678 !important declarations (industry standard: <50)
+- 3,846 !important declarations (industry standard: <50)
 - 13 emergency CSS files (standard: 0)
 - 557% performance degradation
 - 35% weekly debt growth rate

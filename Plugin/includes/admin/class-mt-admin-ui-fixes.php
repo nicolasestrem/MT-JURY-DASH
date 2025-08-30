@@ -132,4 +132,13 @@ class MT_Admin_UI_Fixes {
                         $('.wp-list-table td.username strong').each(function() {
                             var text = $(this).text();
                             // Remove any leading dots/ellipsis
-                            if
+                            if (text && text.startsWith('...')) {
+                                $(this).text(text.substring(3));
+                            }
+                        });
+                    }, 500);
+                });
+            ");
+        }
+    }
+}

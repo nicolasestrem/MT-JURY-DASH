@@ -1,14 +1,14 @@
 ﻿# CSS Statistics Report
 **Generated:** 2025-08-30 12:25:15  
-**Total Files Analyzed:** 51  
-**Total !important Declarations:** 3678
+**Total Files Analyzed:** 52  
+**Total !important Declarations:** 3846
 
 ## Summary Statistics
 | Metric | Value |
 |--------|-------|
-| Total CSS Files | 51 |
-| Total !important | 3678 |
-| Average !important per file | 72.1 |
+| Total CSS Files | 52 |
+| Total !important | 3846 |
+| Average !important per file | 73.9 |
 | Total Size | 552.26 KB |
 
 ## Files by !important Count (Top 20)
@@ -36,8 +36,8 @@
 | Plugin\assets\css\mt-modal-fix.css | 30 | 15 | 200% | 2.64 | 1 | 3 | 0 |
 ## Emergency/Hotfix Files Analysis
 **Total Emergency Files:** 13  
-**Total !important in Emergency Files:** 1192  
-**Percentage of Total !important:** 32.4%
+**Total !important in Emergency Files:** 1250  
+**Percentage of Total !important:** 32.5%
 
 | File | !important | Size(KB) |
 |------|------------|----------|

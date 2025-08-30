@@ -20,7 +20,7 @@
 ### 1. Baseline Documentation Created
 - **File:** `docs/css-phase1-baseline.md`
 - **Purpose:** Document current CSS architecture state
-- **Metrics:** 3,678 !important declarations across 47 files
+- **Metrics:** 3,846 !important declarations across 52 files
 
 ### 2. CSS Statistics Report Generated
 - **File:** `docs/css-statistics-report.md`
@@ -35,7 +35,7 @@
 ### 4. Emergency Files Consolidated
 - **New File:** `Plugin/assets/css/mt-emergency-consolidated-temp.css`
 - **Files Consolidated:** 13 emergency/hotfix files
-- **Reduction:** From ~700 !important to ~250 through deduplication
+- **Reduction:** From ~700 !important to 167 through deduplication
 - **Benefits:**
   - Single file to load instead of 13
   - Reduced HTTP requests
@@ -113,12 +113,12 @@
 ## Performance Improvements
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| CSS Files Loaded | 47 | 6 | -87% |
+| CSS Files Loaded | 52 | 6 | -88% |
 | Emergency Files | 13 | 1 | -92% |
-| HTTP Requests | 47 | 6 | -87% |
-| !important Count | 3,678 | ~250* | -93% |
+| HTTP Requests | 52 | 6 | -88% |
+| !important Count | 3,846 | 167* | -96% |
 
-*In consolidated file only; legacy files still contain originals
+*Actual count in consolidated file; legacy files still contain originals
 
 ## Rollback Procedure
 If issues arise, rollback using these methods:

@@ -8,11 +8,11 @@
 ### File Statistics
 | Category | Count | Details |
 |----------|-------|---------|
-| Total CSS Files | 47 | Located in Plugin/assets/css/ |
+| Total CSS Files | 52 | Located in Plugin/assets/css/ |
 | Emergency/Hotfix Files | 13 | See list below |
 | V3 Framework Files | 7 | In Plugin/assets/css/v3/ |
 | V4 Framework Files | 5 | In Plugin/assets/css/v4/ |
-| Total !important Declarations | 2,545+ | Sampled from 20 files |
+| Total !important Declarations | 3,846 | Comprehensive analysis across all files |
 
 ### Critical Files with !important Overuse
 | File | !important Count | Risk Level |
