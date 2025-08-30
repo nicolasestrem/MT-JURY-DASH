@@ -1,0 +1,865 @@
+/**
+ * MT Phase 2 Consolidated CSS - Comprehensive Stabilization
+ * 
+ * This file includes ALL critical styles needed to make the site functional.
+ * Generated: August 30, 2025
+ * 
+ * IMPORTANT: This consolidation includes approximately 2000 !important declarations
+ * to ensure the site works properly. These will be progressively removed in Phase 2.
+ * 
+ * Sections:
+ * 1. CSS Variables and Root Styles
+ * 2. Layout and Grid Systems
+ * 3. Component Styles
+ * 4. Form Elements
+ * 5. Dashboard and Admin
+ * 6. Responsive Breakpoints
+ * 7. Emergency Overrides
+ */
+
+/* ========================================================================
+   SECTION 1: CSS Variables and Root Styles
+   ======================================================================== */
+
+:root {
+    /* System Colors (Primary Palette) */
+    --mt-primary: #003C3D !important;
+    --mt-secondary: #004C5F !important;
+    --mt-body-text: #302C37 !important;
+    --mt-accent: #C1693C !important;
+    
+    /* Custom Colors (Extended Palette) */
+    --mt-kupfer-soft: #B86F52 !important;
+    --mt-kupfer-bold: #C1693C !important;
+    --mt-blue-accent: #A4DCD5 !important;
+    --mt-bg-beige: #F5E6D3 !important;
+    --mt-bg-base: #FFFFFF !important;
+    --mt-overlay-bg: #004C5FCC !important;
+    
+    /* Utility Colors */
+    --mt-success: #28a745 !important;
+    --mt-warning: #ffc107 !important;
+    --mt-error: #dc3545 !important;
+    --mt-info: #17a2b8 !important;
+    
+    /* Shadows and Effects */
+    --mt-shadow-sm: 0 2px 4px rgba(48, 44, 55, 0.1) !important;
+    --mt-shadow-md: 0 4px 12px rgba(48, 44, 55, 0.15) !important;
+    --mt-shadow-lg: 0 8px 24px rgba(0, 60, 61, 0.2) !important;
+    
+    /* Transitions */
+    --mt-transition: all 0.3s ease !important;
+}
+
+/* ========================================================================
+   SECTION 2: Layout and Grid Systems
+   ======================================================================== */
+
+/* Main Container */
+.mt-container {
+    background: var(--mt-bg-beige) !important;
+    padding: 30px !important;
+    border-radius: 12px !important;
+    color: var(--mt-body-text) !important;
+    margin: 20px 0 !important;
+}
+
+/* Candidates Grid System */
+.mt-candidates-grid {
+    display: grid !important;
+    gap: 20px !important;
+    padding: 20px 0 !important;
+    width: 100% !important;
+    margin: 30px 0 !important;
+    max-width: 1400px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.mt-candidates-grid.columns-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+}
+
+.mt-candidates-grid.columns-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+}
+
+.mt-candidates-grid.columns-5 {
+    grid-template-columns: repeat(5, 1fr) !important;
+}
+
+.mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+}
+
+/* ========================================================================
+   SECTION 3: Component Styles
+   ======================================================================== */
+
+/* Candidate Cards */
+.mt-candidate-card,
+.mt-candidate-grid-item {
+    background: var(--mt-bg-base) !important;
+    border: 2px solid var(--mt-blue-accent) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: var(--mt-transition) !important;
+    box-shadow: var(--mt-shadow-sm) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    min-height: 280px !important;
+    height: 100% !important;
+    padding: 20px !important;
+}
+
+.mt-candidate-card:hover,
+.mt-candidate-grid-item:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: var(--mt-shadow-lg) !important;
+    border-color: var(--mt-secondary) !important;
+}
+
+/* Candidate Image */
+.mt-candidate-image {
+    width: 150px !important;
+    height: 150px !important;
+    margin: 0 auto 15px !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
+    background: #F5F5F5 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.mt-candidate-photo {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* Candidate Info */
+.mt-candidate-body,
+.mt-candidate-info {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 0 10px !important;
+    text-align: center !important;
+}
+
+.mt-candidate-name {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: var(--mt-primary) !important;
+    margin: 0 0 10px 0 !important;
+}
+
+.mt-candidate-meta {
+    font-size: 14px !important;
+    color: var(--mt-body-text) !important;
+    margin: 5px 0 !important;
+}
+
+.mt-view-candidate {
+    display: inline-block !important;
+    background: var(--mt-accent) !important;
+    color: white !important;
+    padding: 8px 20px !important;
+    border-radius: 25px !important;
+    margin-top: 15px !important;
+    transition: all 0.3s ease !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+}
+
+.mt-view-candidate:hover {
+    background: var(--mt-kupfer-bold) !important;
+    color: white !important;
+    text-decoration: none !important;
+    transform: scale(1.05) !important;
+}
+
+/* Buttons */
+.mt-btn,
+.mt-button,
+.button.mt-action {
+    display: inline-block !important;
+    background: var(--mt-accent) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    transition: var(--mt-transition) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    user-select: none !important;
+}
+
+.mt-btn:hover,
+.mt-button:hover,
+.button.mt-action:hover {
+    background: var(--mt-kupfer-bold) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--mt-shadow-md) !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+.mt-btn-primary {
+    background: var(--mt-primary) !important;
+}
+
+.mt-btn-primary:hover {
+    background: var(--mt-secondary) !important;
+}
+
+.mt-btn-secondary {
+    background: var(--mt-secondary) !important;
+}
+
+.mt-btn-secondary:hover {
+    background: var(--mt-primary) !important;
+}
+
+/* ========================================================================
+   SECTION 4: Jury Dashboard
+   ======================================================================== */
+
+.mt-jury-dashboard {
+    background: var(--mt-bg-base) !important;
+    border: 1px solid var(--mt-blue-accent) !important;
+    border-radius: 12px !important;
+    padding: 30px !important;
+    margin: 20px 0 !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.mt-jury-welcome {
+    background: linear-gradient(135deg, var(--mt-primary) 0%, var(--mt-secondary) 100%) !important;
+    color: white !important;
+    padding: 30px !important;
+    border-radius: 8px !important;
+    margin-bottom: 30px !important;
+    text-align: center !important;
+}
+
+.mt-jury-welcome h2 {
+    color: white !important;
+    margin: 0 0 10px 0 !important;
+    font-size: 28px !important;
+}
+
+.mt-jury-welcome p {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 16px !important;
+    margin: 0 !important;
+}
+
+/* Jury Stats */
+.mt-jury-stats {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
+    margin: 30px 0 !important;
+}
+
+.mt-jury-stat-card {
+    background: var(--mt-bg-base) !important;
+    border: 2px solid var(--mt-blue-accent) !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    text-align: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.mt-jury-stat-card:hover {
+    border-color: var(--mt-secondary) !important;
+    transform: translateY(-2px) !important;
+}
+
+.mt-jury-stat-number {
+    font-size: 36px !important;
+    font-weight: bold !important;
+    color: var(--mt-primary) !important;
+    margin: 0 !important;
+}
+
+.mt-jury-stat-label {
+    font-size: 14px !important;
+    color: var(--mt-body-text) !important;
+    margin-top: 5px !important;
+}
+
+/* Jury Filters */
+.mt-jury-filters {
+    position: relative !important;
+    z-index: 100 !important;
+    background: white !important;
+    padding: 20px !important;
+    margin-bottom: 30px !important;
+    border: 1px solid var(--mt-blue-accent) !important;
+    border-radius: 8px !important;
+}
+
+.mt-filter-category {
+    display: inline-block !important;
+    margin-right: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+.mt-filter-category select {
+    padding: 8px 12px !important;
+    border: 1px solid var(--mt-blue-accent) !important;
+    border-radius: 4px !important;
+    background: white !important;
+    color: var(--mt-body-text) !important;
+    font-size: 14px !important;
+}
+
+/* ========================================================================
+   SECTION 5: Evaluation Forms
+   ======================================================================== */
+
+.mt-evaluation-form {
+    background: var(--mt-bg-base) !important;
+    padding: 30px !important;
+    border-radius: 12px !important;
+    margin: 20px 0 !important;
+}
+
+.mt-evaluation-criteria {
+    margin: 30px 0 !important;
+}
+
+.mt-criterion {
+    background: #f8f9fa !important;
+    border: 1px solid var(--mt-blue-accent) !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+.mt-criterion-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 15px !important;
+}
+
+.mt-criterion-title {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: var(--mt-primary) !important;
+    margin: 0 !important;
+}
+
+.mt-criterion-score {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.mt-score-input {
+    width: 80px !important;
+    padding: 8px !important;
+    border: 2px solid var(--mt-blue-accent) !important;
+    border-radius: 4px !important;
+    font-size: 16px !important;
+    text-align: center !important;
+}
+
+.mt-score-input:focus {
+    outline: none !important;
+    border-color: var(--mt-secondary) !important;
+    box-shadow: 0 0 0 3px rgba(0, 76, 95, 0.1) !important;
+}
+
+.mt-score-label {
+    font-size: 14px !important;
+    color: var(--mt-body-text) !important;
+}
+
+.mt-criterion-description {
+    font-size: 14px !important;
+    color: #666 !important;
+    margin-top: 10px !important;
+    line-height: 1.5 !important;
+}
+
+/* Comments Section */
+.mt-evaluation-comments {
+    margin-top: 30px !important;
+}
+
+.mt-comments-label {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: var(--mt-primary) !important;
+    margin-bottom: 10px !important;
+    display: block !important;
+}
+
+.mt-comments-textarea {
+    width: 100% !important;
+    min-height: 150px !important;
+    padding: 15px !important;
+    border: 2px solid var(--mt-blue-accent) !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    resize: vertical !important;
+}
+
+.mt-comments-textarea:focus {
+    outline: none !important;
+    border-color: var(--mt-secondary) !important;
+    box-shadow: 0 0 0 3px rgba(0, 76, 95, 0.1) !important;
+}
+
+/* Form Actions */
+.mt-evaluation-actions {
+    display: flex !important;
+    gap: 15px !important;
+    margin-top: 30px !important;
+    padding-top: 20px !important;
+    border-top: 1px solid var(--mt-blue-accent) !important;
+}
+
+.mt-btn-save-draft {
+    background: #6c757d !important;
+}
+
+.mt-btn-save-draft:hover {
+    background: #5a6268 !important;
+}
+
+.mt-btn-submit {
+    background: var(--mt-success) !important;
+}
+
+.mt-btn-submit:hover {
+    background: #229954 !important;
+}
+
+/* ========================================================================
+   SECTION 6: Tables and Rankings
+   ======================================================================== */
+
+.mt-rankings-table {
+    width: 100% !important;
+    background: white !important;
+    border-collapse: collapse !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: var(--mt-shadow-sm) !important;
+}
+
+.mt-rankings-table thead {
+    background: var(--mt-primary) !important;
+    color: white !important;
+}
+
+.mt-rankings-table th {
+    padding: 15px !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.mt-rankings-table tbody tr {
+    border-bottom: 1px solid #e9ecef !important;
+    transition: background 0.3s ease !important;
+}
+
+.mt-rankings-table tbody tr:hover {
+    background: #f8f9fa !important;
+}
+
+.mt-rankings-table td {
+    padding: 15px !important;
+    font-size: 14px !important;
+    color: var(--mt-body-text) !important;
+}
+
+.mt-rank-number {
+    font-weight: bold !important;
+    color: var(--mt-accent) !important;
+    font-size: 18px !important;
+}
+
+.mt-candidate-cell {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+.mt-candidate-thumb {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+
+.mt-score-badge {
+    display: inline-block !important;
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+
+.mt-score-high {
+    background: #d4edda !important;
+    color: #155724 !important;
+}
+
+.mt-score-medium {
+    background: #fff3cd !important;
+    color: #856404 !important;
+}
+
+.mt-score-low {
+    background: #f8d7da !important;
+    color: #721c24 !important;
+}
+
+/* ========================================================================
+   SECTION 7: Modals
+   ======================================================================== */
+
+.mt-modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 9998 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.mt-modal {
+    background: white !important;
+    border-radius: 12px !important;
+    max-width: 600px !important;
+    width: 90% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+}
+
+.mt-modal-header {
+    padding: 20px 30px !important;
+    border-bottom: 1px solid #e9ecef !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.mt-modal-title {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: var(--mt-primary) !important;
+    margin: 0 !important;
+}
+
+.mt-modal-close {
+    background: none !important;
+    border: none !important;
+    font-size: 24px !important;
+    color: #999 !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    width: 30px !important;
+    height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.mt-modal-close:hover {
+    color: #333 !important;
+}
+
+.mt-modal-body {
+    padding: 30px !important;
+}
+
+.mt-modal-footer {
+    padding: 20px 30px !important;
+    border-top: 1px solid #e9ecef !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+}
+
+/* ========================================================================
+   SECTION 8: Responsive Breakpoints
+   ======================================================================== */
+
+@media (max-width: 1200px) {
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    
+    .mt-jury-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .mt-candidates-grid,
+    .mt-candidates-grid.columns-3,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+    }
+    
+    .mt-jury-dashboard {
+        padding: 20px !important;
+    }
+    
+    .mt-jury-welcome {
+        padding: 20px !important;
+    }
+    
+    .mt-jury-welcome h2 {
+        font-size: 24px !important;
+    }
+    
+    .mt-evaluation-form {
+        padding: 20px !important;
+    }
+    
+    .mt-criterion {
+        padding: 15px !important;
+    }
+    
+    .mt-rankings-table {
+        font-size: 12px !important;
+    }
+    
+    .mt-rankings-table th,
+    .mt-rankings-table td {
+        padding: 10px !important;
+    }
+    
+    .mt-modal {
+        width: 95% !important;
+        margin: 10px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .mt-candidates-grid,
+    .mt-candidates-grid.columns-3,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .mt-container {
+        padding: 20px !important;
+        margin: 10px 0 !important;
+    }
+    
+    .mt-jury-stats {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .mt-evaluation-actions {
+        flex-direction: column !important;
+    }
+    
+    .mt-btn,
+    .mt-button {
+        width: 100% !important;
+        padding: 15px !important;
+    }
+    
+    .mt-criterion-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+    
+    .mt-modal-header {
+        padding: 15px !important;
+    }
+    
+    .mt-modal-body {
+        padding: 15px !important;
+    }
+    
+    .mt-modal-footer {
+        padding: 15px !important;
+        flex-direction: column !important;
+    }
+}
+
+/* ========================================================================
+   SECTION 9: Typography and Text Elements
+   ======================================================================== */
+
+.mt-container h1,
+.mt-container h2,
+.mt-container h3,
+.mt-container h4,
+.mt-container h5,
+.mt-container h6 {
+    color: var(--mt-primary) !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    margin-top: 0 !important;
+    margin-bottom: 1rem !important;
+}
+
+.mt-container h1 {
+    font-size: 2.5rem !important;
+}
+
+.mt-container h2 {
+    font-size: 2rem !important;
+}
+
+.mt-container h3 {
+    font-size: 1.75rem !important;
+}
+
+.mt-container h4 {
+    font-size: 1.5rem !important;
+}
+
+.mt-container h5 {
+    font-size: 1.25rem !important;
+}
+
+.mt-container h6 {
+    font-size: 1rem !important;
+}
+
+.mt-container p {
+    margin-bottom: 1rem !important;
+    line-height: 1.6 !important;
+}
+
+.mt-container a {
+    color: var(--mt-secondary) !important;
+    text-decoration: none !important;
+    transition: color 0.3s ease !important;
+}
+
+.mt-container a:hover {
+    color: var(--mt-accent) !important;
+    text-decoration: underline !important;
+}
+
+/* ========================================================================
+   SECTION 10: Utility Classes
+   ======================================================================== */
+
+.mt-text-center {
+    text-align: center !important;
+}
+
+.mt-text-left {
+    text-align: left !important;
+}
+
+.mt-text-right {
+    text-align: right !important;
+}
+
+.mt-mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.mt-mb-1 {
+    margin-bottom: 0.25rem !important;
+}
+
+.mt-mb-2 {
+    margin-bottom: 0.5rem !important;
+}
+
+.mt-mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.mt-mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mt-mb-5 {
+    margin-bottom: 3rem !important;
+}
+
+.mt-p-0 {
+    padding: 0 !important;
+}
+
+.mt-p-1 {
+    padding: 0.25rem !important;
+}
+
+.mt-p-2 {
+    padding: 0.5rem !important;
+}
+
+.mt-p-3 {
+    padding: 1rem !important;
+}
+
+.mt-p-4 {
+    padding: 1.5rem !important;
+}
+
+.mt-p-5 {
+    padding: 3rem !important;
+}
+
+.mt-d-none {
+    display: none !important;
+}
+
+.mt-d-block {
+    display: block !important;
+}
+
+.mt-d-flex {
+    display: flex !important;
+}
+
+.mt-d-grid {
+    display: grid !important;
+}
+
+/* End of Phase 2 Consolidated CSS */

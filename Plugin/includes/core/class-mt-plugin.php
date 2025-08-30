@@ -964,12 +964,12 @@ class MT_Plugin {
             MT_VERSION . '-migration'
         );
         
-        // Load consolidated emergency CSS instead of all individual files
+        // Load Phase 2 consolidated CSS with all critical styles
         wp_enqueue_style(
-            'mt-emergency-consolidated',
-            MT_PLUGIN_URL . 'assets/css/mt-emergency-consolidated-temp.css',
+            'mt-phase2-consolidated',
+            MT_PLUGIN_URL . 'assets/css/mt-phase2-consolidated.css',
             ['mt-v4-base'],
-            MT_VERSION . '-migration'
+            MT_VERSION . '-phase2'
         );
         
         // Add performance monitoring if enabled
