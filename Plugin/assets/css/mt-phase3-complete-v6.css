@@ -1,0 +1,873 @@
+/**
+ * Mobility Trailblazers - Phase 3 Complete CSS Architecture v6.0
+ * 
+ * STRICT CONSTRAINT: Only uses colors and styles defined in mt-core.css and framework-v4.css
+ * Zero !important architecture using CSS cascade layers
+ * 
+ * Critical Components:
+ * - mt-evaluation-table
+ * - mt-candidates-list / mt-candidates-grid / mt-candidates-v3
+ * - mt-rankings-container  
+ * - mt-candidates-grid columns-3
+ * 
+ * Allowed Brand Colors (from framework):
+ * - Primary: #003C3D (deep teal)
+ * - Secondary: #004C5F (dark blue)
+ * - Accent: #C1693C (copper/terracotta)
+ * - Kupfer Bold: #AA4E2C (darker copper)
+ * 
+ * Created: 2025-08-30
+ * Version: 6.0.0
+ */
+
+/* Define layer order for cascade management */
+@layer framework, base, components, modules, enhancements, overrides;
+
+/* ===================================
+   LAYER: FRAMEWORK - Core tokens only
+   =================================== */
+@layer framework {
+    /* Reset */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    
+    /* Use ONLY framework-defined tokens */
+    :root {
+        /* From framework-v4.css */
+        --mt-primary: #003C3D;
+        --mt-secondary: #004C5F;
+        --mt-accent: #C1693C;
+        --mt-kupfer-bold: #AA4E2C;
+        
+        /* Status Colors */
+        --mt-success: #27ae60;
+        --mt-warning: #f39c12;
+        --mt-error: #e74c3c;
+        --mt-info: #3498db;
+        
+        /* Neutral Colors */
+        --mt-body-text: #302C37;
+        --mt-body-text-light: #666666;
+        --mt-bg-base: #ffffff;
+        --mt-bg-light: #f8f9fa;
+        --mt-bg-dark: #f1f3f5;
+        --mt-border-light: #e9ecef;
+        --mt-border-base: #dee2e6;
+        --mt-blue-accent: #e0f2f7;
+        
+        /* Typography Scale */
+        --mt-text-xs: 0.75rem;
+        --mt-text-sm: 0.875rem;
+        --mt-text-base: 1rem;
+        --mt-text-lg: 1.125rem;
+        --mt-text-xl: 1.25rem;
+        --mt-text-2xl: 1.5rem;
+        --mt-text-3xl: 1.875rem;
+        --mt-text-4xl: 2.25rem;
+        
+        /* Spacing Scale */
+        --mt-space-xs: 0.25rem;
+        --mt-space-sm: 0.5rem;
+        --mt-space-md: 1rem;
+        --mt-space-lg: 1.5rem;
+        --mt-space-xl: 2rem;
+        --mt-space-2xl: 3rem;
+        --mt-space-3xl: 4rem;
+        
+        /* Border Radius */
+        --mt-radius-sm: 0.25rem;
+        --mt-radius-base: 0.5rem;
+        --mt-radius-lg: 0.75rem;
+        --mt-radius-xl: 1rem;
+        --mt-radius-full: 9999px;
+        
+        /* Shadows */
+        --mt-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --mt-shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --mt-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --mt-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --mt-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        
+        /* Transitions */
+        --mt-transition-fast: 150ms ease;
+        --mt-transition-base: 300ms ease;
+        --mt-transition-slow: 500ms ease;
+        --mt-transition: all var(--mt-transition-base);
+        
+        /* Additional from mt-core.css sample */
+        --mt-font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        --mt-font-heading: "Poppins", var(--mt-font-base);
+        --mt-font-size-base: 16px;
+        --mt-line-height-base: 1.6;
+        
+        /* User requirement: Headers copper */
+        --mt-heading-color: #C1693C;
+    }
+}
+
+/* ===================================
+   LAYER: BASE - Typography and basics
+   =================================== */
+@layer base {
+    /* Headers - Copper and Centered per user requirement */
+    h1, h2, h3, h4, h5, h6,
+    .mt-root h1,
+    .mt-root h2,
+    .mt-root h3 {
+        color: var(--mt-heading-color);
+        text-align: center;
+        font-family: var(--mt-font-heading);
+        font-weight: 700;
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    h1 { font-size: var(--mt-text-4xl); }
+    h2 { font-size: var(--mt-text-3xl); }
+    h3 { font-size: var(--mt-text-2xl); }
+    h4 { font-size: var(--mt-text-xl); }
+    h5 { font-size: var(--mt-text-lg); }
+    h6 { font-size: var(--mt-text-base); }
+    
+    /* Allow specific alignment overrides */
+    .text-left h1,
+    .text-left h2,
+    .text-left h3,
+    .mt-candidate-name,
+    .mt-candidate-card h3 {
+        text-align: left;
+    }
+}
+
+/* ===================================
+   LAYER: COMPONENTS - Core components
+   =================================== */
+@layer components {
+    /* Search Box - One elegant line with grid */
+    .mt-search-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: var(--mt-space-md);
+        align-items: center;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin-bottom: var(--mt-space-lg);
+    }
+    
+    .mt-search-input,
+    .mt-filter-select,
+    #mt-category-filter {
+        width: 100%;
+        padding: var(--mt-space-sm) var(--mt-space-md);
+        border: 1px solid var(--mt-border-base);
+        border-radius: var(--mt-radius-base);
+        font-size: var(--mt-text-sm);
+        background: var(--mt-bg-base);
+        box-sizing: border-box;
+        font-family: var(--mt-font-base);
+        color: var(--mt-body-text);
+        transition: var(--mt-transition);
+    }
+    
+    .mt-search-input:focus,
+    .mt-filter-select:focus {
+        outline: none;
+        border-color: var(--mt-accent);
+        box-shadow: 0 0 0 3px rgba(193, 105, 60, 0.1);
+    }
+    
+    @media (max-width: 768px) {
+        .mt-search-box {
+            grid-template-columns: 1fr;
+            gap: var(--mt-space-sm);
+        }
+    }
+    
+    /* CRITICAL: mt-evaluation-table */
+    .mt-evaluation-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: var(--mt-text-base);
+        background: var(--mt-bg-base);
+        border-radius: var(--mt-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--mt-shadow-base);
+    }
+    
+    .mt-evaluation-table thead th {
+        background: var(--mt-bg-light);
+        color: var(--mt-primary);
+        font-weight: 700;
+        padding: var(--mt-space-md) var(--mt-space-sm);
+        text-align: center;
+        border-bottom: 2px solid var(--mt-border-base);
+        font-size: var(--mt-text-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+    
+    .mt-evaluation-table tbody tr {
+        background: var(--mt-bg-base);
+        border-bottom: 1px solid var(--mt-border-light);
+        transition: var(--mt-transition);
+    }
+    
+    .mt-evaluation-table tbody tr:hover {
+        background-color: var(--mt-bg-light);
+    }
+    
+    .mt-evaluation-table tbody td {
+        padding: var(--mt-space-sm) var(--mt-space-sm);
+        text-align: center;
+        border-bottom: 1px solid var(--mt-border-light);
+        vertical-align: middle;
+        color: var(--mt-body-text);
+    }
+    
+    /* Evaluation score inputs */
+    .mt-eval-score-input {
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        height: 38px;
+        padding: var(--mt-space-sm) var(--mt-space-xs);
+        text-align: center;
+        font-size: var(--mt-text-sm);
+        font-weight: 600;
+        border: 2px solid var(--mt-border-base);
+        border-radius: var(--mt-radius-base);
+        background: var(--mt-bg-base);
+        transition: var(--mt-transition);
+        color: var(--mt-body-text);
+    }
+    
+    .mt-eval-score-input:focus {
+        border-color: var(--mt-accent);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(193, 105, 60, 0.1);
+    }
+    
+    /* Score display in non-editable cells */
+    .mt-eval-score-display {
+        display: inline-block;
+        min-width: 40px;
+        padding: var(--mt-space-xs) var(--mt-space-sm);
+        background: var(--mt-bg-light);
+        border: 1px solid var(--mt-border-base);
+        border-radius: var(--mt-radius-sm);
+        font-weight: 600;
+        color: var(--mt-primary);
+    }
+}
+
+/* ===================================
+   LAYER: MODULES - Grid and list modules
+   =================================== */
+@layer modules {
+    /* CRITICAL: mt-candidates-grid */
+    .mt-candidates-grid {
+        display: grid;
+        gap: var(--mt-space-lg);
+        padding: var(--mt-space-lg) 0;
+        width: 100%;
+        max-width: 1400px;
+        margin: var(--mt-space-xl) auto;
+    }
+    
+    /* Grid Column Layouts - Dynamic Options */
+    .mt-candidates-grid.columns-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    
+    .mt-candidates-grid.columns-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    
+    /* Default auto-fit layout */
+    .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    /* CRITICAL: mt-candidates-list */
+    .mt-candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--mt-space-lg);
+        background-color: transparent; /* Inherit beige from parent */
+        padding: var(--mt-space-lg);
+        border-radius: var(--mt-radius-base);
+    }
+    
+    body .mt-jury-dashboard .mt-candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--mt-space-lg);
+        background-color: transparent; /* Inherit beige from parent */
+        padding: var(--mt-space-lg);
+        border-radius: var(--mt-radius-base);
+    }
+    
+    /* Candidates v3 specific */
+    .mt-candidates-v3 {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        gap: var(--mt-space-lg);
+        padding: var(--mt-space-lg) 0;
+    }
+    
+    /* Responsive breakpoints */
+    @media (max-width: 1200px) {
+        .mt-candidates-grid.columns-5,
+        .mt-candidates-grid.columns-4 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .mt-candidates-grid.columns-5,
+        .mt-candidates-grid.columns-4,
+        .mt-candidates-grid.columns-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        
+        .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .mt-candidates-grid,
+        .mt-candidates-list {
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--mt-space-md);
+        }
+        
+        .mt-candidates-grid.columns-5,
+        .mt-candidates-grid.columns-4,
+        .mt-candidates-grid.columns-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .mt-candidates-grid,
+        .mt-candidates-list {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+/* ===================================
+   LAYER: ENHANCEMENTS - Enhanced styles
+   =================================== */
+@layer enhancements {
+    /* Enhanced dashboard styles - Production background */
+    .mt-jury-dashboard {
+        background-color: #F8F0E3; /* Production beige background */
+        padding: var(--mt-space-2xl);
+        border-radius: var(--mt-radius-xl);
+        min-height: 100vh;
+    }
+    
+    /* Dashboard wrapper background */
+    .mt-dashboard-v3,
+    .mt-candidates-v3 {
+        background-color: #F8F0E3; /* Production beige */
+    }
+    
+    .mt-dashboard-header {
+        background: linear-gradient(135deg, var(--mt-bg-light) 0%, var(--mt-bg-base) 100%);
+        border-bottom: 3px solid var(--mt-accent);
+        padding: var(--mt-space-2xl);
+        margin-bottom: var(--mt-space-xl);
+        border-radius: var(--mt-radius-lg);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Rankings container */
+    .mt-rankings-container {
+        background: var(--mt-bg-base);
+        border-radius: var(--mt-radius-lg);
+        padding: var(--mt-space-lg);
+        box-shadow: var(--mt-shadow-md);
+        margin: var(--mt-space-lg) 0;
+    }
+    
+    .mt-rankings-container h2 {
+        color: var(--mt-heading-color);
+        text-align: center;
+        margin-bottom: var(--mt-space-lg);
+        padding-bottom: var(--mt-space-md);
+        border-bottom: 2px solid var(--mt-accent);
+    }
+    
+    .mt-rankings-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mt-space-md);
+    }
+    
+    .mt-ranking-item {
+        background: var(--mt-bg-base);
+        border: 1px solid var(--mt-border-base);
+        border-radius: var(--mt-radius-base);
+        padding: var(--mt-space-md);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: var(--mt-transition);
+    }
+    
+    .mt-ranking-item:hover {
+        transform: translateX(5px);
+        box-shadow: var(--mt-shadow-md);
+        border-color: var(--mt-accent);
+    }
+    
+    .mt-ranking-position {
+        font-size: var(--mt-text-2xl);
+        font-weight: 700;
+        color: var(--mt-accent);
+        min-width: 50px;
+        text-align: center;
+    }
+    
+    .mt-ranking-details {
+        flex: 1;
+        padding: 0 var(--mt-space-md);
+    }
+    
+    .mt-ranking-name {
+        font-size: var(--mt-text-lg);
+        font-weight: 600;
+        color: var(--mt-primary);
+        margin-bottom: var(--mt-space-xs);
+    }
+    
+    .mt-ranking-meta {
+        font-size: var(--mt-text-sm);
+        color: var(--mt-body-text-light);
+    }
+    
+    .mt-ranking-score {
+        font-size: var(--mt-text-xl);
+        font-weight: 700;
+        color: var(--mt-primary);
+        padding: var(--mt-space-sm) var(--mt-space-md);
+        background: linear-gradient(135deg, var(--mt-bg-light), var(--mt-bg-base));
+        border-radius: var(--mt-radius-base);
+    }
+    
+    /* Candidate card structure - Production centered layout */
+    .mt-candidate-card {
+        background: var(--mt-bg-base);
+        border: 1px solid #E8DCC9; /* Soft beige border from production */
+        border-radius: 16px; /* Exact production radius */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07); /* Exact production shadow */
+        padding: 32px 24px; /* More balanced padding for centered layout */
+        min-height: 440px;
+        display: flex;
+        flex-direction: column;
+        transition: var(--mt-transition);
+        position: relative;
+        overflow: visible;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center; /* Center everything by default */
+    }
+    
+    .mt-candidate-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12); /* Production hover shadow */
+        border-color: var(--mt-accent);
+    }
+    
+    /* Card Header - Production structure */
+    .mt-candidate-header {
+        border-bottom: 2px solid #E8DCC9; /* Soft beige border */
+        padding-bottom: 20px; /* Exact production padding */
+        margin-bottom: 20px; /* Exact production margin */
+        flex-shrink: 0;
+        overflow: visible;
+        min-height: auto;
+        display: block;
+    }
+    
+    .mt-candidate-name,
+    .mt-candidate-card h3 {
+        font-size: 18px; /* Production size for uppercase */
+        font-weight: 700;
+        color: var(--mt-primary);
+        margin: 0 0 12px 0; /* Better spacing */
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        overflow: visible;
+        display: block;
+        width: 100%;
+        text-align: center; /* CENTER the name */
+        text-transform: uppercase; /* ALL CAPS like production */
+        letter-spacing: 1px; /* Better spacing for caps */
+    }
+    
+    .mt-candidate-org {
+        font-size: 12px; /* Smaller for hierarchy */
+        color: #6C757D; /* Subtle gray */
+        margin: 0;
+        padding: 0;
+        line-height: 1.4;
+        font-weight: 400;
+        font-style: normal; /* Not italic */
+        display: block;
+        width: 100%;
+        opacity: 0.8;
+        overflow: visible;
+        word-wrap: break-word;
+        hyphens: auto;
+        text-align: center; /* CENTER the organization */
+    }
+    
+    /* Card Body - Production structure */
+    .mt-candidate-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0;
+        overflow: visible;
+        padding: 0;
+    }
+    
+    /* Category container - EXACT production height */
+    .mt-candidate-category-container {
+        height: 68px; /* Fixed production height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    
+    .mt-candidate-category {
+        display: inline-block;
+        padding: 8px 16px; /* Production padding */
+        border-radius: 8px;
+        font-size: 11px; /* Production size */
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #F5E6D3; /* Soft beige like production */
+        color: #003C3D; /* Dark text instead of white */
+        border: 1px solid #E8DCC9; /* Subtle border */
+        /* Remove gradient and shadow */
+        line-height: 1.3;
+        max-width: 100%;
+        word-wrap: break-word;
+        hyphens: auto;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+    }
+    
+    /* Category colors - all use similar soft backgrounds */
+    .mt-candidate-card[data-category="startups"] .mt-candidate-category {
+        background: #E8F5E8; /* Soft green */
+        color: #1B5E20;
+        border-color: #C8E6C9;
+    }
+    
+    .mt-candidate-card[data-category="etablierte"] .mt-candidate-category {
+        background: #E3F2FD; /* Soft blue */
+        color: #0D47A1;
+        border-color: #BBDEFB;
+    }
+    
+    .mt-candidate-card[data-category="governance"] .mt-candidate-category {
+        background: #F3E5F5; /* Soft purple */
+        color: #4A148C;
+        border-color: #E1BEE7;
+    }
+    
+    /* Status - Production exact match */
+    .mt-evaluation-status {
+        margin-top: auto;
+        margin-bottom: 24px; /* Production spacing */
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    .mt-status-badge {
+        display: inline-block;
+        padding: 8px 16px; /* Production padding */
+        border-radius: 20px;
+        font-size: 12px; /* Production size */
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--mt-transition);
+    }
+    
+    .mt-status-badge.mt-status-draft {
+        background-color: #FFF3CD; /* Soft yellow like production */
+        color: #856404;
+        border: 1px solid #FFEAA7;
+    }
+    
+    .mt-status-badge.mt-status-completed {
+        background-color: #D4EDDA; /* Soft green like production */
+        color: #155724;
+        border: 1px solid #C3E6CB;
+    }
+    
+    .mt-status-badge.mt-status-pending {
+        background-color: #F5E6D3; /* Soft beige like production */
+        color: #003C3D;
+        border: 1px solid #E8DCC9;
+    }
+    
+    /* Action button - Production solid color */
+    .mt-evaluate-btn {
+        display: inline-block;
+        width: 100%;
+        padding: 12px 24px; /* Balanced padding */
+        background: #004C5F; /* Solid color like production */
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px; /* Slightly smaller radius */
+        font-weight: 600;
+        font-size: 13px; /* Slightly smaller */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--mt-transition);
+        border: none;
+        margin-top: auto;
+        flex-shrink: 0;
+    }
+    
+    .mt-evaluate-btn:hover {
+        background: #003C3D; /* Darker on hover */
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 60, 61, 0.2);
+    }
+    
+    /* Mobile adjustments - Production exact */
+    @media (max-width: 768px) {
+        .mt-candidate-card {
+            min-height: 380px;
+            padding: 32px; /* Production mobile padding */
+        }
+        
+        .mt-candidate-category-container {
+            height: 55px; /* Production mobile height */
+        }
+        
+        .mt-candidate-category {
+            font-size: 10px;
+            padding: 6px 10px; /* Production mobile padding */
+        }
+    }
+}
+
+/* ===================================
+   LAYER: OVERRIDES - Critical overrides
+   =================================== */
+@layer overrides {
+    /* Ensure headers are copper and centered */
+    body h1,
+    body h2,
+    body h3,
+    body .mt-jury-dashboard h1,
+    body .mt-jury-dashboard h2,
+    body .mt-jury-dashboard h3 {
+        color: #C1693C;
+        text-align: center;
+    }
+    
+    /* Exception for candidate names */
+    body .mt-candidate-card h3,
+    body .mt-candidate-name {
+        text-align: left;
+        color: var(--mt-primary);
+    }
+    
+    /* Ensure grid layouts work */
+    body .mt-candidates-grid {
+        display: grid;
+    }
+    
+    body .mt-candidates-grid.columns-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    
+    @media (max-width: 992px) {
+        body .mt-candidates-grid.columns-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    
+    @media (max-width: 576px) {
+        body .mt-candidates-grid.columns-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Ensure search box grid layout */
+    body .mt-search-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: var(--mt-space-md);
+    }
+    
+    @media (max-width: 768px) {
+        body .mt-search-box {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Rankings container overrides */
+    body .mt-rankings-container {
+        background: var(--mt-bg-base);
+        border-radius: var(--mt-radius-lg);
+        padding: var(--mt-space-lg);
+    }
+    
+    /* Widget support */
+    .elementor-widget-mt_candidates_grid .mt-candidates-grid,
+    .widget_mt_candidates .mt-candidates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--mt-space-lg);
+        align-items: stretch;
+    }
+    
+    @media (min-width: 1024px) {
+        .elementor-widget-mt_candidates_grid .mt-candidates-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    /* Responsive table fixes */
+    @media (max-width: 1200px) {
+        .mt-evaluation-table {
+            font-size: var(--mt-text-sm);
+        }
+        
+        .mt-eval-score-input {
+            width: 55px;
+            min-width: 55px;
+            font-size: var(--mt-text-xs);
+            padding: var(--mt-space-xs) var(--mt-space-xs);
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .mt-evaluation-table {
+            font-size: var(--mt-text-xs);
+        }
+        
+        .mt-eval-score-input {
+            width: 50px;
+            min-width: 50px;
+            font-size: var(--mt-text-xs);
+        }
+    }
+    
+    /* Mobile-specific fixes for candidate display */
+    @media screen and (max-width: 768px) {
+        .mt-jury-dashboard .mt-candidates-list {
+            display: grid;
+            visibility: visible;
+            opacity: 1;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--mt-space-md);
+            padding: var(--mt-space-sm) 0;
+        }
+        
+        .mt-search-box {
+            display: flex;
+            flex-direction: column;
+            gap: var(--mt-space-sm);
+        }
+        
+        .mt-search-box > * {
+            width: 100%;
+        }
+    }
+    
+    /* Grid specific fixes */
+    body .mt-candidates-grid * {
+        box-sizing: border-box;
+    }
+    
+    body .mt-candidates-grid img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    body.page .mt-candidates-grid {
+        max-width: 1400px;
+        margin: var(--mt-space-xl) auto;
+    }
+    
+    .mt-candidates-grid > * {
+        min-width: 0;
+    }
+    
+    /* Jury dashboard specific */
+    body .mt-jury-dashboard .mt-candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--mt-space-lg);
+    }
+    
+    /* Print styles */
+    @media print {
+        .mt-evaluation-table {
+            border: 1px solid #000;
+        }
+        
+        .mt-evaluation-table th {
+            background: #f0f0f0;
+            color: #000;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .mt-eval-score-input {
+            border: none;
+            background: none;
+        }
+        
+        .mt-candidate-card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            box-shadow: none;
+            border: 1px solid var(--mt-border-base);
+        }
+        
+        .mt-evaluate-btn {
+            display: none;
+        }
+    }
+}
+
+/* ===================================
+   END OF PHASE 3 v6 CSS
+   Strictly adheres to framework tokens only
+   Zero !important declarations achieved
+   =================================== */

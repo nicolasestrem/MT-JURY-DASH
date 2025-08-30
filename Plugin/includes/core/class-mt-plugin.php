@@ -404,7 +404,11 @@ class MT_Plugin {
      */
     public function enqueue_frontend_assets() {
         // CSS Feature Flags Support (Phase 1 Stabilization - Added 2025-08-30)
-        $css_version = defined('MT_CSS_VERSION') ? MT_CSS_VERSION : 'legacy';
+        // Check database first, then constant, then default
+        $css_version = get_option('mt_css_version', 'legacy');
+        if (defined('MT_CSS_VERSION')) {
+            $css_version = MT_CSS_VERSION;
+        }
         $css_debug = defined('MT_CSS_DEBUG') && MT_CSS_DEBUG;
         $force_legacy = defined('MT_CSS_FORCE_LEGACY') && MT_CSS_FORCE_LEGACY;
         
@@ -422,7 +426,7 @@ class MT_Plugin {
         }
         
         // Handle migration mode - load consolidated CSS and return early
-        if ($css_version === 'migration') {
+        if ($css_version === 'migration' || $css_version === 'phase2' || $css_version === 'phase3') {
             $this->load_migration_css();
             $this->enqueue_common_scripts();
             return;
@@ -946,6 +950,20 @@ class MT_Plugin {
      * @return void
      */
     private function load_migration_css() {
+        // Check CSS version from database or constant
+        $css_version = get_option('mt_css_version', 'phase3');
+        
+        if (defined('MT_CSS_VERSION')) {
+            $css_version = MT_CSS_VERSION;
+        }
+        
+        // Load Phase 3 CSS if enabled
+        if ($css_version === 'phase3') {
+            $this->load_phase3_css();
+            return;
+        }
+        
+        // Otherwise load Phase 2 CSS
         // Load v4 base framework first
         $v4_base_url = MT_PLUGIN_URL . 'assets/css/v4/';
         
@@ -988,6 +1006,35 @@ class MT_Plugin {
         // Add performance monitoring if enabled
         if (defined('MT_CSS_PERFORMANCE_MONITOR') && MT_CSS_PERFORMANCE_MONITOR) {
             add_action('wp_footer', [$this, 'output_css_performance_metrics']);
+        }
+    }
+    
+    /**
+     * Load Phase 3 CSS - Zero !important Architecture
+     * 
+     * @since 3.0.0
+     * @return void
+     */
+    private function load_phase3_css() {
+        // Load the comprehensive Phase 3 CSS with cascade layers - V6 with strict framework compliance
+        wp_enqueue_style(
+            'mt-phase3-complete',
+            MT_PLUGIN_URL . 'assets/css/mt-phase3-complete-v6.css',
+            [],
+            MT_VERSION . '-phase3-v6'
+        );
+        
+        // Add performance monitoring if enabled
+        if (defined('MT_CSS_PERFORMANCE_MONITOR') && MT_CSS_PERFORMANCE_MONITOR) {
+            add_action('wp_footer', [$this, 'output_css_performance_metrics']);
+        }
+        
+        // Add debug info if in debug mode
+        if (defined('MT_CSS_DEBUG') && MT_CSS_DEBUG && current_user_can('manage_options')) {
+            add_action('wp_footer', function() {
+                echo "<!-- MT CSS Phase 3 Active - Zero !important Architecture -->\n";
+                echo "<!-- CSS Cascade Layers: reset, base, framework, layout, components, utilities, overrides -->\n";
+            });
         }
     }
     
