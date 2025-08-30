@@ -1,0 +1,50 @@
+{
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "declaration-no-important": [true, {
+      "severity": "error",
+      "message": "!important declarations are prohibited. Use proper CSS specificity instead."
+    }],
+    "max-nesting-depth": [3, {
+      "severity": "warning",
+      "message": "Nesting depth exceeds 3 levels. Consider flattening your CSS structure."
+    }],
+    "selector-max-id": [0, {
+      "severity": "warning",
+      "message": "ID selectors are discouraged. Use classes for better reusability."
+    }],
+    "selector-max-specificity": ["0,3,0", {
+      "severity": "warning",
+      "message": "Selector specificity is too high. Keep it under 0,3,0."
+    }],
+    "selector-max-compound-selectors": [3, {
+      "severity": "warning"
+    }],
+    "declaration-property-value-disallowed-list": {
+      "z-index": ["/^[0-9]{5,}$/"],
+      "message": "Z-index values must be below 10000 for security."
+    },
+    "at-rule-no-unknown": [true, {
+      "ignoreAtRules": ["layer", "container"]
+    }],
+    "color-hex-length": "short",
+    "color-no-invalid-hex": true,
+    "font-family-no-duplicate-names": true,
+    "function-calc-no-unspaced-operator": true,
+    "string-no-newline": true,
+    "unit-no-unknown": true,
+    "property-no-unknown": true,
+    "comment-empty-line-before": null,
+    "custom-property-empty-line-before": null,
+    "declaration-empty-line-before": null,
+    "rule-empty-line-before": null,
+    "selector-class-pattern": "^mt-[a-z][a-z0-9-]*(__[a-z][a-z0-9-]*)?(--[a-z][a-z0-9-]*)?$",
+    "custom-property-pattern": "^mt-[a-z][a-z0-9-]*$"
+  },
+  "ignoreFiles": [
+    "**/*.min.css",
+    "**/backup-*/**/*.css",
+    "**/node_modules/**/*.css",
+    "**/vendor/**/*.css"
+  ]
+}

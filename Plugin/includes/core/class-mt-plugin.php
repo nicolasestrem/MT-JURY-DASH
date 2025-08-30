@@ -397,6 +397,32 @@ class MT_Plugin {
      * @return void
      */
     public function enqueue_frontend_assets() {
+        // CSS Feature Flags Support (Phase 1 Stabilization - Added 2025-08-30)
+        $css_version = defined('MT_CSS_VERSION') ? MT_CSS_VERSION : 'legacy';
+        $css_debug = defined('MT_CSS_DEBUG') && MT_CSS_DEBUG;
+        $force_legacy = defined('MT_CSS_FORCE_LEGACY') && MT_CSS_FORCE_LEGACY;
+        
+        // Force legacy mode if safety switch is enabled
+        if ($force_legacy) {
+            $css_version = 'legacy';
+        }
+        
+        // Debug output if enabled
+        if ($css_debug && current_user_can('manage_options')) {
+            add_action('wp_footer', function() use ($css_version) {
+                echo "<!-- MT CSS Version: {$css_version} -->\n";
+                echo "<script>console.log('MT CSS Version:', '{$css_version}');</script>\n";
+            });
+        }
+        
+        // Handle migration mode - load consolidated CSS and return early
+        if ($css_version === 'migration') {
+            $this->load_migration_css();
+            $this->enqueue_common_scripts();
+            return;
+        }
+        
+        // Original code continues for legacy mode
         // Check if v4 CSS is enabled (can be disabled via filter)
         $use_v4_css = apply_filters('mt_enable_css_v4', true);
         
@@ -905,5 +931,110 @@ class MT_Plugin {
                 'all_assignments_cleared' => __('All assignments have been cleared.', 'mobility-trailblazers')
             ]
         ]);
+    }
+    
+    /**
+     * Load migration CSS (Phase 1 consolidated emergency files)
+     * 
+     * @since 2.5.42
+     * @return void
+     */
+    private function load_migration_css() {
+        // Load v4 base framework first
+        $v4_base_url = MT_PLUGIN_URL . 'assets/css/v4/';
+        
+        wp_enqueue_style(
+            'mt-v4-tokens',
+            $v4_base_url . 'mt-tokens.css',
+            [],
+            MT_VERSION . '-migration'
+        );
+        
+        wp_enqueue_style(
+            'mt-v4-reset',
+            $v4_base_url . 'mt-reset.css',
+            ['mt-v4-tokens'],
+            MT_VERSION . '-migration'
+        );
+        
+        wp_enqueue_style(
+            'mt-v4-base',
+            $v4_base_url . 'mt-base.css',
+            ['mt-v4-reset'],
+            MT_VERSION . '-migration'
+        );
+        
+        // Load consolidated emergency CSS instead of all individual files
+        wp_enqueue_style(
+            'mt-emergency-consolidated',
+            MT_PLUGIN_URL . 'assets/css/mt-emergency-consolidated-temp.css',
+            ['mt-v4-base'],
+            MT_VERSION . '-migration'
+        );
+        
+        // Add performance monitoring if enabled
+        if (defined('MT_CSS_PERFORMANCE_MONITOR') && MT_CSS_PERFORMANCE_MONITOR) {
+            add_action('wp_footer', [$this, 'output_css_performance_metrics']);
+        }
+    }
+    
+    /**
+     * Enqueue common JavaScript files
+     * 
+     * @since 2.5.42
+     * @return void
+     */
+    private function enqueue_common_scripts() {
+        // Frontend JavaScript
+        wp_enqueue_script(
+            'mt-frontend',
+            MT_PLUGIN_URL . 'assets/js/frontend.js',
+            ['jquery'],
+            MT_VERSION,
+            true
+        );
+        
+        // Localize script
+        wp_localize_script('mt-frontend', 'mt_frontend', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('mt_frontend_nonce'),
+            'is_logged_in' => is_user_logged_in()
+        ]);
+    }
+    
+    /**
+     * Output CSS performance metrics
+     * 
+     * @since 2.5.42
+     * @return void
+     */
+    public function output_css_performance_metrics() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        ?>
+        <script>
+        (function() {
+            if (window.performance && window.performance.getEntriesByType) {
+                const resources = performance.getEntriesByType('resource');
+                const cssFiles = resources.filter(r => r.name.includes('.css'));
+                let totalSize = 0;
+                let totalDuration = 0;
+                
+                console.group('MT CSS Performance Metrics');
+                console.log('CSS Files Loaded:', cssFiles.length);
+                
+                cssFiles.forEach(css => {
+                    const duration = css.responseEnd - css.startTime;
+                    totalDuration += duration;
+                    console.log(`- ${css.name.split('/').pop()}: ${duration.toFixed(2)}ms`);
+                });
+                
+                console.log('Total CSS Load Time:', totalDuration.toFixed(2) + 'ms');
+                console.groupEnd();
+            }
+        })();
+        </script>
+        <?php
     }
 } 

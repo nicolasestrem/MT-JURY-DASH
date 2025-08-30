@@ -439,7 +439,9 @@ body .mt-jury-dashboard .mt-rankings-section {
 
 .mt-rankings-header,
 body .mt-jury-dashboard .mt-rankings-header {
-    background-image: url('https://mobilitytrailblazers.de/vote/wp-content/uploads/2025/08/Background.webp') !important;
+    /* SECURITY FIX: External URL removed - use local asset or CSS gradient instead */
+    /* background-image: url('https://mobilitytrailblazers.de/vote/wp-content/uploads/2025/08/Background.webp') !important; */
+    background: linear-gradient(135deg, #007cba 0%, #005a87 100%) !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;

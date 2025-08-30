@@ -1,8 +1,12 @@
 {
   "name": "mobility-trailblazers",
-  "version": "2.5.41",
-  "description": "E2E tests for Mobility Trailblazers WordPress plugin",
+  "version": "2.5.42",
+  "description": "E2E tests for Mobility Trailblazers WordPress plugin - CSS Phase 1 Stabilization",
   "scripts": {
+    "lint:css": "stylelint \"Plugin/assets/css/**/*.css\" --ignore-path .stylelintignore",
+    "lint:css:fix": "stylelint \"Plugin/assets/css/**/*.css\" --fix --ignore-path .stylelintignore",
+    "analyze:css": "powershell -ExecutionPolicy Bypass -File scripts/css-analyzer.ps1",
+    "css:important-check": "powershell -Command \"(Get-Content Plugin/assets/css/*.css | Select-String -Pattern '!important').Count\"",
     "test": "playwright test",
     "test:e2e": "playwright test",
     "test:ui": "playwright test --ui",
@@ -36,7 +40,13 @@
     "clean-css-cli": "^5.6.3",
     "dotenv": "^16.0.3",
     "terser": "^5.43.1",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "stylelint": "^15.11.0",
+    "stylelint-config-standard": "^34.0.0",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
+    "autoprefixer": "^10.4.16",
+    "cssnano": "^6.0.1"
   },
   "engines": {
     "node": ">=16.0.0"
