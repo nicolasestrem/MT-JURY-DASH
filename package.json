@@ -1,0 +1,44 @@
+{
+  "name": "mobility-trailblazers",
+  "version": "2.5.41",
+  "description": "E2E tests for Mobility Trailblazers WordPress plugin",
+  "scripts": {
+    "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:local": "playwright test",
+    "test:staging": "playwright test --config=tests/config/playwright.config.staging.ts",
+    "test:production": "playwright test --config=tests/config/playwright.config.production.ts",
+    "test:headed": "playwright test --headed",
+    "test:auth": "playwright test tests/e2e/auth.setup.ts --project=setup",
+    "show-report": "playwright show-report tests/reports/playwright-report",
+    "build": "bash scripts/minify-assets.sh",
+    "build:css": "bash scripts/minify-assets.sh css",
+    "build:js": "bash scripts/minify-assets.sh js",
+    "build:clean": "find assets -name '*.min.css' -o -name '*.min.js' -o -name '*.min.js.map' | xargs rm -f",
+    "build:prod": "npm run build:clean && npm run build && echo 'Production assets built successfully'",
+    "build:watch": "echo 'Use WP_DEBUG=true for development (loads unminified files)'",
+    "i18n:analyze": "php scripts/german-translation-automation.php analyze",
+    "i18n:extract": "php scripts/german-translation-automation.php extract",
+    "i18n:compile": "php scripts/german-translation-automation.php compile",
+    "i18n:validate": "php scripts/validate-translation-deployment.php",
+    "i18n:validate:verbose": "php scripts/validate-translation-deployment.php -v",
+    "i18n:update-pot": "wp i18n make-pot . languages/mobility-trailblazers.pot --domain=mobility-trailblazers --exclude=vendor,node_modules,tests,build",
+    "i18n:install-hooks": "bash scripts/install-translation-hooks.sh",
+    "i18n:check": "npm run i18n:analyze && npm run i18n:validate",
+    "predeploy": "npm run i18n:validate",
+    "deploy:check": "npm run test && npm run i18n:validate && npm run build:prod"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^20.0.0",
+    "clean-css-cli": "^5.6.3",
+    "dotenv": "^16.0.3",
+    "terser": "^5.43.1",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

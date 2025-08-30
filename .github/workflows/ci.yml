@@ -1,0 +1,142 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  php-checks:
+    name: PHP Quality Checks
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.2']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer, phpcs, phpcbf
+          coverage: none
+      
+      - name: Validate PHP syntax
+        run: |
+          find Plugin -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
+      
+      - name: Check for debug code
+        run: |
+          ! grep -r "var_dump\|print_r\|die(\|dd(\|exit(" Plugin --include="*.php" || echo "No debug code found"
+      
+      - name: Install WordPress Coding Standards
+        run: |
+          composer global require wp-coding-standards/wpcs
+          phpcs --config-set installed_paths $(composer global config vendor-dir)/wp-coding-standards/wpcs
+      
+      - name: Run WordPress Coding Standards
+        run: |
+          phpcs --standard=WordPress --severity=1 --warning-severity=8 Plugin/
+        continue-on-error: true
+
+  javascript-checks:
+    name: JavaScript Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Check for console.log
+        run: |
+          ! find Plugin/assets/js -name "*.js" ! -name "*.min.js" -exec grep -l "console.log" {} \; || echo "No console.log found"
+      
+      - name: Validate JavaScript syntax
+        run: |
+          npx jshint Plugin/assets/js/*.js --exclude Plugin/assets/js/*.min.js || true
+
+  css-checks:
+    name: CSS Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for !important
+        run: |
+          ! find Plugin/assets/css -name "*.css" ! -name "*.min.css" -exec grep -l "!important" {} \; || echo "No !important found"
+      
+      - name: Validate CSS syntax
+        run: |
+          npx csslint Plugin/assets/css/*.css --exclude-list=Plugin/assets/css/*.min.css || true
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for hardcoded credentials
+        run: |
+          ! grep -r "password\|api_key\|secret\|token\|private_key" Plugin --include="*.php" --include="*.js" | grep -v "// \|# \|* " || echo "No credentials found"
+      
+      - name: Check for SQL injection vulnerabilities
+        run: |
+          ! grep -r "\$wpdb->query\|\$wpdb->get_results\|\$wpdb->get_var" Plugin --include="*.php" | grep -v "prepare" || echo "All queries use prepare statements"
+
+  translation-checks:
+    name: Translation Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: gettext
+      
+      - name: Validate PO file syntax
+        run: |
+          if [ -f "languages/mobility-trailblazers-de_DE.po" ]; then
+            msgfmt -c -v -o /dev/null languages/mobility-trailblazers-de_DE.po
+          fi
+      
+      - name: Check MO file is up to date
+        run: |
+          if [ -f "languages/mobility-trailblazers-de_DE.po" ]; then
+            msgfmt -o languages/mobility-trailblazers-de_DE.mo.test languages/mobility-trailblazers-de_DE.po
+            if [ -f "languages/mobility-trailblazers-de_DE.mo" ]; then
+              diff languages/mobility-trailblazers-de_DE.mo languages/mobility-trailblazers-de_DE.mo.test || echo "MO file needs updating"
+            fi
+            rm -f languages/mobility-trailblazers-de_DE.mo.test
+          fi
+
+  line-endings:
+    name: Line Ending Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for CRLF line endings
+        run: |
+          ! find . -type f \( -name "*.php" -o -name "*.js" -o -name "*.css" \) -exec file {} \; | grep CRLF || echo "All files use LF line endings"

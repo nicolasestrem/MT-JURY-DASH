@@ -1,0 +1,395 @@
+name: Translation Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**.php'
+      - 'languages/**'
+      - 'templates/**'
+      - 'includes/**'
+      - 'scripts/german-translation-automation.php'
+  push:
+    branches: [ develop ]
+    paths:
+      - '**.php'
+      - 'languages/**'
+  workflow_dispatch:
+    inputs:
+      minimum_threshold:
+        description: 'Minimum translation percentage required'
+        required: false
+        default: '95'
+        type: number
+
+env:
+  REQUIRED_TRANSLATION_PERCENTAGE: 95
+  PHP_VERSION: '8.0'
+  NODE_VERSION: '18'
+
+jobs:
+  check-pot-file:
+    name: Validate POT File
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: wp-cli, gettext
+          coverage: none
+      
+      - name: Check if POT file exists
+        run: |
+          if [ ! -f "languages/mobility-trailblazers.pot" ]; then
+            echo "ERROR: POT file not found!"
+            exit 1
+          fi
+          echo "POT file found: languages/mobility-trailblazers.pot"
+      
+      - name: Extract strings from PHP files
+        run: |
+          echo "Extracting translatable strings from PHP files..."
+          wp i18n make-pot . languages/mobility-trailblazers-new.pot \
+            --domain=mobility-trailblazers \
+            --exclude=vendor,node_modules,tests,build \
+            --headers='{"Report-Msgid-Bugs-To":"https://mobilitytrailblazers.com"}' || true
+      
+      - name: Compare POT files
+        id: pot_check
+        run: |
+          if [ -f "languages/mobility-trailblazers-new.pot" ]; then
+            # Count strings in both files
+            OLD_COUNT=$(grep -c "^msgid " languages/mobility-trailblazers.pot || echo 0)
+            NEW_COUNT=$(grep -c "^msgid " languages/mobility-trailblazers-new.pot || echo 0)
+            
+            echo "Current POT file has $OLD_COUNT strings"
+            echo "New extraction found $NEW_COUNT strings"
+            
+            if [ "$OLD_COUNT" -ne "$NEW_COUNT" ]; then
+              echo "WARNING: POT file may be outdated!"
+              echo "pot_outdated=true" >> $GITHUB_OUTPUT
+              
+              # Show difference summary
+              diff -u languages/mobility-trailblazers.pot languages/mobility-trailblazers-new.pot | head -50 || true
+            else
+              echo "POT file is up to date"
+              echo "pot_outdated=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+      
+      - name: Upload POT comparison
+        if: steps.pot_check.outputs.pot_outdated == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: pot-comparison
+          path: |
+            languages/mobility-trailblazers.pot
+            languages/mobility-trailblazers-new.pot
+
+  validate-german-translation:
+    name: Validate German Translation
+    runs-on: ubuntu-latest
+    needs: check-pot-file
+    
+    outputs:
+      translation_percentage: ${{ steps.analyze.outputs.percentage }}
+      translation_status: ${{ steps.analyze.outputs.status }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: gettext
+          coverage: none
+      
+      - name: Analyze translation status
+        id: analyze
+        run: |
+          echo "Running translation analysis..."
+          php scripts/german-translation-automation.php analyze > translation_report.txt 2>&1
+          
+          # Extract percentage from report
+          PERCENTAGE=$(grep "Translated:" translation_report.txt | grep -oP '\([\d.]+%' | grep -oP '[\d.]+' || echo "0")
+          TOTAL=$(grep "Total strings:" translation_report.txt | grep -oP '\d+' || echo "0")
+          TRANSLATED=$(grep "Translated:" translation_report.txt | grep -oP '^\s*\d+' | grep -oP '\d+' || echo "0")
+          UNTRANSLATED=$(grep "Untranslated:" translation_report.txt | grep -oP '^\s*\d+' | grep -oP '\d+' || echo "0")
+          
+          echo "Translation percentage: ${PERCENTAGE}%"
+          echo "Total strings: $TOTAL"
+          echo "Translated: $TRANSLATED"
+          echo "Untranslated: $UNTRANSLATED"
+          
+          # Set outputs
+          echo "percentage=$PERCENTAGE" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "translated=$TRANSLATED" >> $GITHUB_OUTPUT
+          echo "untranslated=$UNTRANSLATED" >> $GITHUB_OUTPUT
+          
+          # Determine status
+          THRESHOLD=${{ github.event.inputs.minimum_threshold || env.REQUIRED_TRANSLATION_PERCENTAGE }}
+          if (( $(echo "$PERCENTAGE >= $THRESHOLD" | bc -l) )); then
+            echo "status=passing" >> $GITHUB_OUTPUT
+            echo "Translation meets minimum threshold of ${THRESHOLD}%"
+          else
+            echo "status=failing" >> $GITHUB_OUTPUT
+            echo "Translation below minimum threshold of ${THRESHOLD}%"
+          fi
+          
+          # Display full report
+          cat translation_report.txt
+      
+      - name: Check for missing critical translations
+        run: |
+          echo "Checking for critical untranslated strings..."
+          
+          # Define critical patterns that must be translated
+          CRITICAL_PATTERNS=(
+            "Submit"
+            "Save"
+            "Cancel"
+            "Error"
+            "Success"
+            "Loading"
+            "Required"
+            "Email"
+            "Password"
+            "Login"
+            "Logout"
+            "Dashboard"
+            "Settings"
+            "Evaluation"
+            "Candidate"
+            "Jury"
+          )
+          
+          MISSING_CRITICAL=0
+          for pattern in "${CRITICAL_PATTERNS[@]}"; do
+            if grep -q "msgid.*$pattern" languages/mobility-trailblazers.pot; then
+              if ! grep -A1 "msgid.*$pattern" languages/mobility-trailblazers-de_DE.po | grep -q "msgstr.*[^\"]"; then
+                echo "WARNING: Critical string '$pattern' is not translated!"
+                MISSING_CRITICAL=$((MISSING_CRITICAL + 1))
+              fi
+            fi
+          done
+          
+          if [ $MISSING_CRITICAL -gt 0 ]; then
+            echo "Found $MISSING_CRITICAL critical untranslated strings"
+            exit 1
+          fi
+      
+      - name: Validate translation files
+        run: |
+          echo "Validating PO file syntax..."
+          msgfmt -c -v -o /dev/null languages/mobility-trailblazers-de_DE.po || {
+            echo "ERROR: PO file has syntax errors!"
+            exit 1
+          }
+          
+          echo "Checking MO file..."
+          if [ ! -f "languages/mobility-trailblazers-de_DE.mo" ]; then
+            echo "WARNING: MO file is missing!"
+          else
+            # Check if MO is older than PO
+            if [ "languages/mobility-trailblazers-de_DE.po" -nt "languages/mobility-trailblazers-de_DE.mo" ]; then
+              echo "WARNING: MO file is outdated and needs recompilation!"
+            fi
+          fi
+      
+      - name: Run placeholder validation
+        run: |
+          echo "Validating placeholders in translations..."
+          php -r '
+            $po_content = file_get_contents("languages/mobility-trailblazers-de_DE.po");
+            $errors = [];
+            
+            // Parse PO file for msgid/msgstr pairs
+            preg_match_all("/msgid \"([^\"]*)\"\nmsgstr \"([^\"]*)\"/", $po_content, $matches);
+            
+            for ($i = 0; $i < count($matches[1]); $i++) {
+                $msgid = $matches[1][$i];
+                $msgstr = $matches[2][$i];
+                
+                if (empty($msgstr)) continue;
+                
+                // Check printf placeholders
+                preg_match_all("/%[sdxfFgGoeEbcuX]/", $msgid, $id_placeholders);
+                preg_match_all("/%[sdxfFgGoeEbcuX]/", $msgstr, $str_placeholders);
+                
+                if ($id_placeholders[0] != $str_placeholders[0]) {
+                    $errors[] = "Placeholder mismatch in: $msgid";
+                }
+                
+                // Check HTML tags
+                preg_match_all("/<[^>]+>/", $msgid, $id_tags);
+                preg_match_all("/<[^>]+>/", $msgstr, $str_tags);
+                
+                if (count($id_tags[0]) != count($str_tags[0])) {
+                    $errors[] = "HTML tag mismatch in: $msgid";
+                }
+            }
+            
+            if (!empty($errors)) {
+                echo "Found " . count($errors) . " validation errors:\n";
+                foreach (array_slice($errors, 0, 10) as $error) {
+                    echo "  - $error\n";
+                }
+                exit(1);
+            }
+            
+            echo "All placeholder validations passed!\n";
+          '
+      
+      - name: Generate translation report
+        if: always()
+        run: |
+          cat > translation_summary.md << EOF
+          ## Translation Status Report
+          
+          **Date:** $(date +"%Y-%m-%d %H:%M:%S UTC")
+          **Branch:** ${{ github.head_ref || github.ref_name }}
+          **Commit:** ${{ github.sha }}
+          
+          ### Summary
+          - **Translation Percentage:** ${{ steps.analyze.outputs.percentage }}%
+          - **Required Threshold:** ${{ env.REQUIRED_TRANSLATION_PERCENTAGE }}%
+          - **Status:** ${{ steps.analyze.outputs.status == 'passing' && '✅ Passing' || '❌ Failing' }}
+          
+          ### Statistics
+          | Metric | Count | Percentage |
+          |--------|-------|------------|
+          | Total Strings | ${{ steps.analyze.outputs.total }} | 100% |
+          | Translated | ${{ steps.analyze.outputs.translated }} | ${{ steps.analyze.outputs.percentage }}% |
+          | Untranslated | ${{ steps.analyze.outputs.untranslated }} | $(echo "scale=2; 100 - ${{ steps.analyze.outputs.percentage }}" | bc)% |
+          
+          ### Next Steps
+          EOF
+          
+          if [ "${{ steps.analyze.outputs.status }}" == "failing" ]; then
+            cat >> translation_summary.md << EOF
+          
+          ⚠️ **Action Required:** Translation percentage is below the required threshold.
+          
+          To fix this:
+          1. Run \`php scripts/german-translation-automation.php extract\` to get untranslated strings
+          2. Translate the missing strings
+          3. Run \`php scripts/german-translation-automation.php import --input=translations.csv\`
+          4. Compile with \`php scripts/german-translation-automation.php compile\`
+          EOF
+          fi
+          
+          cat translation_summary.md
+      
+      - name: Upload translation report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: translation-report
+          path: |
+            translation_report.txt
+            translation_summary.md
+
+  update-pr-comment:
+    name: Update PR Comment
+    runs-on: ubuntu-latest
+    needs: validate-german-translation
+    if: github.event_name == 'pull_request'
+    
+    permissions:
+      pull-requests: write
+      
+    steps:
+      - name: Download translation report
+        uses: actions/download-artifact@v3
+        with:
+          name: translation-report
+      
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('translation_summary.md', 'utf8');
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('## Translation Status Report')
+            );
+            
+            const commentBody = `${summary}\n\n---\n*Generated by Translation Validation CI*`;
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+  block-deployment:
+    name: Deployment Gate Check
+    runs-on: ubuntu-latest
+    needs: validate-german-translation
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    
+    steps:
+      - name: Check translation threshold
+        run: |
+          PERCENTAGE="${{ needs.validate-german-translation.outputs.translation_percentage }}"
+          THRESHOLD="${{ env.REQUIRED_TRANSLATION_PERCENTAGE }}"
+          
+          echo "Translation percentage: ${PERCENTAGE}%"
+          echo "Required threshold: ${THRESHOLD}%"
+          
+          if (( $(echo "$PERCENTAGE < $THRESHOLD" | bc -l) )); then
+            echo "::error::Translation percentage (${PERCENTAGE}%) is below required threshold (${THRESHOLD}%)"
+            echo "Deployment blocked due to insufficient translation coverage!"
+            exit 1
+          fi
+          
+          echo "Translation coverage meets requirements. Deployment can proceed."
+      
+      - name: Create deployment status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ needs.validate-german-translation.outputs.translation_status }}' === 'passing' ? 'success' : 'failure';
+            const percentage = '${{ needs.validate-german-translation.outputs.translation_percentage }}';
+            
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: status,
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              description: `Translation coverage: ${percentage}%`,
+              context: 'translation/validation'
+            });

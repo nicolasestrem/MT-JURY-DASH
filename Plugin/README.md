@@ -1,6 +1,6 @@
 # Mobility Trailblazers WordPress Plugin
 
-**Version:** 2.5.41
+**Version:** 2.5.40
 **Author:** Mobility Trailblazers - Nicolas Estrem  
 **License:** GPL v2 or later  
 **WordPress Version:** 5.8+  
@@ -33,22 +33,7 @@ To create a transparent, efficient, and engaging platform that identifies and ce
 - **Dashboard Widgets**: Custom WordPress widgets for jury and admin interfaces
 - **Debug Center**: Comprehensive diagnostics and maintenance tools for system health monitoring
 
-### Recent Enhancements (v2.5.34)
-
-#### Critical Bug Fixes (v2.5.34 - August 28, 2025)
-- **Fixed Fatal Error**: Resolved duplicate `content_template()` method in Elementor Candidates Grid widget
-- **Fixed Array Conversion Warning**: Added recursive sanitization for nested arrays in Debug AJAX handler
-- **Code Quality**: Verified PHP syntax and improved error handling in critical components
-
-#### Test Consolidation & Version Alignment (v2.5.33)
-- **Test Suite Consolidation**: Reduced from 23 test files to 8 (65% reduction) while maintaining full coverage
-- **Version Alignment**: Fixed version inconsistencies across entire codebase (was showing 4.2.0 in some places)
-- **CSS Minification**: Added production build scripts for CSS minification
-- **Documentation Cleanup**: Removed duplicate test files and configs from doc/ directory
-- **Security Improvements**: Removed hardcoded credentials from all documentation
-- **Test Organization**: All tests now properly located in /dev/tests/ with correct auth paths
-
-### Previous Enhancements (v2.5.40 - v2.2.28)
+### Recent Enhancements (v2.5.40 - v2.2.28)
 
 #### Medal Display & Score Centering Fixes (v2.5.40)
 - **Medal Display Issues**: Fixed medal visibility with explicit SVG fill colors for gold, silver, and bronze medals
@@ -249,11 +234,11 @@ npm run build
 - **[Architecture Guide](doc/architecture.md)** - Complete system architecture and design patterns
 - **[Developer Guide](doc/developer-guide.md)** - Development environment setup and coding patterns  
 - **[CSS Guide](doc/css-guide.md)** - Frontend styling system and component architecture
-- **[Import/Export Guide](doc/IMPORT-EXPORT-GUIDE.md)** - Data management, import/export, and migration procedures
+- **[Import/Export Guide](doc/import-export.md)** - Data management, import/export, and migration procedures
 - **[API Reference](doc/API-REFERENCE.md)** - Complete API documentation for all components
 - **[Dependency Injection Guide](doc/DEPENDENCY-INJECTION-GUIDE.md)** - DI container usage and patterns
 - **[Testing Strategies](doc/TESTING-STRATEGIES.md)** - Testing patterns with dependency injection
-- **[Changelog](docs/CHANGELOG.md)** - Complete version history
+- **[Changelog](CHANGELOG.md)** - Complete version history (v2.5.40 to v2.2.0)
 
 ### Archived Documentation
 - **[Archived](doc/archived/)** - Historical documentation and dated fix reports
@@ -278,11 +263,6 @@ Located in `../../Documentation/`:
 3. Follow WordPress coding standards
 4. Submit pull request with tests
 
-## Open Issues
-
-- **Rankings Page**: Returns 404 in some environments. Investigating route and controller wiring.
-- **WP-CLI Reliability**: Issues in production. Investigating registration and error handling.
-
 ## 🏆 Acknowledgments
 
 - **DACH Mobility Community** - For nominations and support
@@ -291,7 +271,7 @@ Located in `../../Documentation/`:
 
 ## 📈 Platform Status
 
-**Current Version**: 2.5.41 (August 29, 2025)
+**Current Version**: 2.5.40 (August 22, 2025)
 **Status**: Production Ready ✅
 
 ### Recent Updates
@@ -313,4 +293,4 @@ Located in `../../Documentation/`:
 
 **Developed for the Mobility Trailblazers initiative** - Recognizing pioneers in mobility transformation across the DACH region.
 
-*Last updated: August 29, 2025 | Version 2.5.41*
+*Last updated: August 22, 2025 | Version 2.5.40*

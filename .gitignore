@@ -1,48 +1,174 @@
-# Wordpress - ignore core, configuration, examples, uploads and logs.
-# https://github.com/github/gitignore/blob/main/WordPress.gitignore
+# Mobility Trailblazers .gitignore
+# =================================
 
-# Core
-#
-# Note: if you want to stage/commit WP core files
-# you can delete this whole section/until Configuration.
-/wp-admin/
-/wp-content/index.php
-/wp-content/languages
-/wp-content/plugins/index.php
-/wp-content/themes/index.php
-/wp-includes/
-/index.php
-/license.txt
-/readme.html
-/wp-*.php
-/xmlrpc.php
+# ===== Development & Debug Files =====
+/tools/
+/sql/
+*debug*.php
+*diagnose*.php
+*fix-*.php
+*fix-*.sh
+*fix-*.sql
+test-*.php
+test-*.sh
+/testing/
 
-# Configuration
+# ===== Security & Credentials =====
+*credentials*
+*password*
+*.env
+.env.*
 wp-config.php
+wp-config-local.php
+.claude/settings.local.json
 
-# Example themes
-/wp-content/themes/twenty*/
+# ===== Temporary Files & Directories =====
+/_trash*/
+/tmp/
+/temp/
+*.session
+*.cache
 
-# Example plugin
-/wp-content/plugins/hello.php
+# ===== Backup Files =====
+*.backup
+*.bak
+*.old
+*backup*.sql
+*backup*.php
+backup-*/
+/archived/
+/deprecated/
+*-deprecated.*
 
-# Uploads
-/wp-content/uploads/
+# ===== Database Files =====
+*.sql
+*.dump
+*.mysql
 
-# Log files
+# ===== Log Files =====
 *.log
+debug.log
+error.log
 
-# htaccess
-/.htaccess
+# ===== IDE & System Files =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
 
-# All plugins
-#
-# Note: If you wish to whitelist plugins,
-# uncomment the next line
-#/wp-content/plugins
+# ===== Scripts & Executables =====
+*.ps1
+*.bat
+cleanup-*.sh
+scripts/*credentials*
+scripts/*production*.sh
+scripts/fix-*.sh
 
-# All themes
-#
-# Note: If you wish to whitelist themes,
-# uncomment the next line
-#/wp-content/themes
+# ===== Data & Sample Files =====
+sample-*.csv
+test-*.csv
+/data/templates/
+
+# ===== Documentation Exceptions =====
+# Keep important documentation
+!docs/*.md
+!README.md
+!CHANGELOG.md
+
+# But exclude sensitive docs
+docs/*fix*.sql
+docs/*USERNAME_FIX_GUIDE*
+docs/archive/
+
+# ===== Directory Exclusions =====
+
+/report/
+/Photos_candidates/
+
+# ===== Core Plugin Files (Keep These) =====
+!mobility-trailblazers.php
+!includes/
+!assets/
+!templates/
+!languages/
+
+
+.internal/
+mobility-trailblazers.zip
+/Exemple old css
+DEPLOYMENT-PLAN.md
+
+# ===== Playwright Test Files & Credentials =====
+tests/reports/
+tests/.auth/
+tests/**/*.webm
+tests/**/*.png
+tests/config/.env.test
+tests/config/.env.test.local
+
+# Test result files
+
+tests/reports/**
+
+# Environment files with credentials
+.env.test
+.env.test.local
+tests/config/.env.test
+tests/config/.env.test.local
+.env.local
+.env.production
+.env.staging
+
+# ===== Node.js Dependencies =====
+node_modules/
+package-lock.json
+
+
+# ===== CSS Backup Files =====
+/css backup/
+css-backup/
+*css*.backup
+*css*.bak
+*.css.backup*
+*.css.bak*
+css-nuclear-backup*.tar.gz
+css-nuclear-backup*.zip
+*-backup-*.css
+performance-report-*.txt
+mt_ranking_prototype*.html
+
+# ===== Backup Directories (Added 2025-08-26) =====
+/backups/
+/.internal/backups/
+**/css-backup*/
+**/v3/
+*-deprecated/
+
+# ===== Miscellaneous Files =====
+templates.zip
+cssdead.md
+redo rank table.md
+*.backup-20250825-201601
+
+# Old test directories (now cleaned up)
+test-results/
+playwright-report/
+/.playwright-mcp
+/.internal/
+/node_modules/
+/screenshots/
+/tests/
+nul
+
+# ===== Auto-generated minified files =====
+# These are generated during build/deployment, not tracked in git
+#*.min.css
+#*.min.js
+#assets/min/
+#assets/css/*.min.css
+#assets/js/*.min.js
+august-2025-daily-activities.xlsx
+/Production Files
