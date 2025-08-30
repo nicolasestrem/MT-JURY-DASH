@@ -9,6 +9,14 @@ services:
     restart: unless-stopped
     ports:
       - "${WORDPRESS_PORT:-8080}:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
     environment:
       WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST:-db}
       WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
@@ -60,6 +68,14 @@ services:
     image: wordpress:cli-php8.2
     container_name: mobility_wpcli_dev
     user: "33:33"  # www-data user
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
     depends_on:
       - db
       - wordpress
@@ -83,8 +99,17 @@ services:
     image: mariadb:11
     container_name: mobility_mariadb_dev
     restart: unless-stopped
-    ports:
-      - "${MYSQL_PORT:-3306}:3306"
+    # Database port removed - only accessible within Docker network
+    # ports:
+    #   - "${MYSQL_PORT:-3306}:3306"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     environment:
       MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MARIADB_DATABASE: ${MYSQL_DATABASE}
@@ -110,6 +135,14 @@ services:
     restart: unless-stopped
     ports:
       - "${PHPMYADMIN_PORT:-8081}:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
     environment:
       PMA_HOST: db
       PMA_PORT: 3306

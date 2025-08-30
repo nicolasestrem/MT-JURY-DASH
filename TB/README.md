@@ -5,7 +5,7 @@ This Docker configuration provides a complete WordPress development environment 
 
 ## Services
 - **WordPress** (PHP 8.2 + Apache) - Port 8080
-- **MariaDB 11** - Port 3306  
+- **MariaDB 11** - Internal only (not exposed to host)  
 - **phpMyAdmin** - Port 8081
 - **WP-CLI** - For WordPress management
 
@@ -79,8 +79,9 @@ docker-compose exec wpcli wp plugin activate mobility-trailblazers
 # Clear cache
 docker-compose exec wpcli wp cache flush
 
-# Create admin user (first time setup)
-docker-compose exec wpcli wp user create admin admin@example.com --role=administrator --user_pass=admin123
+# Create admin user (first time setup) - Use a strong password!
+# Generate a secure password: openssl rand -base64 32
+docker-compose exec wpcli wp user create admin admin@example.com --role=administrator --user_pass=$(openssl rand -base64 32)
 ```
 
 ### Access WordPress container shell
@@ -90,8 +91,8 @@ docker-compose exec wordpress bash
 
 ### Access database shell
 ```bash
-docker-compose exec db mysql -u wp_user -p
-# Password: Wp7kL9xP2qR7vN6wE3zY4uC1sA5f
+docker-compose exec db mysql -u ${MYSQL_USER} -p
+# Enter password from .env file when prompted
 ```
 
 ## Database Access
@@ -99,15 +100,15 @@ docker-compose exec db mysql -u wp_user -p
 ### phpMyAdmin
 - URL: http://localhost:8081
 - Server: db
-- Username: wp_user
-- Password: Wp7kL9xP2qR7vN6wE3zY4uC1sA5f
+- Username: See MYSQL_USER in .env file
+- Password: See MYSQL_PASSWORD in .env file
 
-### Direct MySQL Connection
-- Host: localhost
-- Port: 3306
-- Database: wordpress_db
-- Username: wp_user
-- Password: Wp7kL9xP2qR7vN6wE3zY4uC1sA5f
+### Direct MySQL Connection (from within containers only)
+- Host: db (internal hostname)
+- Port: 3306 (internal only, not exposed to host)
+- Database: See MYSQL_DATABASE in .env file
+- Username: See MYSQL_USER in .env file
+- Password: See MYSQL_PASSWORD in .env file
 
 ## Development Features
 
