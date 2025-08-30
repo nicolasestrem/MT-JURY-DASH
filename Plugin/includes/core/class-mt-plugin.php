@@ -306,6 +306,12 @@ class MT_Plugin {
             // Initialize coaching dashboard for admin users
             if (current_user_can('manage_options')) {
                 $coaching = new \MobilityTrailblazers\Admin\MT_Coaching();
+                
+                // Initialize CSS migration tool for Phase 2
+                if (class_exists('\MobilityTrailblazers\Admin\MT_CSS_Migration')) {
+                    $css_migration = new \MobilityTrailblazers\Admin\MT_CSS_Migration();
+                    $css_migration->init();
+                }
             }
         }
         
@@ -964,13 +970,20 @@ class MT_Plugin {
             MT_VERSION . '-migration'
         );
         
-        // Load consolidated emergency CSS instead of all individual files
-        wp_enqueue_style(
-            'mt-emergency-consolidated',
-            MT_PLUGIN_URL . 'assets/css/mt-emergency-consolidated-temp.css',
-            ['mt-v4-base'],
-            MT_VERSION . '-migration'
-        );
+        // Check if we should use the new CSS loader system
+        if (class_exists('\MobilityTrailblazers\Core\MT_CSS_Loader')) {
+            // Use the new component-based CSS loader for Phase 2
+            $css_loader = new \MobilityTrailblazers\Core\MT_CSS_Loader();
+            $css_loader->init();
+        } else {
+            // Fallback to Phase 2 consolidated CSS
+            wp_enqueue_style(
+                'mt-phase2-consolidated',
+                MT_PLUGIN_URL . 'assets/css/mt-phase2-consolidated.css',
+                ['mt-v4-base'],
+                MT_VERSION . '-phase2'
+            );
+        }
         
         // Add performance monitoring if enabled
         if (defined('MT_CSS_PERFORMANCE_MONITOR') && MT_CSS_PERFORMANCE_MONITOR) {

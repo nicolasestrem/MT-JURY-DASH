@@ -1,0 +1,298 @@
+/**
+ * MT Assignments Table Component - BEM Architecture
+ * 
+ * Block: mt-assignments-table
+ * Elements: __wrapper, __header, __body, __row, __cell, __actions, __filters
+ * Modifiers: --striped, --hoverable, --compact, --responsive
+ * 
+ * NO !important declarations - using CSS layers and proper specificity
+ */
+
+@layer components {
+    /* Block: Main table wrapper */
+    .mt-assignments-table {
+        width: 100%;
+        background: var(--mt-bg-base);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Element: Table wrapper for scroll */
+    .mt-assignments-table__wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Element: Table element */
+    .mt-assignments-table__table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+    }
+
+    /* Element: Table header */
+    .mt-assignments-table__header {
+        background: linear-gradient(135deg, var(--mt-primary) 0%, var(--mt-secondary) 100%);
+    }
+
+    /* Element: Header row */
+    .mt-assignments-table__header-row {
+        border-bottom: 2px solid var(--mt-blue-accent);
+    }
+
+    /* Element: Header cell */
+    .mt-assignments-table__header-cell {
+        padding: 15px;
+        text-align: left;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    /* Sortable header cells */
+    .mt-assignments-table__header-cell--sortable {
+        cursor: pointer;
+        position: relative;
+        padding-right: 25px;
+        user-select: none;
+    }
+
+    .mt-assignments-table__header-cell--sortable::after {
+        content: '↕';
+        position: absolute;
+        right: 10px;
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+    }
+
+    .mt-assignments-table__header-cell--sortable:hover::after {
+        opacity: 1;
+    }
+
+    .mt-assignments-table__header-cell--sorted-asc::after {
+        content: '↑';
+        opacity: 1;
+    }
+
+    .mt-assignments-table__header-cell--sorted-desc::after {
+        content: '↓';
+        opacity: 1;
+    }
+
+    /* Element: Table body */
+    .mt-assignments-table__body {
+        background: white;
+    }
+
+    /* Element: Body row */
+    .mt-assignments-table__row {
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.2s ease;
+    }
+
+    .mt-assignments-table__row:last-child {
+        border-bottom: none;
+    }
+
+    /* Element: Body cell */
+    .mt-assignments-table__cell {
+        padding: 12px 15px;
+        font-size: 14px;
+        color: var(--mt-body-text);
+        vertical-align: middle;
+    }
+
+    /* Cell variations */
+    .mt-assignments-table__cell--primary {
+        font-weight: 600;
+        color: var(--mt-primary);
+    }
+
+    .mt-assignments-table__cell--numeric {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .mt-assignments-table__cell--center {
+        text-align: center;
+    }
+
+    .mt-assignments-table__cell--status {
+        text-align: center;
+    }
+
+    /* Status badges within cells */
+    .mt-assignments-table__badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .mt-assignments-table__badge--assigned {
+        background: #e7f3ff;
+        color: #0066cc;
+    }
+
+    .mt-assignments-table__badge--completed {
+        background: #e6f4ea;
+        color: #188038;
+    }
+
+    .mt-assignments-table__badge--pending {
+        background: #fef7e0;
+        color: #b05000;
+    }
+
+    .mt-assignments-table__badge--overdue {
+        background: #fce8e6;
+        color: #c5221f;
+    }
+
+    /* Element: Actions container */
+    .mt-assignments-table__actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+    }
+
+    /* Action buttons */
+    .mt-assignments-table__action {
+        padding: 4px 8px;
+        background: transparent;
+        border: 1px solid var(--mt-blue-accent);
+        border-radius: 4px;
+        color: var(--mt-primary);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .mt-assignments-table__action:hover {
+        background: var(--mt-primary);
+        color: white;
+        border-color: var(--mt-primary);
+    }
+
+    .mt-assignments-table__action--delete {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .mt-assignments-table__action--delete:hover {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+
+    /* Element: Empty state */
+    .mt-assignments-table__empty {
+        padding: 40px;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .mt-assignments-table__empty-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+
+    .mt-assignments-table__empty-text {
+        font-size: 16px;
+        margin: 0;
+    }
+
+    /* Modifiers */
+    .mt-assignments-table--striped .mt-assignments-table__row:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    .mt-assignments-table--hoverable .mt-assignments-table__row:hover {
+        background: #f1f3f5;
+    }
+
+    .mt-assignments-table--compact .mt-assignments-table__cell,
+    .mt-assignments-table--compact .mt-assignments-table__header-cell {
+        padding: 8px 12px;
+    }
+
+    /* Responsive behavior */
+    @media (max-width: 768px) {
+        .mt-assignments-table__wrapper {
+            margin: 0 -15px;
+        }
+
+        .mt-assignments-table__header-cell,
+        .mt-assignments-table__cell {
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .mt-assignments-table__actions {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mt-assignments-table__action {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Hide less important columns on mobile */
+        .mt-assignments-table__cell--hide-mobile,
+        .mt-assignments-table__header-cell--hide-mobile {
+            display: none;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .mt-assignments-table__header-cell,
+        .mt-assignments-table__cell {
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .mt-assignments-table__badge {
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+    }
+
+    /* Loading state */
+    .mt-assignments-table--loading {
+        position: relative;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .mt-assignments-table--loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--mt-primary);
+        border-radius: 50%;
+        animation: mt-spin 1s linear infinite;
+    }
+
+    @keyframes mt-spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+}

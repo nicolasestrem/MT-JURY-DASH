@@ -1,0 +1,381 @@
+/**
+ * Mobility Trailblazers CSS Framework v4
+ * Base styles and CSS reset for Phase 2 architecture
+ * 
+ * This file provides the foundation for the BEM component system
+ * Uses CSS cascade layers for proper specificity management
+ */
+
+/* Reset Layer - Normalize browser defaults */
+@layer reset {
+    *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    
+    html {
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
+    
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.6;
+        color: var(--mt-body-text);
+        background-color: var(--mt-bg-base);
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        margin: 0;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    
+    p {
+        margin: 0 0 1rem;
+    }
+    
+    a {
+        color: var(--mt-secondary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    a:hover {
+        color: var(--mt-primary);
+    }
+    
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    button {
+        cursor: pointer;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+    
+    input, textarea, select {
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+}
+
+/* Base Layer - Design tokens and fundamentals */
+@layer base {
+    :root {
+        /* Primary Brand Colors */
+        --mt-primary: #003C3D;
+        --mt-secondary: #004C5F;
+        --mt-accent: #C1693C;
+        --mt-kupfer-bold: #AA4E2C;
+        
+        /* Status Colors */
+        --mt-success: #27ae60;
+        --mt-warning: #f39c12;
+        --mt-error: #e74c3c;
+        --mt-info: #3498db;
+        
+        /* Neutral Colors */
+        --mt-body-text: #302C37;
+        --mt-body-text-light: #666666;
+        --mt-bg-base: #ffffff;
+        --mt-bg-light: #f8f9fa;
+        --mt-bg-dark: #f1f3f5;
+        --mt-border-light: #e9ecef;
+        --mt-border-base: #dee2e6;
+        --mt-blue-accent: #e0f2f7;
+        
+        /* Typography Scale */
+        --mt-text-xs: 0.75rem;
+        --mt-text-sm: 0.875rem;
+        --mt-text-base: 1rem;
+        --mt-text-lg: 1.125rem;
+        --mt-text-xl: 1.25rem;
+        --mt-text-2xl: 1.5rem;
+        --mt-text-3xl: 1.875rem;
+        --mt-text-4xl: 2.25rem;
+        
+        /* Spacing Scale */
+        --mt-space-xs: 0.25rem;
+        --mt-space-sm: 0.5rem;
+        --mt-space-md: 1rem;
+        --mt-space-lg: 1.5rem;
+        --mt-space-xl: 2rem;
+        --mt-space-2xl: 3rem;
+        --mt-space-3xl: 4rem;
+        
+        /* Border Radius */
+        --mt-radius-sm: 0.25rem;
+        --mt-radius-base: 0.5rem;
+        --mt-radius-lg: 0.75rem;
+        --mt-radius-xl: 1rem;
+        --mt-radius-full: 9999px;
+        
+        /* Shadows */
+        --mt-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --mt-shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --mt-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --mt-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --mt-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        
+        /* Transitions */
+        --mt-transition-fast: 150ms ease;
+        --mt-transition-base: 300ms ease;
+        --mt-transition-slow: 500ms ease;
+        --mt-transition: all var(--mt-transition-base);
+        
+        /* Z-index Scale */
+        --mt-z-dropdown: 1000;
+        --mt-z-sticky: 1020;
+        --mt-z-fixed: 1030;
+        --mt-z-modal-backdrop: 1040;
+        --mt-z-modal: 1050;
+        --mt-z-popover: 1060;
+        --mt-z-tooltip: 1070;
+    }
+    
+    /* Base Typography */
+    body {
+        font-size: var(--mt-text-base);
+        font-weight: 400;
+    }
+    
+    h1 {
+        font-size: var(--mt-text-4xl);
+        margin-bottom: var(--mt-space-lg);
+    }
+    
+    h2 {
+        font-size: var(--mt-text-3xl);
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    h3 {
+        font-size: var(--mt-text-2xl);
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    h4 {
+        font-size: var(--mt-text-xl);
+        margin-bottom: var(--mt-space-sm);
+    }
+    
+    h5 {
+        font-size: var(--mt-text-lg);
+        margin-bottom: var(--mt-space-sm);
+    }
+    
+    h6 {
+        font-size: var(--mt-text-base);
+        margin-bottom: var(--mt-space-sm);
+    }
+}
+
+/* Layout Layer - Grid and container systems */
+@layer layout {
+    .mt-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 var(--mt-space-md);
+    }
+    
+    .mt-grid {
+        display: grid;
+        gap: var(--mt-space-md);
+    }
+    
+    .mt-grid--2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mt-grid--3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .mt-grid--4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .mt-flex {
+        display: flex;
+    }
+    
+    .mt-flex--center {
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .mt-flex--between {
+        justify-content: space-between;
+    }
+    
+    .mt-flex--wrap {
+        flex-wrap: wrap;
+    }
+    
+    /* Responsive Grid */
+    @media (max-width: 768px) {
+        .mt-grid--2,
+        .mt-grid--3,
+        .mt-grid--4 {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .mt-grid--3,
+        .mt-grid--4 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+/* Utilities Layer - Helper classes */
+@layer utilities {
+    /* Display Utilities */
+    .mt-hidden {
+        display: none;
+    }
+    
+    .mt-block {
+        display: block;
+    }
+    
+    .mt-inline-block {
+        display: inline-block;
+    }
+    
+    /* Text Utilities */
+    .mt-text-center {
+        text-align: center;
+    }
+    
+    .mt-text-left {
+        text-align: left;
+    }
+    
+    .mt-text-right {
+        text-align: right;
+    }
+    
+    .mt-font-bold {
+        font-weight: 600;
+    }
+    
+    .mt-font-normal {
+        font-weight: 400;
+    }
+    
+    /* Color Utilities */
+    .mt-text-primary {
+        color: var(--mt-primary);
+    }
+    
+    .mt-text-secondary {
+        color: var(--mt-secondary);
+    }
+    
+    .mt-text-accent {
+        color: var(--mt-accent);
+    }
+    
+    .mt-text-success {
+        color: var(--mt-success);
+    }
+    
+    .mt-text-error {
+        color: var(--mt-error);
+    }
+    
+    .mt-text-warning {
+        color: var(--mt-warning);
+    }
+    
+    /* Background Utilities */
+    .mt-bg-primary {
+        background-color: var(--mt-primary);
+    }
+    
+    .mt-bg-secondary {
+        background-color: var(--mt-secondary);
+    }
+    
+    .mt-bg-accent {
+        background-color: var(--mt-accent);
+    }
+    
+    .mt-bg-light {
+        background-color: var(--mt-bg-light);
+    }
+    
+    .mt-bg-dark {
+        background-color: var(--mt-bg-dark);
+    }
+    
+    /* Spacing Utilities */
+    .mt-m-0 { margin: 0; }
+    .mt-m-xs { margin: var(--mt-space-xs); }
+    .mt-m-sm { margin: var(--mt-space-sm); }
+    .mt-m-md { margin: var(--mt-space-md); }
+    .mt-m-lg { margin: var(--mt-space-lg); }
+    .mt-m-xl { margin: var(--mt-space-xl); }
+    
+    .mt-p-0 { padding: 0; }
+    .mt-p-xs { padding: var(--mt-space-xs); }
+    .mt-p-sm { padding: var(--mt-space-sm); }
+    .mt-p-md { padding: var(--mt-space-md); }
+    .mt-p-lg { padding: var(--mt-space-lg); }
+    .mt-p-xl { padding: var(--mt-space-xl); }
+    
+    /* Border Utilities */
+    .mt-border {
+        border: 1px solid var(--mt-border-base);
+    }
+    
+    .mt-border-none {
+        border: none;
+    }
+    
+    .mt-rounded {
+        border-radius: var(--mt-radius-base);
+    }
+    
+    .mt-rounded-lg {
+        border-radius: var(--mt-radius-lg);
+    }
+    
+    .mt-rounded-full {
+        border-radius: var(--mt-radius-full);
+    }
+    
+    /* Shadow Utilities */
+    .mt-shadow {
+        box-shadow: var(--mt-shadow-base);
+    }
+    
+    .mt-shadow-sm {
+        box-shadow: var(--mt-shadow-sm);
+    }
+    
+    .mt-shadow-lg {
+        box-shadow: var(--mt-shadow-lg);
+    }
+    
+    .mt-shadow-none {
+        box-shadow: none;
+    }
+}
+
+/* Components Layer - Placeholder for BEM components */
+@layer components {
+    /* BEM components are loaded separately */
+}
