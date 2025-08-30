@@ -41,7 +41,7 @@ foreach ($deprecated_options as $option_name) {
     $current_value = get_option($option_name);
     
     if ($current_value !== false) {
-        echo "Found option: {$option_name} = " . print_r($current_value, true) . "\n";
+        echo "Found option: {$option_name} = " . (is_array($current_value) ? '[array]' : $current_value) . "\n";
         
         if (delete_option($option_name)) {
             echo "  ✓ Successfully removed\n";

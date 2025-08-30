@@ -381,8 +381,7 @@ class MT_Shortcode_Renderer {
         $primary_color = $settings['primary_color'] ?? '#667eea';
         $secondary_color = $settings['secondary_color'] ?? '#764ba2';
         
-        // DEBUG: Log what settings we're getting
-        error_log('MT DEBUG: Dashboard settings: ' . print_r($settings, true));
+        // Settings loaded for custom CSS generation
         
         $css = "
         .mt-dashboard-header.mt-header-gradient {

@@ -1,0 +1,238 @@
+{
+  "timestamp": "2025-08-30T20:53:20.015Z",
+  "totalFiles": 38,
+  "totalOriginalSize": 395.15999999999997,
+  "totalMinifiedSize": 259.70000000000005,
+  "totalSavings": 34.28,
+  "targetAchieved": false,
+  "files": [
+    {
+      "original": 42.65,
+      "minified": 30.77,
+      "savings": 27.85,
+      "path": "admin.css"
+    },
+    {
+      "original": 3.64,
+      "minified": 1.91,
+      "savings": 47.53,
+      "path": "components\\card\\mt-candidate-card.css"
+    },
+    {
+      "original": 6.96,
+      "minified": 4.06,
+      "savings": 41.67,
+      "path": "components\\dashboard\\mt-dashboard-widget.css"
+    },
+    {
+      "original": 5.89,
+      "minified": 3.33,
+      "savings": 43.46,
+      "path": "components\\form\\mt-evaluation-form.css"
+    },
+    {
+      "original": 7.91,
+      "minified": 4.45,
+      "savings": 43.74,
+      "path": "components\\notification\\mt-notification.css"
+    },
+    {
+      "original": 7.99,
+      "minified": 4.6,
+      "savings": 42.43,
+      "path": "components\\stats\\mt-jury-stats.css"
+    },
+    {
+      "original": 7.12,
+      "minified": 4.2,
+      "savings": 41.01,
+      "path": "components\\table\\mt-assignments-table.css"
+    },
+    {
+      "original": 3.91,
+      "minified": 2.68,
+      "savings": 31.46,
+      "path": "csv-import.css"
+    },
+    {
+      "original": 24.48,
+      "minified": 16.09,
+      "savings": 34.27,
+      "path": "enhanced-candidate-profile.css"
+    },
+    {
+      "original": 8.33,
+      "minified": 4.71,
+      "savings": 43.46,
+      "path": "framework\\mobility-trailblazers-framework-v4.css"
+    },
+    {
+      "original": 3.23,
+      "minified": 2.08,
+      "savings": 35.6,
+      "path": "framework\\mt-base.css"
+    },
+    {
+      "original": 1.06,
+      "minified": 0.51,
+      "savings": 51.89,
+      "path": "framework\\mt-reset.css"
+    },
+    {
+      "original": 11.9,
+      "minified": 7.44,
+      "savings": 37.48,
+      "path": "frontend-new.css"
+    },
+    {
+      "original": 20.19,
+      "minified": 13.87,
+      "savings": 31.3,
+      "path": "jury-dashboard.css"
+    },
+    {
+      "original": 10.1,
+      "minified": 6.04,
+      "savings": 40.2,
+      "path": "mt-brand-alignment.css"
+    },
+    {
+      "original": 13.45,
+      "minified": 8.25,
+      "savings": 38.66,
+      "path": "mt-brand-fixes.css"
+    },
+    {
+      "original": 17.49,
+      "minified": 11.14,
+      "savings": 36.31,
+      "path": "mt-candidate-cards-v3.css"
+    },
+    {
+      "original": 12.01,
+      "minified": 7.89,
+      "savings": 34.3,
+      "path": "mt-candidate-grid.css"
+    },
+    {
+      "original": 21.14,
+      "minified": 15.62,
+      "savings": 26.11,
+      "path": "mt-components.css"
+    },
+    {
+      "original": 4,
+      "minified": 2.65,
+      "savings": 33.75,
+      "path": "mt-evaluation-fixes.css"
+    },
+    {
+      "original": 22.46,
+      "minified": 15.55,
+      "savings": 30.77,
+      "path": "mt-evaluation-forms.css"
+    },
+    {
+      "original": 27.82,
+      "minified": 15.61,
+      "savings": 43.89,
+      "path": "mt-hotfixes-consolidated.css"
+    },
+    {
+      "original": 33.81,
+      "minified": 24.27,
+      "savings": 28.22,
+      "path": "mt-jury-dashboard-enhanced.css"
+    },
+    {
+      "original": 20.36,
+      "minified": 13.66,
+      "savings": 32.91,
+      "path": "mt-phase2-consolidated.css"
+    },
+    {
+      "original": 7.84,
+      "minified": 4.64,
+      "savings": 40.82,
+      "path": "mt-rankings-v2.css"
+    },
+    {
+      "original": 7.51,
+      "minified": 4,
+      "savings": 46.74,
+      "path": "mt-variables.css"
+    },
+    {
+      "original": 0.26,
+      "minified": 0.1,
+      "savings": 61.54,
+      "path": "v3\\mt-compat.css"
+    },
+    {
+      "original": 4.44,
+      "minified": 2.71,
+      "savings": 38.96,
+      "path": "v3\\mt-jury-evaluation-cards.css"
+    },
+    {
+      "original": 0.42,
+      "minified": 0.27,
+      "savings": 35.71,
+      "path": "v3\\mt-reset.css"
+    },
+    {
+      "original": 1.91,
+      "minified": 0.32,
+      "savings": 83.25,
+      "path": "v3\\mt-tokens.css"
+    },
+    {
+      "original": 3.07,
+      "minified": 1.96,
+      "savings": 36.16,
+      "path": "v3\\mt-visual-tune.css"
+    },
+    {
+      "original": 2.32,
+      "minified": 1.62,
+      "savings": 30.17,
+      "path": "v3\\mt-widget-candidates-grid.css"
+    },
+    {
+      "original": 0.65,
+      "minified": 0.48,
+      "savings": 26.15,
+      "path": "v3\\mt-widget-jury-dashboard.css"
+    },
+    {
+      "original": 4.96,
+      "minified": 3.99,
+      "savings": 19.56,
+      "path": "v4\\mt-base.css"
+    },
+    {
+      "original": 14,
+      "minified": 10.7,
+      "savings": 23.57,
+      "path": "v4\\mt-components.css"
+    },
+    {
+      "original": 6.52,
+      "minified": 5.13,
+      "savings": 21.32,
+      "path": "v4\\mt-pages.css"
+    },
+    {
+      "original": 1.73,
+      "minified": 1.25,
+      "savings": 27.75,
+      "path": "v4\\mt-reset.css"
+    },
+    {
+      "original": 1.63,
+      "minified": 1.15,
+      "savings": 29.45,
+      "path": "v4\\mt-tokens.css"
+    }
+  ]
+}

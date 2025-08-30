@@ -7,10 +7,10 @@
 (function($) {
     'use strict';
     
-    console.log('MT Jury Filters Script Loaded');
+    // MT Jury Filters Script Initialized
     
     $(document).ready(function() {
-        console.log('MT Jury Filters - jQuery Ready');
+        // jQuery DOM ready handler initialized
         
         // Filter candidates based on search, status, and category
         function filterDashboardCandidates() {
@@ -20,7 +20,7 @@
             var visibleCount = 0;
             var totalCandidates = $('.mt-candidate-card').length;
             
-            console.log('Filter called - Search:', searchTerm, 'Status:', statusFilter, 'Category:', categoryFilter, 'Total cards:', totalCandidates);
+            // Apply filtering logic
             
             $('.mt-candidate-card').each(function() {
                 var $card = $(this);
@@ -52,7 +52,7 @@
                 }
             });
             
-            console.log('Filter complete - Visible:', visibleCount);
+            // Filter processing complete
             
             // Show/hide no results message
             if (visibleCount === 0 && (searchTerm !== '' || statusFilter !== '' || categoryFilter !== 'all')) {
@@ -82,7 +82,7 @@
         // Search functionality with debounce
         let searchTimer;
         $('#mt-candidate-search').on('input', function() {
-            console.log('Search input changed:', $(this).val());
+            // Search input event handled
             clearTimeout(searchTimer);
             searchTimer = setTimeout(function() {
                 filterDashboardCandidates();
@@ -92,14 +92,14 @@
         // Status filter
         $('#mt-status-filter').on('change', function(e) {
             e.preventDefault();
-            console.log('Status filter changed to:', $(this).val());
+            // Status filter changed
             filterDashboardCandidates();
         });
         
         // Category filter dropdown
         $('#mt-category-filter').on('change', function(e) {
             e.preventDefault();
-            console.log('Category filter changed to:', $(this).val());
+            // Category filter changed
             filterDashboardCandidates();
         });
         
@@ -110,7 +110,7 @@
             window.location.href = '?evaluate=' + candidateId;
         });
         
-        console.log('MT Jury Filters - Event handlers attached');
+        // Event handlers attached successfully
     });
     
 })(jQuery);
