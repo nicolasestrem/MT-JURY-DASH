@@ -976,13 +976,40 @@ class MT_Plugin {
             $css_loader = new \MobilityTrailblazers\Core\MT_CSS_Loader();
             $css_loader->init();
         } else {
-            // Fallback to Phase 2 consolidated CSS
+            // Use Phase 3 clean CSS with zero !important (except utilities)
             wp_enqueue_style(
-                'mt-phase2-consolidated',
-                MT_PLUGIN_URL . 'assets/css/mt-phase2-consolidated.css',
+                'mt-phase3-clean',
+                MT_PLUGIN_URL . 'assets/css/mt-phase3-clean.css',
                 ['mt-v4-base'],
-                MT_VERSION . '-phase2'
+                MT_VERSION . '-phase3'
             );
+            
+            // Load BEM components
+            $components_url = MT_PLUGIN_URL . 'assets/css/components/';
+            
+            // Load all BEM components
+            $components = [
+                'card/mt-candidate-card',
+                'dashboard/mt-dashboard-widget',
+                'form/mt-evaluation-form',
+                'notification/mt-notification',
+                'stats/mt-jury-stats',
+                'table/mt-assignments-table',
+                'navigation/mt-navigation',
+                'modal/mt-modal',
+                'pagination/mt-pagination',
+                'loader/mt-loader'
+            ];
+            
+            foreach ($components as $component) {
+                $handle = 'mt-component-' . basename($component);
+                wp_enqueue_style(
+                    $handle,
+                    $components_url . $component . '.css',
+                    ['mt-phase3-clean'],
+                    MT_VERSION . '-phase3'
+                );
+            }
         }
         
         // Add performance monitoring if enabled
