@@ -57,7 +57,6 @@ jobs:
           #   Follow our coding standards
           #   Ensure all new code has tests
           #   Use TypeScript for new files
-           
           # Optional: Custom environment variables for Claude
           # claude_env: |
           #   NODE_ENV: test
