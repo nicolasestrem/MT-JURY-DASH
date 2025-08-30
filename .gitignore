@@ -18,6 +18,7 @@ test-*.sh
 *password*
 *.env
 .env.*
+!.env.example
 wp-config.php
 wp-config-local.php
 .claude/settings.local.json
