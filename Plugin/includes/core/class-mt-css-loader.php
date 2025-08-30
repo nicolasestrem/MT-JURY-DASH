@@ -175,6 +175,16 @@ class MT_CSS_Loader {
      * Enqueue a single component
      */
     private function enqueue_component($handle, $component) {
+        // Validate file exists before enqueueing
+        $file_path = MT_PLUGIN_DIR . 'assets/css/' . $component['file'];
+        if (!file_exists($file_path)) {
+            // Log error but don't break the site
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("MT CSS Loader: Missing CSS file - " . $component['file']);
+            }
+            return;
+        }
+        
         $handle = 'mt-' . $handle;
         $url = MT_PLUGIN_URL . 'assets/css/' . $component['file'];
         

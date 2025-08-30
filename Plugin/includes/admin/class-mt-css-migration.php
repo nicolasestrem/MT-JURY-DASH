@@ -251,6 +251,11 @@ class MT_CSS_Migration {
     public function ajax_test_component() {
         check_ajax_referer('mt_css_test', 'nonce');
         
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized access');
+            exit;
+        }
+        
         ob_start();
         ?>
         <div class="component-test-results">
@@ -287,6 +292,11 @@ class MT_CSS_Migration {
      */
     public function ajax_get_stats() {
         check_ajax_referer('mt_css_stats', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized access');
+            exit;
+        }
         
         $stats = "CSS Statistics Report\n";
         $stats .= "====================\n\n";
