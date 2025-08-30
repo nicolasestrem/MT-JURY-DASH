@@ -127,10 +127,11 @@ class MT_CSS_Loader {
         if ($this->version === self::CSS_VERSION_PHASE2) {
             $this->load_components('frontend');
         } else {
-            // Load legacy consolidated CSS
+            // Load legacy consolidated CSS (minified in production)
+            $css_file = $this->get_optimized_css_file('mt-phase2-consolidated.css');
             wp_enqueue_style(
                 'mt-phase2-consolidated',
-                MT_PLUGIN_URL . 'assets/css/mt-phase2-consolidated.css',
+                MT_PLUGIN_URL . 'assets/css/' . $css_file,
                 [],
                 MT_VERSION
             );
@@ -144,10 +145,11 @@ class MT_CSS_Loader {
         if ($this->version === self::CSS_VERSION_PHASE2) {
             $this->load_components('admin');
         } else {
-            // Load legacy consolidated CSS
+            // Load legacy consolidated CSS (minified in production)
+            $css_file = $this->get_optimized_css_file('mt-phase2-consolidated.css');
             wp_enqueue_style(
                 'mt-phase2-consolidated',
-                MT_PLUGIN_URL . 'assets/css/mt-phase2-consolidated.css',
+                MT_PLUGIN_URL . 'assets/css/' . $css_file,
                 [],
                 MT_VERSION
             );
@@ -175,18 +177,27 @@ class MT_CSS_Loader {
      * Enqueue a single component
      */
     private function enqueue_component($handle, $component) {
+        // Get the appropriate CSS file (minified in production, regular in development)
+        $css_file = $this->get_optimized_css_file($component['file']);
+        
         // Validate file exists before enqueueing
-        $file_path = MT_PLUGIN_DIR . 'assets/css/' . $component['file'];
+        $file_path = MT_PLUGIN_DIR . 'assets/css/' . $css_file;
         if (!file_exists($file_path)) {
-            // Log error but don't break the site
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("MT CSS Loader: Missing CSS file - " . $component['file']);
+            // Fallback to original file if minified version doesn't exist
+            $css_file = $component['file'];
+            $file_path = MT_PLUGIN_DIR . 'assets/css/' . $css_file;
+            
+            if (!file_exists($file_path)) {
+                // Log error but don't break the site
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("MT CSS Loader: Missing CSS file - " . $component['file']);
+                }
+                return;
             }
-            return;
         }
         
         $handle = 'mt-' . $handle;
-        $url = MT_PLUGIN_URL . 'assets/css/' . $component['file'];
+        $url = MT_PLUGIN_URL . 'assets/css/' . $css_file;
         
         wp_enqueue_style(
             $handle,
@@ -195,6 +206,22 @@ class MT_CSS_Loader {
             $component['version'],
             $component['media']
         );
+    }
+    
+    /**
+     * Get optimized CSS file path (minified in production, regular in development)
+     */
+    private function get_optimized_css_file($original_file) {
+        // Use minified version when not in debug mode
+        $use_minified = !defined('WP_DEBUG') || !WP_DEBUG;
+        
+        if ($use_minified) {
+            // Convert file.css to file.min.css
+            $minified_file = str_replace('.css', '.min.css', $original_file);
+            return $minified_file;
+        }
+        
+        return $original_file;
     }
     
     /**

@@ -475,7 +475,7 @@ class MT_Plugin {
         // Core CSS Variables (loaded first)
         wp_enqueue_style(
             'mt-variables',
-            MT_PLUGIN_URL . 'assets/css/mt-variables.css',
+            $this->get_optimized_css_url('mt-variables.css'),
             [],
             MT_VERSION
         );
@@ -483,7 +483,7 @@ class MT_Plugin {
         // Component Library (loaded second)
         wp_enqueue_style(
             'mt-components',
-            MT_PLUGIN_URL . 'assets/css/mt-components.css',
+            $this->get_optimized_css_url('mt-components.css'),
             ['mt-variables'],
             MT_VERSION
         );
@@ -515,7 +515,7 @@ class MT_Plugin {
         // Jury Dashboard Enhanced Module
         wp_enqueue_style(
             'mt-jury-dashboard-enhanced',
-            MT_PLUGIN_URL . 'assets/css/mt-jury-dashboard-enhanced.css',
+            $this->get_optimized_css_url('mt-jury-dashboard-enhanced.css'),
             ['mt-variables', 'mt-components'],
             MT_VERSION
         );
@@ -611,7 +611,7 @@ class MT_Plugin {
         // IMPORTANT: Loaded after v3 CSS to provide targeted fixes without breaking v3 design
         wp_enqueue_style(
             'mt-hotfixes-consolidated',
-            MT_PLUGIN_URL . 'assets/css/mt-hotfixes-consolidated.css',
+            $this->get_optimized_css_url('mt-hotfixes-consolidated.css'),
             ['mt-candidate-cards-v3'],
             MT_VERSION
         );
@@ -793,7 +793,7 @@ class MT_Plugin {
         // Core CSS Variables (loaded first)
         wp_enqueue_style(
             'mt-variables',
-            MT_PLUGIN_URL . 'assets/css/mt-variables.css',
+            $this->get_optimized_css_url('mt-variables.css'),
             [],
             MT_VERSION
         );
@@ -801,7 +801,7 @@ class MT_Plugin {
         // Component Library (loaded second)
         wp_enqueue_style(
             'mt-components',
-            MT_PLUGIN_URL . 'assets/css/mt-components.css',
+            $this->get_optimized_css_url('mt-components.css'),
             ['mt-variables'],
             MT_VERSION
         );
@@ -809,7 +809,7 @@ class MT_Plugin {
         // Admin Styles (includes debug center)
         wp_enqueue_style(
             'mt-admin',
-            MT_PLUGIN_URL . 'assets/css/admin.css',
+            $this->get_optimized_css_url('admin.css'),
             ['mt-variables', 'mt-components'],
             MT_VERSION
         );
@@ -1013,6 +1013,32 @@ class MT_Plugin {
             'nonce' => wp_create_nonce('mt_frontend_nonce'),
             'is_logged_in' => is_user_logged_in()
         ]);
+    }
+    
+    /**
+     * Get optimized CSS URL (minified in production, regular in development)
+     * 
+     * @since 2.5.42
+     * @param string $css_file The relative CSS file path
+     * @return string The optimized CSS URL
+     */
+    private function get_optimized_css_url($css_file) {
+        // Use minified version when not in debug mode
+        $use_minified = !defined('WP_DEBUG') || !WP_DEBUG;
+        
+        if ($use_minified) {
+            // Convert file.css to file.min.css
+            $minified_file = str_replace('.css', '.min.css', $css_file);
+            $minified_path = MT_PLUGIN_DIR . 'assets/css/' . $minified_file;
+            
+            // Only use minified version if it exists
+            if (file_exists($minified_path)) {
+                return MT_PLUGIN_URL . 'assets/css/' . $minified_file;
+            }
+        }
+        
+        // Fallback to original file
+        return MT_PLUGIN_URL . 'assets/css/' . $css_file;
     }
     
     /**
