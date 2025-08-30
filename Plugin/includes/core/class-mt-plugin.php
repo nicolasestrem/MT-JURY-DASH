@@ -403,8 +403,8 @@ class MT_Plugin {
      * @return void
      */
     public function enqueue_frontend_assets() {
-        // CSS Feature Flags Support (Phase 3 Complete - Updated 2025-08-30)
-        $css_version = get_option('mt_css_version', 'phase3');
+        // CSS Feature Flags Support (Phase 1 Stabilization - Added 2025-08-30)
+        $css_version = defined('MT_CSS_VERSION') ? MT_CSS_VERSION : 'legacy';
         $css_debug = defined('MT_CSS_DEBUG') && MT_CSS_DEBUG;
         $force_legacy = defined('MT_CSS_FORCE_LEGACY') && MT_CSS_FORCE_LEGACY;
         
@@ -421,9 +421,9 @@ class MT_Plugin {
             });
         }
         
-        // Handle Phase 3 mode - load clean CSS with zero !important
-        if ($css_version === 'phase3' || $css_version === 'migration') {
-            $this->load_phase3_css();
+        // Handle migration mode - load consolidated CSS and return early
+        if ($css_version === 'migration') {
+            $this->load_migration_css();
             $this->enqueue_common_scripts();
             return;
         }
@@ -940,52 +940,48 @@ class MT_Plugin {
     }
     
     /**
-     * Load Phase 3 CSS with zero !important architecture
+     * Load migration CSS (Phase 1 consolidated emergency files)
      * 
      * @since 2.5.42
      * @return void
      */
-    private function load_phase3_css() {
-        // Load unified tokens first (now with standardized variables)
+    private function load_migration_css() {
+        // Load v4 base framework first
+        $v4_base_url = MT_PLUGIN_URL . 'assets/css/v4/';
+        
         wp_enqueue_style(
             'mt-v4-tokens',
-            MT_PLUGIN_URL . 'assets/css/v4/mt-tokens.css',
+            $v4_base_url . 'mt-tokens.css',
             [],
-            MT_VERSION . '-phase3'
+            MT_VERSION . '-migration'
         );
         
-        // Load Phase 3 refactored CSS with all styles and zero !important
         wp_enqueue_style(
-            'mt-phase3-refactored',
-            MT_PLUGIN_URL . 'assets/css/mt-phase3-refactored.css',
+            'mt-v4-reset',
+            $v4_base_url . 'mt-reset.css',
             ['mt-v4-tokens'],
-            MT_VERSION . '-phase3'
+            MT_VERSION . '-migration'
         );
         
-        // Load BEM components
-        $components_url = MT_PLUGIN_URL . 'assets/css/components/';
+        wp_enqueue_style(
+            'mt-v4-base',
+            $v4_base_url . 'mt-base.css',
+            ['mt-v4-reset'],
+            MT_VERSION . '-migration'
+        );
         
-        // Load all BEM components (10 total from Phase 2 and 3)
-        $components = [
-            'card/mt-candidate-card',
-            'dashboard/mt-dashboard-widget',
-            'form/mt-evaluation-form',
-            'notification/mt-notification',
-            'stats/mt-jury-stats',
-            'table/mt-assignments-table',
-            'navigation/mt-navigation',
-            'modal/mt-modal',
-            'pagination/mt-pagination',
-            'loader/mt-loader'
-        ];
-        
-        foreach ($components as $component) {
-            $handle = 'mt-component-' . basename($component);
+        // Check if we should use the new CSS loader system
+        if (class_exists('\MobilityTrailblazers\Core\MT_CSS_Loader')) {
+            // Use the new component-based CSS loader for Phase 2
+            $css_loader = new \MobilityTrailblazers\Core\MT_CSS_Loader();
+            $css_loader->init();
+        } else {
+            // Fallback to Phase 2 consolidated CSS
             wp_enqueue_style(
-                $handle,
-                $components_url . $component . '.css',
-                ['mt-phase3-refactored'],
-                MT_VERSION . '-phase3'
+                'mt-phase2-consolidated',
+                MT_PLUGIN_URL . 'assets/css/mt-phase2-consolidated.css',
+                ['mt-v4-base'],
+                MT_VERSION . '-phase2'
             );
         }
         
