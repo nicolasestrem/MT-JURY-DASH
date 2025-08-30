@@ -151,7 +151,7 @@
                 }
                 // Log submission data for debugging
                 $('.mt-score-slider').each(function() {
-    // console.log($(this).attr('name') + ': ' + $(this).val());
+                    console.log($(this).attr('name') + ': ' + $(this).val());
                 });
             });
         }
@@ -223,7 +223,7 @@
             reinitialize: initializeAllFixes,
             checkValues: function() {
                 $('.mt-score-slider').each(function() {
-    // console.log($(this).attr('name') + ': ' + $(this).val());
+                    console.log($(this).attr('name') + ': ' + $(this).val());
                 });
             }
         };

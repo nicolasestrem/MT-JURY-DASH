@@ -340,5 +340,5 @@ jQuery(document).ready(function($) {
         }, 100);
     });
     
-    // console.log('MT Evaluation Details Emergency Fix loaded successfully');
+    console.log('MT Evaluation Details Emergency Fix loaded successfully');
 });
