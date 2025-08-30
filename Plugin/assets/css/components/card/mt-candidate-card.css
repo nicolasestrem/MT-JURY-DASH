@@ -1,0 +1,157 @@
+/**
+ * MT Candidate Card Component - BEM Architecture
+ * 
+ * Block: mt-candidate-card
+ * Elements: __image, __photo, __body, __name, __meta, __action
+ * Modifiers: --featured, --disabled, --hover
+ * 
+ * NO !important declarations - using specificity and cascade layers
+ */
+
+@layer components {
+    /* Block: Main card container */
+    .mt-candidate-card {
+        background: var(--mt-bg-base);
+        border: 2px solid var(--mt-blue-accent);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: var(--mt-transition);
+        box-shadow: var(--mt-shadow-sm);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        min-height: 280px;
+        height: 100%;
+        padding: 20px;
+    }
+
+    /* Block modifier: Hover state */
+    .mt-candidate-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--mt-shadow-lg);
+        border-color: var(--mt-secondary);
+    }
+
+    /* Element: Image container */
+    .mt-candidate-card__image {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 15px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #F5F5F5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Element: Photo */
+    .mt-candidate-card__photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Element: Card body */
+    .mt-candidate-card__body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        padding: 0 10px;
+        text-align: center;
+    }
+
+    /* Element: Name */
+    .mt-candidate-card__name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--mt-primary);
+        margin: 0 0 10px 0;
+    }
+
+    /* Element: Meta information */
+    .mt-candidate-card__meta {
+        font-size: 14px;
+        color: var(--mt-body-text);
+        margin: 5px 0;
+    }
+
+    /* Element: Action button */
+    .mt-candidate-card__action {
+        display: inline-block;
+        background: var(--mt-accent);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .mt-candidate-card__action:hover {
+        background: var(--mt-kupfer-bold);
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+
+    /* Modifier: Featured card */
+    .mt-candidate-card--featured {
+        border-color: var(--mt-accent);
+        box-shadow: 0 0 0 3px rgba(193, 105, 60, 0.1);
+    }
+
+    .mt-candidate-card--featured .mt-candidate-card__name {
+        color: var(--mt-accent);
+    }
+
+    /* Modifier: Disabled card */
+    .mt-candidate-card--disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .mt-candidate-card {
+            padding: 15px;
+            min-height: 250px;
+        }
+
+        .mt-candidate-card__image {
+            width: 120px;
+            height: 120px;
+        }
+
+        .mt-candidate-card__name {
+            font-size: 15px;
+        }
+
+        .mt-candidate-card__meta {
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .mt-candidate-card {
+            padding: 15px;
+            min-height: 220px;
+        }
+
+        .mt-candidate-card__image {
+            width: 100px;
+            height: 100px;
+        }
+
+        .mt-candidate-card__action {
+            padding: 6px 16px;
+            font-size: 14px;
+        }
+    }
+}

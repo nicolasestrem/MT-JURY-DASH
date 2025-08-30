@@ -3,29 +3,45 @@
   "rules": {
     "declaration-no-important": [true, {
       "severity": "error",
-      "message": "!important declarations are prohibited. Use proper CSS specificity instead."
+      "message": "!important declarations are STRICTLY PROHIBITED. Use proper CSS specificity instead."
     }],
     "max-nesting-depth": [3, {
       "severity": "warning",
-      "message": "Nesting depth exceeds 3 levels. Consider flattening your CSS structure."
+      "message": "Nesting depth exceeds 3 levels. Consider flattening your CSS structure for better performance."
     }],
     "selector-max-id": [0, {
-      "severity": "warning",
-      "message": "ID selectors are discouraged. Use classes for better reusability."
+      "severity": "warning", 
+      "message": "ID selectors are discouraged. Use classes with BEM methodology for better maintainability."
     }],
     "selector-max-specificity": ["0,3,0", {
       "severity": "warning",
-      "message": "Selector specificity is too high. Keep it under 0,3,0."
+      "message": "Selector specificity too high (max: 0,3,0). Reduce complexity to improve maintainability."
     }],
     "selector-max-compound-selectors": [3, {
-      "severity": "warning"
+      "severity": "warning",
+      "message": "Too many compound selectors. Keep chains simple for better performance."
     }],
     "declaration-property-value-disallowed-list": {
-      "z-index": ["/^[0-9]{5,}$/"],
-      "message": "Z-index values must be below 10000 for security."
+      "z-index": ["/^[0-9]{5,}$/", "/^9[0-9]{3,}$/"],
+      "position": ["fixed"]
+    },
+    "number-max-precision": [2, {
+      "severity": "warning",
+      "message": "Decimal precision should not exceed 2 places for browser compatibility."
+    }],
+    "selector-max-universal": [1, {
+      "severity": "warning",
+      "message": "Universal selectors can impact performance. Use sparingly."
+    }],
+    "selector-max-attribute": [2, {
+      "severity": "warning", 
+      "message": "Too many attribute selectors can impact performance."
+    }],
+    "declaration-property-value-allowed-list": {
+      "z-index": ["/^[0-9]{1,4}$/", "auto", "inherit", "initial", "unset"]
     },
     "at-rule-no-unknown": [true, {
-      "ignoreAtRules": ["layer", "container"]
+      "ignoreAtRules": ["layer", "container", "supports"]
     }],
     "color-hex-length": "short",
     "color-no-invalid-hex": true,
@@ -34,17 +50,51 @@
     "string-no-newline": true,
     "unit-no-unknown": true,
     "property-no-unknown": true,
+    "length-zero-no-unit": [true, {
+      "severity": "warning"
+    }],
+    "shorthand-property-no-redundant-values": [true, {
+      "severity": "warning"
+    }],
+    "declaration-block-no-duplicate-properties": [true, {
+      "severity": "error"
+    }],
+    "declaration-block-single-line-max-declarations": [1, {
+      "severity": "warning"
+    }],
     "comment-empty-line-before": null,
     "custom-property-empty-line-before": null,
     "declaration-empty-line-before": null,
     "rule-empty-line-before": null,
-    "selector-class-pattern": "^mt-[a-z][a-z0-9-]*(__[a-z][a-z0-9-]*)?(--[a-z][a-z0-9-]*)?$",
-    "custom-property-pattern": "^mt-[a-z][a-z0-9-]*$"
+    "selector-class-pattern": [
+      "^mt-[a-z][a-z0-9-]*(__[a-z][a-z0-9-]*)?(--[a-z][a-z0-9-]*)?$",
+      {
+        "message": "Class names must follow BEM methodology with 'mt-' prefix: mt-block__element--modifier"
+      }
+    ],
+    "custom-property-pattern": [
+      "^mt-[a-z][a-z0-9-]*$",
+      {
+        "message": "CSS custom properties must use 'mt-' prefix and lowercase kebab-case"
+      }
+    ],
+    "selector-no-qualifying-type": [true, {
+      "ignore": ["attribute", "class"],
+      "severity": "warning",
+      "message": "Avoid qualifying selectors with element types for better performance"
+    }],
+    "selector-max-type": [2, {
+      "severity": "warning",
+      "message": "Too many type selectors can impact performance and specificity"
+    }]
   },
   "ignoreFiles": [
     "**/*.min.css",
-    "**/backup-*/**/*.css",
+    "**/backup-*/**/*.css", 
     "**/node_modules/**/*.css",
-    "**/vendor/**/*.css"
+    "**/vendor/**/*.css",
+    "**/v3/**/*.css",
+    "**/emergency-*.css",
+    "**/hotfix-*.css"
   ]
 }
