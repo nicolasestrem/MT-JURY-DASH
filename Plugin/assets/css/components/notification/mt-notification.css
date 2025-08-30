@@ -1,0 +1,351 @@
+/**
+ * MT Notification Component - BEM Architecture
+ * 
+ * Block: mt-notification
+ * Elements: __icon, __content, __title, __message, __actions, __close
+ * Modifiers: --success, --error, --warning, --info, --floating, --inline
+ * 
+ * NO !important declarations - using CSS layers and proper specificity
+ */
+
+@layer components {
+    /* Block: Main notification container */
+    .mt-notification {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 16px 20px;
+        background: white;
+        border: 1px solid var(--mt-blue-accent);
+        border-left-width: 4px;
+        border-radius: 8px;
+        margin: 15px 0;
+        position: relative;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        animation: mt-slide-in 0.3s ease-out;
+    }
+
+    /* Element: Icon container */
+    .mt-notification__icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--mt-blue-accent);
+        color: white;
+        font-size: 14px;
+    }
+
+    /* Element: Content container */
+    .mt-notification__content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Element: Title */
+    .mt-notification__title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--mt-primary);
+        margin: 0 0 4px 0;
+        line-height: 1.4;
+    }
+
+    /* Element: Message */
+    .mt-notification__message {
+        font-size: 14px;
+        color: var(--mt-body-text);
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .mt-notification__message a {
+        color: var(--mt-secondary);
+        text-decoration: underline;
+        transition: color 0.2s ease;
+    }
+
+    .mt-notification__message a:hover {
+        color: var(--mt-primary);
+    }
+
+    /* Element: Actions */
+    .mt-notification__actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .mt-notification__action {
+        padding: 6px 12px;
+        background: transparent;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: var(--mt-primary);
+    }
+
+    .mt-notification__action:hover {
+        background: var(--mt-primary);
+        color: white;
+        border-color: var(--mt-primary);
+    }
+
+    /* Element: Close button */
+    .mt-notification__close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 24px;
+        height: 24px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 18px;
+        line-height: 1;
+        padding: 0;
+        transition: all 0.2s ease;
+        border-radius: 4px;
+    }
+
+    .mt-notification__close:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--mt-primary);
+    }
+
+    /* Success modifier */
+    .mt-notification--success {
+        border-left-color: var(--mt-success);
+        background: #f0f9ff;
+    }
+
+    .mt-notification--success .mt-notification__icon {
+        background: var(--mt-success);
+    }
+
+    .mt-notification--success .mt-notification__title {
+        color: #0f5132;
+    }
+
+    .mt-notification--success .mt-notification__action {
+        color: var(--mt-success);
+    }
+
+    .mt-notification--success .mt-notification__action:hover {
+        background: var(--mt-success);
+        color: white;
+        border-color: var(--mt-success);
+    }
+
+    /* Error modifier */
+    .mt-notification--error {
+        border-left-color: var(--mt-error);
+        background: #fef2f2;
+    }
+
+    .mt-notification--error .mt-notification__icon {
+        background: var(--mt-error);
+    }
+
+    .mt-notification--error .mt-notification__title {
+        color: #842029;
+    }
+
+    .mt-notification--error .mt-notification__action {
+        color: var(--mt-error);
+    }
+
+    .mt-notification--error .mt-notification__action:hover {
+        background: var(--mt-error);
+        color: white;
+        border-color: var(--mt-error);
+    }
+
+    /* Warning modifier */
+    .mt-notification--warning {
+        border-left-color: var(--mt-warning);
+        background: #fffbeb;
+    }
+
+    .mt-notification--warning .mt-notification__icon {
+        background: var(--mt-warning);
+    }
+
+    .mt-notification--warning .mt-notification__title {
+        color: #664d03;
+    }
+
+    .mt-notification--warning .mt-notification__action {
+        color: var(--mt-warning);
+    }
+
+    .mt-notification--warning .mt-notification__action:hover {
+        background: var(--mt-warning);
+        color: white;
+        border-color: var(--mt-warning);
+    }
+
+    /* Info modifier */
+    .mt-notification--info {
+        border-left-color: var(--mt-secondary);
+        background: #e7f3ff;
+    }
+
+    .mt-notification--info .mt-notification__icon {
+        background: var(--mt-secondary);
+    }
+
+    .mt-notification--info .mt-notification__title {
+        color: var(--mt-secondary);
+    }
+
+    /* Floating modifier - for toast-style notifications */
+    .mt-notification--floating {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: mt-slide-in-right 0.3s ease-out;
+    }
+
+    /* Inline modifier - no margins */
+    .mt-notification--inline {
+        margin: 0;
+    }
+
+    /* Dismissible animation */
+    .mt-notification--dismissing {
+        animation: mt-fade-out 0.3s ease-out forwards;
+    }
+
+    /* Progress bar for auto-dismiss */
+    .mt-notification__progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: currentColor;
+        opacity: 0.3;
+        animation: mt-progress-countdown 5s linear;
+    }
+
+    /* Toast stack */
+    .mt-notification-stack {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 400px;
+        pointer-events: none;
+    }
+
+    .mt-notification-stack .mt-notification {
+        pointer-events: auto;
+        margin: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .mt-notification {
+            padding: 14px 16px;
+        }
+
+        .mt-notification__title {
+            font-size: 15px;
+        }
+
+        .mt-notification__message {
+            font-size: 13px;
+        }
+
+        .mt-notification--floating {
+            left: 10px;
+            right: 10px;
+            max-width: none;
+        }
+
+        .mt-notification-stack {
+            left: 10px;
+            right: 10px;
+            max-width: none;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .mt-notification {
+            padding: 12px 14px;
+            gap: 12px;
+        }
+
+        .mt-notification__icon {
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+        }
+
+        .mt-notification__actions {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mt-notification__action {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    /* Animations */
+    @keyframes mt-slide-in {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes mt-slide-in-right {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes mt-fade-out {
+        to {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+    }
+
+    @keyframes mt-progress-countdown {
+        from {
+            width: 100%;
+        }
+        to {
+            width: 0;
+        }
+    }
+}

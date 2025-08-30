@@ -120,7 +120,7 @@ class CSSAnalyzer {
         return fileStats;
     }
 
-    analyzeDirectory(dirPath) {
+    analyzeDirectory(dirPath, recursive = true) {
         if (!fs.existsSync(dirPath)) {
             console.error(`Directory not found: ${dirPath}`);
             return;
@@ -128,16 +128,25 @@ class CSSAnalyzer {
 
         const files = fs.readdirSync(dirPath);
         files.forEach(file => {
-            if (file.endsWith('.css')) {
-                this.analyzeFile(path.join(dirPath, file));
+            const fullPath = path.join(dirPath, file);
+            const stat = fs.statSync(fullPath);
+            
+            if (stat.isDirectory() && recursive) {
+                // Recursively analyze subdirectories
+                this.analyzeDirectory(fullPath, recursive);
+            } else if (file.endsWith('.css')) {
+                this.analyzeFile(fullPath);
             }
         });
 
-        // Find duplicate selectors
-        this.findDuplicates();
-        
-        // Sort specificity scores
-        this.results.specificity.sort((a, b) => b.specificity - a.specificity);
+        // Only run these on the final call
+        if (dirPath === this.originalDir) {
+            // Find duplicate selectors
+            this.findDuplicates();
+            
+            // Sort specificity scores
+            this.results.specificity.sort((a, b) => b.specificity - a.specificity);
+        }
     }
 
     isBEMCompliant(selector) {
@@ -406,6 +415,7 @@ if (require.main === module) {
     
     // Run analysis
     if (fs.statSync(targetPath).isDirectory()) {
+        analyzer.originalDir = targetPath; // Store original directory for recursive check
         analyzer.analyzeDirectory(targetPath);
     } else {
         analyzer.analyzeFile(targetPath);

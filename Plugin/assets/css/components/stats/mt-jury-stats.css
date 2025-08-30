@@ -1,0 +1,355 @@
+/**
+ * MT Jury Stats Component - BEM Architecture
+ * 
+ * Block: mt-jury-stats
+ * Elements: __container, __card, __icon, __value, __label, __progress, __chart
+ * Modifiers: --primary, --success, --warning, --danger, --animated
+ * 
+ * NO !important declarations - using CSS layers and proper specificity
+ */
+
+@layer components {
+    /* Block: Main stats container */
+    .mt-jury-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+
+    /* Element: Individual stat card */
+    .mt-jury-stats__card {
+        background: white;
+        border: 1px solid var(--mt-blue-accent);
+        border-radius: 12px;
+        padding: 25px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .mt-jury-stats__card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--mt-primary) 0%, var(--mt-secondary) 100%);
+    }
+
+    .mt-jury-stats__card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-color: var(--mt-secondary);
+    }
+
+    /* Element: Card header */
+    .mt-jury-stats__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    /* Element: Icon */
+    .mt-jury-stats__icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--mt-primary) 0%, var(--mt-secondary) 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    /* Element: Main value */
+    .mt-jury-stats__value {
+        font-size: 32px;
+        font-weight: bold;
+        color: var(--mt-primary);
+        line-height: 1;
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Element: Label */
+    .mt-jury-stats__label {
+        font-size: 14px;
+        color: #6c757d;
+        margin-top: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    /* Element: Subtitle/description */
+    .mt-jury-stats__subtitle {
+        font-size: 12px;
+        color: #adb5bd;
+        margin-top: 5px;
+        line-height: 1.4;
+    }
+
+    /* Element: Progress bar */
+    .mt-jury-stats__progress {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .mt-jury-stats__progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 12px;
+    }
+
+    .mt-jury-stats__progress-label {
+        color: #6c757d;
+    }
+
+    .mt-jury-stats__progress-value {
+        color: var(--mt-primary);
+        font-weight: 600;
+    }
+
+    .mt-jury-stats__progress-bar {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .mt-jury-stats__progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--mt-accent) 0%, var(--mt-kupfer-bold) 100%);
+        border-radius: 4px;
+        transition: width 0.6s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mt-jury-stats__progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        animation: mt-shimmer 2s infinite;
+    }
+
+    /* Element: Mini chart */
+    .mt-jury-stats__chart {
+        margin-top: 15px;
+        height: 40px;
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+    }
+
+    .mt-jury-stats__chart-bar {
+        flex: 1;
+        background: var(--mt-blue-accent);
+        border-radius: 2px 2px 0 0;
+        transition: all 0.3s ease;
+        opacity: 0.6;
+    }
+
+    .mt-jury-stats__chart-bar:hover {
+        opacity: 1;
+        background: var(--mt-secondary);
+    }
+
+    /* Element: Trend indicator */
+    .mt-jury-stats__trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .mt-jury-stats__trend--up {
+        background: #e6f4ea;
+        color: #188038;
+    }
+
+    .mt-jury-stats__trend--down {
+        background: #fce8e6;
+        color: #c5221f;
+    }
+
+    .mt-jury-stats__trend--neutral {
+        background: #f8f9fa;
+        color: #5f6368;
+    }
+
+    .mt-jury-stats__trend-icon {
+        font-size: 10px;
+    }
+
+    /* Modifiers for card colors */
+    .mt-jury-stats__card--primary .mt-jury-stats__icon {
+        background: var(--mt-primary);
+    }
+
+    .mt-jury-stats__card--primary::before {
+        background: var(--mt-primary);
+    }
+
+    .mt-jury-stats__card--success .mt-jury-stats__icon {
+        background: var(--mt-success);
+    }
+
+    .mt-jury-stats__card--success::before {
+        background: var(--mt-success);
+    }
+
+    .mt-jury-stats__card--success .mt-jury-stats__value {
+        color: var(--mt-success);
+    }
+
+    .mt-jury-stats__card--warning .mt-jury-stats__icon {
+        background: var(--mt-warning);
+    }
+
+    .mt-jury-stats__card--warning::before {
+        background: var(--mt-warning);
+    }
+
+    .mt-jury-stats__card--warning .mt-jury-stats__value {
+        color: var(--mt-warning);
+    }
+
+    .mt-jury-stats__card--danger .mt-jury-stats__icon {
+        background: var(--mt-error);
+    }
+
+    .mt-jury-stats__card--danger::before {
+        background: var(--mt-error);
+    }
+
+    .mt-jury-stats__card--danger .mt-jury-stats__value {
+        color: var(--mt-error);
+    }
+
+    /* Animated modifier */
+    .mt-jury-stats__card--animated .mt-jury-stats__value {
+        animation: mt-count-up 1s ease-out;
+    }
+
+    .mt-jury-stats__card--animated .mt-jury-stats__progress-fill {
+        animation: mt-fill-progress 1.5s ease-out;
+    }
+
+    /* Comparison stats */
+    .mt-jury-stats__comparison {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .mt-jury-stats__comparison-item {
+        text-align: center;
+    }
+
+    .mt-jury-stats__comparison-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--mt-primary);
+        display: block;
+    }
+
+    .mt-jury-stats__comparison-label {
+        font-size: 11px;
+        color: #6c757d;
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        .mt-jury-stats {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .mt-jury-stats {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .mt-jury-stats__card {
+            padding: 20px;
+        }
+
+        .mt-jury-stats__value {
+            font-size: 28px;
+        }
+
+        .mt-jury-stats__icon {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .mt-jury-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .mt-jury-stats__card {
+            padding: 15px;
+        }
+
+        .mt-jury-stats__value {
+            font-size: 24px;
+        }
+    }
+
+    /* Animations */
+    @keyframes mt-shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    @keyframes mt-count-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes mt-fill-progress {
+        from {
+            width: 0;
+        }
+    }
+}
