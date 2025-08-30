@@ -1,0 +1,551 @@
+/**
+ * MT Phase 3 Clean CSS - Zero !important Architecture
+ * 
+ * This file implements a modern CSS architecture using cascade layers
+ * to manage specificity without !important declarations.
+ * 
+ * Generated: August 30, 2025
+ * Version: 3.0.0
+ * 
+ * Architecture:
+ * - CSS Cascade Layers for specificity management
+ * - CSS Custom Properties for theming
+ * - BEM methodology for component structure
+ * - Zero !important declarations
+ */
+
+/* ========================================================================
+   CSS CASCADE LAYERS DEFINITION
+   Define the order of cascade layers from lowest to highest specificity
+   ======================================================================== */
+
+@layer reset, base, framework, layout, components, utilities, overrides;
+
+/* ========================================================================
+   LAYER: Reset - Browser normalization
+   ======================================================================== */
+
+@layer reset {
+    /* CSS Reset and normalization will be imported here */
+}
+
+/* ========================================================================
+   LAYER: Base - CSS Variables and Root Styles
+   ======================================================================== */
+
+@layer base {
+    :root {
+        /* System Colors (Primary Palette) */
+        --mt-primary: #003C3D;
+        --mt-secondary: #004C5F;
+        --mt-body-text: #302C37;
+        --mt-accent: #C1693C;
+        
+        /* Custom Colors (Extended Palette) */
+        --mt-kupfer-soft: #B86F52;
+        --mt-kupfer-bold: #C1693C;
+        --mt-blue-accent: #A4DCD5;
+        --mt-bg-beige: #F5E6D3;
+        --mt-bg-base: #FFFFFF;
+        --mt-overlay-bg: #004C5FCC;
+        
+        /* Utility Colors */
+        --mt-success: #28a745;
+        --mt-warning: #ffc107;
+        --mt-error: #dc3545;
+        --mt-info: #17a2b8;
+        
+        /* Shadows and Effects */
+        --mt-shadow-sm: 0 2px 4px rgba(48, 44, 55, 0.1);
+        --mt-shadow-md: 0 4px 12px rgba(48, 44, 55, 0.15);
+        --mt-shadow-lg: 0 8px 24px rgba(0, 60, 61, 0.2);
+        
+        /* Transitions */
+        --mt-transition: all 0.3s ease;
+        
+        /* Spacing Scale */
+        --mt-spacing-xs: 4px;
+        --mt-spacing-sm: 8px;
+        --mt-spacing-md: 16px;
+        --mt-spacing-lg: 24px;
+        --mt-spacing-xl: 32px;
+        --mt-spacing-2xl: 48px;
+        --mt-spacing-3xl: 64px;
+        
+        /* Typography Scale */
+        --mt-font-size-xs: 0.75rem;
+        --mt-font-size-sm: 0.875rem;
+        --mt-font-size-base: 1rem;
+        --mt-font-size-lg: 1.125rem;
+        --mt-font-size-xl: 1.25rem;
+        --mt-font-size-2xl: 1.5rem;
+        --mt-font-size-3xl: 2rem;
+        --mt-font-size-4xl: 2.5rem;
+        
+        /* Font Weights */
+        --mt-font-weight-normal: 400;
+        --mt-font-weight-medium: 500;
+        --mt-font-weight-semibold: 600;
+        --mt-font-weight-bold: 700;
+        
+        /* Border Radius */
+        --mt-radius-sm: 4px;
+        --mt-radius-md: 8px;
+        --mt-radius-lg: 12px;
+        --mt-radius-xl: 16px;
+        --mt-radius-full: 9999px;
+        
+        /* Z-Index Scale */
+        --mt-z-base: 0;
+        --mt-z-dropdown: 1000;
+        --mt-z-sticky: 1020;
+        --mt-z-fixed: 1030;
+        --mt-z-modal-backdrop: 1040;
+        --mt-z-modal: 1050;
+        --mt-z-popover: 1060;
+        --mt-z-tooltip: 1070;
+    }
+    
+    /* Base typography and box model */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+    
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-size: var(--mt-font-size-base);
+        font-weight: var(--mt-font-weight-normal);
+        line-height: 1.5;
+        color: var(--mt-body-text);
+        background-color: var(--mt-bg-base);
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+}
+
+/* ========================================================================
+   LAYER: Framework - Core framework styles
+   ======================================================================== */
+
+@layer framework {
+    /* Container system */
+    .mt-container {
+        width: 100%;
+        padding-right: var(--mt-spacing-md);
+        padding-left: var(--mt-spacing-md);
+        margin-right: auto;
+        margin-left: auto;
+    }
+    
+    @media (min-width: 576px) {
+        .mt-container {
+            max-width: 540px;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .mt-container {
+            max-width: 720px;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .mt-container {
+            max-width: 960px;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .mt-container {
+            max-width: 1140px;
+        }
+    }
+    
+    @media (min-width: 1400px) {
+        .mt-container {
+            max-width: 1320px;
+        }
+    }
+}
+
+/* ========================================================================
+   LAYER: Layout - Layout and grid systems
+   ======================================================================== */
+
+@layer layout {
+    /* Main Layout Container */
+    .mt-layout {
+        background: var(--mt-bg-beige);
+        padding: var(--mt-spacing-xl);
+        border-radius: var(--mt-radius-lg);
+        color: var(--mt-body-text);
+        margin: var(--mt-spacing-lg) 0;
+    }
+    
+    /* Grid System */
+    .mt-grid {
+        display: grid;
+        gap: var(--mt-spacing-lg);
+        padding: var(--mt-spacing-lg) 0;
+        width: 100%;
+        margin: var(--mt-spacing-xl) 0;
+    }
+    
+    /* Candidates Grid */
+    .mt-candidates-grid {
+        display: grid;
+        gap: var(--mt-spacing-lg);
+        padding: var(--mt-spacing-lg) 0;
+        width: 100%;
+        margin: var(--mt-spacing-xl) 0;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .mt-candidates-grid.columns-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .mt-candidates-grid.columns-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    
+    /* Responsive Grid Adjustments */
+    @media (max-width: 1200px) {
+        .mt-candidates-grid.columns-5 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .mt-candidates-grid.columns-4,
+        .mt-candidates-grid.columns-5 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .mt-candidates-grid.columns-3,
+        .mt-candidates-grid.columns-4,
+        .mt-candidates-grid.columns-5 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .mt-candidates-grid,
+        .mt-candidates-grid.columns-3,
+        .mt-candidates-grid.columns-4,
+        .mt-candidates-grid.columns-5 {
+            grid-template-columns: 1fr;
+            gap: var(--mt-spacing-md);
+        }
+    }
+    
+    /* Flexbox Layouts */
+    .mt-flex {
+        display: flex;
+    }
+    
+    .mt-flex-column {
+        flex-direction: column;
+    }
+    
+    .mt-flex-wrap {
+        flex-wrap: wrap;
+    }
+    
+    .mt-justify-start {
+        justify-content: flex-start;
+    }
+    
+    .mt-justify-center {
+        justify-content: center;
+    }
+    
+    .mt-justify-end {
+        justify-content: flex-end;
+    }
+    
+    .mt-justify-between {
+        justify-content: space-between;
+    }
+    
+    .mt-align-start {
+        align-items: flex-start;
+    }
+    
+    .mt-align-center {
+        align-items: center;
+    }
+    
+    .mt-align-end {
+        align-items: flex-end;
+    }
+}
+
+/* ========================================================================
+   LAYER: Components - BEM component styles
+   ======================================================================== */
+
+@layer components {
+    /* Component styles will be imported from individual BEM files */
+    
+    /* Candidate Card Component (example) */
+    .mt-candidate-card {
+        background: var(--mt-bg-base);
+        border: 2px solid var(--mt-blue-accent);
+        border-radius: var(--mt-radius-lg);
+        padding: var(--mt-spacing-lg);
+        transition: var(--mt-transition);
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .mt-candidate-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--mt-shadow-lg);
+        border-color: var(--mt-accent);
+    }
+    
+    .mt-candidate-card__image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: var(--mt-radius-md);
+        margin-bottom: var(--mt-spacing-md);
+    }
+    
+    .mt-candidate-card__name {
+        font-size: var(--mt-font-size-lg);
+        font-weight: var(--mt-font-weight-semibold);
+        color: var(--mt-primary);
+        margin-bottom: var(--mt-spacing-sm);
+    }
+    
+    .mt-candidate-card__meta {
+        font-size: var(--mt-font-size-sm);
+        color: var(--mt-secondary);
+        margin-bottom: var(--mt-spacing-md);
+    }
+    
+    .mt-candidate-card__description {
+        flex-grow: 1;
+        font-size: var(--mt-font-size-base);
+        line-height: 1.6;
+        color: var(--mt-body-text);
+    }
+    
+    .mt-candidate-card--featured {
+        border-color: var(--mt-accent);
+        background: linear-gradient(135deg, var(--mt-bg-base) 0%, var(--mt-bg-beige) 100%);
+    }
+    
+    .mt-candidate-card--disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    /* Button Component */
+    .mt-button {
+        display: inline-block;
+        padding: var(--mt-spacing-sm) var(--mt-spacing-lg);
+        font-size: var(--mt-font-size-base);
+        font-weight: var(--mt-font-weight-medium);
+        line-height: 1.5;
+        text-align: center;
+        text-decoration: none;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        user-select: none;
+        border: 2px solid transparent;
+        border-radius: var(--mt-radius-md);
+        transition: var(--mt-transition);
+        background-color: var(--mt-primary);
+        color: white;
+    }
+    
+    .mt-button:hover {
+        background-color: var(--mt-secondary);
+        transform: translateY(-2px);
+        box-shadow: var(--mt-shadow-md);
+    }
+    
+    .mt-button--secondary {
+        background-color: var(--mt-secondary);
+    }
+    
+    .mt-button--accent {
+        background-color: var(--mt-accent);
+    }
+    
+    .mt-button--outline {
+        background-color: transparent;
+        color: var(--mt-primary);
+        border-color: var(--mt-primary);
+    }
+    
+    .mt-button--outline:hover {
+        background-color: var(--mt-primary);
+        color: white;
+    }
+    
+    .mt-button--large {
+        padding: var(--mt-spacing-md) var(--mt-spacing-xl);
+        font-size: var(--mt-font-size-lg);
+    }
+    
+    .mt-button--small {
+        padding: var(--mt-spacing-xs) var(--mt-spacing-md);
+        font-size: var(--mt-font-size-sm);
+    }
+    
+    .mt-button--disabled,
+    .mt-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+}
+
+/* ========================================================================
+   LAYER: Utilities - Utility classes for common patterns
+   Note: These intentionally use !important for predictable overrides
+   ======================================================================== */
+
+@layer utilities {
+    /* Display utilities */
+    .mt-d-none { display: none !important; }
+    .mt-d-block { display: block !important; }
+    .mt-d-inline-block { display: inline-block !important; }
+    .mt-d-flex { display: flex !important; }
+    .mt-d-grid { display: grid !important; }
+    
+    /* Text alignment */
+    .mt-text-left { text-align: left !important; }
+    .mt-text-center { text-align: center !important; }
+    .mt-text-right { text-align: right !important; }
+    
+    /* Spacing utilities */
+    .mt-m-0 { margin: 0 !important; }
+    .mt-p-0 { padding: 0 !important; }
+    .mt-mt-0 { margin-top: 0 !important; }
+    .mt-mb-0 { margin-bottom: 0 !important; }
+    .mt-ml-0 { margin-left: 0 !important; }
+    .mt-mr-0 { margin-right: 0 !important; }
+    
+    /* Width utilities */
+    .mt-w-100 { width: 100% !important; }
+    .mt-w-auto { width: auto !important; }
+    
+    /* Visibility */
+    .mt-visible { visibility: visible !important; }
+    .mt-invisible { visibility: hidden !important; }
+}
+
+/* ========================================================================
+   LAYER: Overrides - WordPress and plugin-specific overrides
+   ======================================================================== */
+
+@layer overrides {
+    /* WordPress Admin Overrides */
+    .wp-admin .mt-container {
+        max-width: 100%;
+        padding: var(--mt-spacing-lg);
+    }
+    
+    .wp-admin .mt-button {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    /* Plugin Compatibility Overrides */
+    .elementor-widget .mt-candidates-grid {
+        width: 100%;
+        max-width: none;
+    }
+    
+    /* Theme Compatibility */
+    .entry-content .mt-container {
+        margin-top: var(--mt-spacing-xl);
+        margin-bottom: var(--mt-spacing-xl);
+    }
+}
+
+/* ========================================================================
+   RESPONSIVE BREAKPOINTS
+   ======================================================================== */
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+    @layer layout {
+        .mt-layout {
+            padding: var(--mt-spacing-lg);
+        }
+        
+        .mt-grid {
+            gap: var(--mt-spacing-md);
+        }
+    }
+    
+    @layer components {
+        .mt-candidate-card__image {
+            height: 150px;
+        }
+        
+        .mt-button {
+            width: 100%;
+            display: block;
+        }
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    @layer base {
+        :root {
+            --mt-font-size-base: 0.875rem;
+        }
+    }
+    
+    @layer layout {
+        .mt-layout {
+            padding: var(--mt-spacing-md);
+            border-radius: var(--mt-radius-md);
+        }
+    }
+    
+    @layer components {
+        .mt-candidate-card {
+            padding: var(--mt-spacing-md);
+        }
+        
+        .mt-candidate-card__image {
+            height: 120px;
+        }
+    }
+}
+
+/* Print Styles */
+@media print {
+    @layer utilities {
+        .mt-no-print {
+            display: none !important;
+        }
+    }
+}
