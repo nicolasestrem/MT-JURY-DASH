@@ -1,0 +1,1413 @@
+/**
+ * Mobility Trailblazers - Phase 3 Complete CSS Architecture v4.0
+ * 
+ * Zero !important architecture using CSS cascade layers
+ * Complete production parity with proper styling
+ * 
+ * Critical Fixes in v4:
+ * - ALL headers (h1/h2/h3) are copper color (#C1693C) and centered
+ * - mt-candidate-card matches production exactly
+ * - Search box on one elegant line with grid layout
+ * - Widget and shortcode CSS support included
+ * 
+ * Brand Colors:
+ * - Primary: #003C3D (deep teal - for body text)
+ * - Accent: #C1693C (warm copper - for headers and CTAs)
+ * - Background: #F8F0E3 (soft cream)
+ * 
+ * Created: 2025-08-30
+ * Version: 4.0.0
+ */
+
+/* Define layer order for specificity management - added 'cards' layer */
+@layer reset, tokens, base, components, cards, layouts, patterns, pages, themes, utilities, overrides;
+
+/* ===================================
+   LAYER: RESET - Browser Normalization
+   =================================== */
+@layer reset {
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    
+    .mt-root *,
+    .mt-root *::before,
+    .mt-root *::after {
+        box-sizing: border-box;
+    }
+    
+    /* Reset margins and paddings */
+    h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Set core body defaults */
+    body {
+        min-height: 100vh;
+        scroll-behavior: smooth;
+        text-rendering: optimizeSpeed;
+        line-height: 1.5;
+    }
+    
+    /* Remove list styles */
+    ul, ol {
+        list-style: none;
+    }
+    
+    /* Remove default button styles */
+    button {
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+    
+    /* Make images easier to work with */
+    img, picture {
+        max-width: 100%;
+        display: block;
+    }
+    
+    /* Inherit fonts for inputs and buttons */
+    input, button, textarea, select {
+        font: inherit;
+    }
+}
+
+/* ===================================
+   LAYER: TOKENS - CSS Variables
+   =================================== */
+@layer tokens {
+    :root {
+        /* ===================================
+           BRAND COLORS - Corrected for Headers
+        =================================== */
+        
+        /* Primary Brand Colors */
+        --mt-primary: #003C3D;          /* Dark Petrol - for body text */
+        --mt-secondary: #004C5F;         /* Dark Indigo */
+        --mt-accent: #C1693C;            /* Copper - FOR HEADERS! */
+        --mt-body-text: #302C37;         /* Dark Gray */
+        
+        /* Extended Palette */
+        --mt-kupfer-soft: #B86F52;       /* Soft Copper */
+        --mt-kupfer-bold: #C1693C;       /* Bold Copper */
+        --mt-blue-accent: #A4DCD5;       /* Light Turquoise */
+        --mt-bg-beige: #F8F0E3;          /* Soft Cream Background */
+        --mt-bg-base: #FFFFFF;           /* White */
+        --mt-overlay-bg: #004C5FCC;      /* Indigo Overlay */
+        
+        /* Card v3 specific colors */
+        --mt-v3-bg-beige: #F8F0E3;
+        --mt-v3-card-bg: #FFFFFF;
+        --mt-v3-border-soft: #E8DCC9;
+        --mt-v3-primary: #003C3D;
+        --mt-v3-secondary: #004C5F;
+        --mt-v3-text: #302C37;
+        --mt-v3-text-secondary: #6C757D;
+        --mt-v3-accent: #C1693C;
+        --mt-v3-kupfer-soft: #BB6F52;
+        
+        /* Category Colors */
+        --mt-v3-cat-startups: #28a745;
+        --mt-v3-cat-etablierte: #007bff;
+        --mt-v3-cat-governance: #6f42c1;
+        
+        /* Status Colors */
+        --mt-v3-status-draft: #ffc107;
+        --mt-v3-status-completed: #28a745;
+        --mt-v3-status-pending: #6c757d;
+        
+        /* Utility Colors */
+        --mt-success: #28a745;
+        --mt-warning: #ffc107;
+        --mt-error: #dc3545;
+        --mt-info: #17a2b8;
+        
+        /* Neutral Colors */
+        --mt-gray-100: #f8f9fa;
+        --mt-gray-200: #e9ecef;
+        --mt-gray-300: #dee2e6;
+        --mt-gray-400: #ced4da;
+        --mt-gray-500: #adb5bd;
+        --mt-gray-600: #6c757d;
+        --mt-gray-700: #495057;
+        --mt-gray-800: #343a40;
+        --mt-gray-900: #212529;
+        
+        /* Typography */
+        --mt-font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        --mt-font-heading: 'Poppins', var(--mt-font-base);
+        --mt-font-mono: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        
+        /* Font Sizes */
+        --mt-font-size-xs: 0.75rem;      /* 12px */
+        --mt-font-size-sm: 0.875rem;     /* 14px */
+        --mt-font-size-base: 1rem;       /* 16px */
+        --mt-font-size-lg: 1.125rem;     /* 18px */
+        --mt-font-size-xl: 1.25rem;      /* 20px */
+        --mt-font-size-xxl: 1.5rem;      /* 24px */
+        --mt-font-size-xxxl: 1.875rem;   /* 30px */
+        
+        /* Font Weights */
+        --mt-font-weight-light: 300;
+        --mt-font-weight-normal: 400;
+        --mt-font-weight-medium: 500;
+        --mt-font-weight-bold: 700;
+        
+        /* Line Heights */
+        --mt-line-height-tight: 1.25;
+        --mt-line-height-base: 1.5;
+        --mt-line-height-relaxed: 1.75;
+        
+        /* Spacing - including v3 spacing */
+        --mt-space-xs: 0.25rem;
+        --mt-space-sm: 0.5rem;
+        --mt-space-md: 1rem;
+        --mt-space-lg: 1.5rem;
+        --mt-space-xl: 2rem;
+        --mt-space-2xl: 3rem;
+        --mt-v3-space-xs: 4px;
+        --mt-v3-space-sm: 8px;
+        --mt-v3-space-md: 16px;
+        --mt-v3-space-lg: 24px;
+        --mt-v3-space-xl: 32px;
+        --mt-v3-space-xxl: 48px;
+        
+        /* Border Radius */
+        --mt-radius-sm: 0.25rem;
+        --mt-radius-md: 0.5rem;
+        --mt-radius-lg: 0.75rem;
+        --mt-radius-xl: 1rem;
+        --mt-radius-full: 9999px;
+        --mt-v3-radius: 16px;
+        
+        /* Shadows */
+        --mt-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --mt-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --mt-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --mt-v3-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+        --mt-v3-shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+        
+        /* Transitions */
+        --mt-transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        --mt-v3-transition: all 0.3s ease;
+        
+        /* Additional tokens */
+        --mt-color-primary-alpha: rgba(0, 60, 61, 0.1);
+        --mt-color-primary-dark: #002a2b;
+        --mt-bg-primary: #ffffff;
+        --mt-bg-secondary: #f8f9fa;
+        --mt-bg-tertiary: #e9ecef;
+        --mt-border-light: #e9ecef;
+        --mt-border-medium: #dee2e6;
+        --mt-border-dark: #adb5bd;
+        --mt-text-primary: #003C3D;
+        --mt-text-secondary: #6c757d;
+        
+        /* CRITICAL: Headers use copper color! */
+        --mt-heading-color: #C1693C;
+    }
+}
+
+/* ===================================
+   LAYER: BASE - Typography & Elements
+   =================================== */
+@layer base {
+    /* Plugin root container */
+    .mt-root {
+        font-family: var(--mt-font-base);
+        font-size: var(--mt-font-size-base);
+        line-height: var(--mt-line-height-base);
+        color: var(--mt-text-primary);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* CRITICAL FIX: Headers are COPPER and CENTERED */
+    .mt-root h1,
+    .mt-root h2,
+    .mt-root h3,
+    .mt-root h4,
+    .mt-root h5,
+    .mt-root h6,
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--mt-font-heading);
+        font-weight: var(--mt-font-weight-bold);
+        line-height: var(--mt-line-height-tight);
+        color: var(--mt-heading-color); /* COPPER COLOR! */
+        text-align: center; /* CENTERED BY DEFAULT! */
+        margin-top: 0;
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    /* Specific overrides to ensure copper color */
+    h1, .mt-root h1 { 
+        font-size: var(--mt-font-size-xxxl);
+        color: #C1693C;
+    }
+    h2, .mt-root h2 { 
+        font-size: var(--mt-font-size-xxl);
+        color: #C1693C;
+    }
+    h3, .mt-root h3 { 
+        font-size: var(--mt-font-size-xl);
+        color: #C1693C;
+    }
+    h4, .mt-root h4 { 
+        font-size: var(--mt-font-size-lg);
+        color: #C1693C;
+    }
+    h5, .mt-root h5 { 
+        font-size: var(--mt-font-size-base);
+        color: #C1693C;
+    }
+    h6, .mt-root h6 { 
+        font-size: var(--mt-font-size-sm);
+        color: #C1693C;
+    }
+    
+    /* Allow specific alignment overrides */
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    .text-justify { text-align: justify; }
+    
+    .mt-root p {
+        margin-top: 0;
+        margin-bottom: var(--mt-space-md);
+        line-height: var(--mt-line-height-base);
+    }
+    
+    .mt-root a {
+        color: var(--mt-color-primary);
+        text-decoration: none;
+        transition: var(--mt-transition);
+    }
+    
+    .mt-root a:hover {
+        color: var(--mt-color-primary-dark);
+        text-decoration: underline;
+    }
+    
+    /* Forms */
+    .mt-root input[type="text"],
+    .mt-root input[type="email"],
+    .mt-root input[type="password"],
+    .mt-root input[type="number"],
+    .mt-root input[type="search"],
+    .mt-root select,
+    .mt-root textarea,
+    input[type="text"],
+    input[type="email"],
+    input[type="search"],
+    select,
+    textarea {
+        width: 100%;
+        padding: var(--mt-space-sm) var(--mt-space-md);
+        font-family: var(--mt-font-base);
+        font-size: var(--mt-font-size-base);
+        line-height: var(--mt-line-height-base);
+        color: var(--mt-text-primary);
+        background-color: var(--mt-bg-primary);
+        border: 1px solid var(--mt-border-medium);
+        border-radius: var(--mt-radius-sm);
+        transition: var(--mt-transition);
+    }
+    
+    /* Buttons */
+    .mt-root button,
+    .mt-root .mt-btn,
+    .mt-btn,
+    .mt-evaluate-btn,
+    .mt-submit-btn,
+    button[type="submit"],
+    input[type="submit"] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--mt-space-sm) var(--mt-space-lg);
+        font-family: var(--mt-font-base);
+        font-size: var(--mt-font-size-base);
+        font-weight: var(--mt-font-weight-medium);
+        line-height: var(--mt-line-height-base);
+        color: white;
+        background: linear-gradient(90deg, var(--mt-accent) 0%, var(--mt-primary) 100%);
+        border: none;
+        border-radius: var(--mt-radius-md);
+        cursor: pointer;
+        transition: var(--mt-transition);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    
+    .mt-root button:hover,
+    .mt-root .mt-btn:hover,
+    .mt-btn:hover,
+    .mt-evaluate-btn:hover,
+    .mt-submit-btn:hover,
+    button[type="submit"]:hover {
+        background: linear-gradient(90deg, var(--mt-kupfer-bold) 0%, var(--mt-secondary) 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--mt-shadow-md);
+    }
+}
+
+/* ===================================
+   LAYER: COMPONENTS - Reusable UI
+   =================================== */
+@layer components {
+    /* Dashboard Container */
+    .mt-jury-dashboard,
+    .mt-dashboard-v3 {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+        border-radius: var(--mt-radius-lg);
+        min-height: 100vh;
+    }
+    
+    /* Dashboard Header */
+    .mt-dashboard-header {
+        background: linear-gradient(135deg, var(--mt-bg-beige) 0%, var(--mt-bg-base) 100%);
+        border-bottom: 3px solid var(--mt-accent);
+        padding: var(--mt-space-2xl);
+        margin-bottom: var(--mt-space-xl);
+        border-radius: var(--mt-radius-md);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Header with image background support */
+    .mt-header-image {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+    }
+    
+    .mt-header-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(0, 60, 61, 0.8) 0%, rgba(0, 76, 95, 0.6) 100%);
+        z-index: 1;
+    }
+    
+    .mt-header-image > * {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .mt-header-image h1,
+    .mt-header-image p {
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* CRITICAL FIX: Search Box - One Elegant Line with Grid */
+    .mt-search-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr; /* Search 50%, Status 25%, Category 25% */
+        gap: 15px;
+        align-items: center;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin-bottom: var(--mt-space-lg);
+    }
+    
+    body .mt-jury-dashboard .mt-search-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 15px;
+        align-items: center;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .mt-search-input,
+    body .mt-jury-dashboard .mt-search-input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid var(--mt-blue-accent);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--mt-bg-base);
+        box-sizing: border-box;
+    }
+    
+    .mt-filter-select,
+    body .mt-jury-dashboard .mt-filter-select,
+    #mt-category-filter,
+    body .mt-jury-dashboard #mt-category-filter {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid var(--mt-blue-accent);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--mt-bg-base);
+        box-sizing: border-box;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 20px;
+        padding-right: 35px;
+    }
+    
+    /* Responsive search box */
+    @media (max-width: 768px) {
+        .mt-search-box,
+        body .mt-jury-dashboard .mt-search-box {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+    }
+    
+    /* Stat Cards */
+    .mt-stat-card {
+        background: var(--mt-bg-base);
+        border: 1px solid var(--mt-accent);
+        border-radius: var(--mt-radius-md);
+        padding: var(--mt-space-lg);
+        transition: var(--mt-transition);
+        text-align: center;
+    }
+    
+    .mt-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(193, 105, 60, 0.2);
+        border-color: var(--mt-primary);
+    }
+    
+    .mt-stat-number {
+        color: var(--mt-accent);
+        font-size: 2.5em;
+        font-weight: var(--mt-font-weight-bold);
+        display: block;
+    }
+    
+    .mt-stat-label {
+        color: var(--mt-primary);
+        text-transform: uppercase;
+        font-size: var(--mt-font-size-sm);
+        letter-spacing: 1px;
+        margin-top: var(--mt-space-sm);
+    }
+    
+    /* Progress Bars */
+    .mt-progress-bar {
+        background-color: var(--mt-gray-200);
+        border-radius: var(--mt-radius-full);
+        overflow: hidden;
+        height: 25px;
+        position: relative;
+    }
+    
+    .mt-progress-fill {
+        background: linear-gradient(90deg, var(--mt-accent) 0%, var(--mt-primary) 100%);
+        height: 100%;
+        transition: width 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: var(--mt-space-sm);
+    }
+    
+    .mt-progress-text {
+        color: white;
+        font-weight: var(--mt-font-weight-bold);
+        font-size: var(--mt-font-size-sm);
+    }
+}
+
+/* ===================================
+   LAYER: CARDS - Candidate Card Styling from Production
+   =================================== */
+@layer cards {
+    /* Container & Grid Layout */
+    .mt-candidates-v3 {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        gap: var(--mt-v3-space-lg);
+        padding: var(--mt-v3-space-lg) 0;
+    }
+    
+    /* Grid responsive layouts */
+    @media (max-width: 767px) {
+        .mt-candidates-v3,
+        .mt-candidates-list {
+            grid-template-columns: 1fr;
+            padding: var(--mt-v3-space-md);
+        }
+    }
+    
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .mt-candidates-v3,
+        .mt-candidates-list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .mt-candidates-v3,
+        .mt-candidates-list {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    /* CRITICAL: Production mt-candidate-card Structure */
+    .mt-candidate-card,
+    .mt-candidates-v3 .mt-candidate-card,
+    .mt-dashboard-v3 .mt-candidate-card,
+    .mt-jury-dashboard .mt-candidate-card,
+    body .mt-candidate-card {
+        background: var(--mt-v3-card-bg);
+        border: 1px solid var(--mt-v3-border-soft);
+        border-radius: var(--mt-v3-radius);
+        box-shadow: var(--mt-v3-shadow);
+        padding: var(--mt-v3-space-xxl);
+        min-height: 440px;
+        display: flex;
+        flex-direction: column;
+        transition: var(--mt-v3-transition);
+        position: relative;
+        overflow: visible;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .mt-candidate-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--mt-v3-shadow-hover);
+        border-color: var(--mt-v3-accent);
+    }
+    
+    /* Card Header Section */
+    .mt-candidate-header,
+    .mt-candidate-card .mt-candidate-header {
+        border-bottom: 2px solid var(--mt-v3-border-soft);
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+        flex-shrink: 0;
+        overflow: visible;
+        min-height: auto;
+        display: block;
+    }
+    
+    /* Candidate Name */
+    .mt-candidate-name,
+    .mt-candidate-card .mt-candidate-name,
+    .mt-candidate-card h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--mt-v3-primary);
+        margin: 0 0 8px 0;
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        overflow: visible;
+        display: block;
+        width: 100%;
+        text-align: left; /* Names should be left-aligned, not centered */
+    }
+    
+    /* Organization/Company */
+    .mt-candidate-org,
+    .mt-candidate-card .mt-candidate-org {
+        font-size: 13px;
+        color: var(--mt-v3-text-secondary);
+        margin: 0;
+        padding-left: 2px;
+        line-height: 1.4;
+        font-weight: 400;
+        font-style: italic;
+        display: block;
+        width: 100%;
+        opacity: 0.85;
+        overflow: visible;
+        word-wrap: break-word;
+        hyphens: auto;
+        text-align: left;
+    }
+    
+    /* Card Body */
+    .mt-candidate-body,
+    .mt-candidate-card .mt-candidate-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0;
+        overflow: visible;
+        padding: 0;
+    }
+    
+    /* Category Container */
+    .mt-candidate-category-container,
+    .mt-candidate-card .mt-candidate-category-container {
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    
+    .mt-candidate-category,
+    .mt-candidate-card .mt-candidate-category {
+        display: inline-block;
+        padding: var(--mt-v3-space-sm) var(--mt-v3-space-md);
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, var(--mt-v3-accent), var(--mt-v3-kupfer-soft));
+        color: white;
+        box-shadow: 0 2px 4px rgba(193, 105, 60, 0.2);
+        line-height: 1.3;
+        max-width: 100%;
+        word-wrap: break-word;
+        hyphens: auto;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+    }
+    
+    /* Category-specific colors */
+    .mt-candidate-card[data-category="startups"] .mt-candidate-category {
+        background: linear-gradient(135deg, var(--mt-v3-cat-startups), #20c997);
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+    }
+    
+    .mt-candidate-card[data-category="etablierte"] .mt-candidate-category {
+        background: linear-gradient(135deg, var(--mt-v3-cat-etablierte), #0056b3);
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+    }
+    
+    .mt-candidate-card[data-category="governance"] .mt-candidate-category {
+        background: linear-gradient(135deg, var(--mt-v3-cat-governance), #5a32a3);
+        box-shadow: 0 2px 4px rgba(111, 66, 193, 0.2);
+    }
+    
+    /* Evaluation Status */
+    .mt-evaluation-status,
+    .mt-candidate-card .mt-evaluation-status {
+        margin-top: auto;
+        margin-bottom: var(--mt-v3-space-lg);
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    .mt-status-badge {
+        display: inline-block;
+        padding: var(--mt-v3-space-sm) var(--mt-v3-space-md);
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--mt-v3-transition);
+    }
+    
+    .mt-status-badge.mt-status-draft {
+        background-color: var(--mt-v3-status-draft);
+        color: #856404;
+    }
+    
+    .mt-status-badge.mt-status-completed {
+        background-color: var(--mt-v3-status-completed);
+        color: white;
+    }
+    
+    .mt-status-badge.mt-status-pending {
+        background-color: var(--mt-v3-status-pending);
+        color: white;
+    }
+    
+    /* Action Button */
+    .mt-evaluate-btn,
+    .mt-candidate-card .mt-evaluate-btn {
+        display: inline-block;
+        width: 100%;
+        padding: var(--mt-v3-space-md);
+        background: linear-gradient(135deg, var(--mt-v3-primary), var(--mt-v3-secondary));
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: var(--mt-v3-transition);
+        box-shadow: 0 2px 4px rgba(0, 60, 61, 0.2);
+        margin-top: auto;
+        flex-shrink: 0;
+    }
+    
+    .mt-evaluate-btn:hover,
+    .mt-candidate-card .mt-evaluate-btn:hover {
+        background: linear-gradient(135deg, var(--mt-v3-secondary), var(--mt-v3-primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 60, 61, 0.3);
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .mt-candidate-card {
+            min-height: 380px;
+            padding: 32px;
+        }
+        
+        .mt-candidate-category-container {
+            height: 55px;
+        }
+        
+        .mt-candidate-category {
+            font-size: 10px;
+            padding: 6px 10px;
+        }
+    }
+    
+    /* Hidden state for filters */
+    .mt-candidate-card.hidden {
+        display: none;
+    }
+}
+
+/* ===================================
+   LAYER: LAYOUTS - Page Layouts
+   =================================== */
+@layer layouts {
+    /* Main container layouts */
+    .mt-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--mt-space-lg);
+    }
+    
+    .mt-container--wide {
+        max-width: 1400px;
+    }
+    
+    .mt-container--narrow {
+        max-width: 800px;
+    }
+    
+    /* Grid Layouts */
+    .mt-grid {
+        display: grid;
+        gap: var(--mt-space-lg);
+    }
+    
+    .mt-grid--2-cols {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mt-grid--3-cols {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .mt-grid--4-cols {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .mt-candidates-grid,
+    .mt-candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--mt-space-lg);
+        margin-top: var(--mt-space-lg);
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-lg);
+        border-radius: var(--mt-radius-md);
+    }
+    
+    /* Flex Layouts */
+    .mt-flex {
+        display: flex;
+    }
+    
+    .mt-flex--wrap {
+        flex-wrap: wrap;
+    }
+    
+    .mt-flex--center {
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .mt-flex--between {
+        justify-content: space-between;
+    }
+    
+    .mt-flex--gap {
+        gap: var(--mt-space-md);
+    }
+}
+
+/* ===================================
+   LAYER: PAGES - Page-specific Styles
+   =================================== */
+@layer pages {
+    /* Jury Dashboard Page */
+    .mt-jury-dashboard-page {
+        background-color: var(--mt-bg-beige);
+        min-height: 100vh;
+        padding: var(--mt-space-xl) 0;
+    }
+    
+    /* Candidates Page */
+    .mt-candidates-page,
+    .page-template-candidates {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+    }
+    
+    .mt-candidates-page h1,
+    .page-template-candidates h1 {
+        color: var(--mt-heading-color); /* Copper! */
+        font-size: var(--mt-font-size-xxxl);
+        text-align: center;
+        margin-bottom: var(--mt-space-2xl);
+        font-family: var(--mt-font-heading);
+    }
+    
+    /* Evaluation Page */
+    .mt-evaluation-page {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-2xl);
+    }
+    
+    .mt-criterion-card {
+        background: var(--mt-bg-base);
+        border: 2px solid var(--mt-border-light);
+        border-radius: var(--mt-radius-md);
+        padding: var(--mt-space-lg);
+        margin-bottom: var(--mt-space-lg);
+        transition: var(--mt-transition);
+    }
+    
+    .mt-criterion-card:hover {
+        border-color: var(--mt-accent);
+        box-shadow: 0 5px 20px rgba(0, 60, 61, 0.1);
+    }
+    
+    .mt-score-slider {
+        accent-color: var(--mt-accent);
+    }
+    
+    .mt-score-display {
+        background-color: var(--mt-accent);
+        color: white;
+        padding: var(--mt-space-sm) var(--mt-space-md);
+        border-radius: var(--mt-radius-sm);
+        font-weight: var(--mt-font-weight-bold);
+        display: inline-block;
+    }
+    
+    /* Rankings Page */
+    .mt-rankings-page {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+    }
+    
+    .mt-rankings-table {
+        background: var(--mt-bg-base);
+        border: 2px solid var(--mt-border-light);
+        border-radius: var(--mt-radius-md);
+        overflow: hidden;
+        width: 100%;
+    }
+    
+    .mt-rankings-table th {
+        background: linear-gradient(135deg, var(--mt-primary) 0%, var(--mt-secondary) 100%);
+        color: white;
+        padding: var(--mt-space-md);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: var(--mt-font-heading);
+        font-size: var(--mt-font-size-sm);
+    }
+    
+    .mt-rankings-table td {
+        padding: var(--mt-space-md);
+        border-bottom: 1px solid var(--mt-border-light);
+        color: var(--mt-text-primary);
+    }
+    
+    .mt-rankings-table tr:hover {
+        background-color: var(--mt-bg-beige);
+    }
+    
+    /* Winners Page */
+    .mt-winners-page {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+    }
+    
+    .mt-winners-header {
+        background: linear-gradient(135deg, var(--mt-bg-beige) 0%, var(--mt-bg-base) 50%, var(--mt-bg-beige) 100%);
+        border-bottom: 4px solid var(--mt-accent);
+        padding: var(--mt-space-2xl);
+        text-align: center;
+        border-radius: var(--mt-radius-lg);
+        margin-bottom: var(--mt-space-2xl);
+    }
+    
+    .mt-winners-header h2 {
+        color: var(--mt-heading-color); /* Copper! */
+        font-family: var(--mt-font-heading);
+        font-size: 2.5em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: var(--mt-space-sm);
+        position: relative;
+    }
+    
+    .mt-winners-header h2::after {
+        content: '';
+        display: block;
+        width: 100px;
+        height: 4px;
+        background: var(--mt-accent);
+        margin: var(--mt-space-lg) auto 0;
+        border-radius: 2px;
+    }
+}
+
+/* ===================================
+   LAYER: THEMES - Theme Variations & Widgets
+   =================================== */
+@layer themes {
+    /* Widget Support */
+    .mt-widget,
+    .mt-award-widget,
+    .widget_mt_rankings,
+    .widget_mt_candidates {
+        background: var(--mt-bg-base);
+        border: 1px solid var(--mt-border-light);
+        border-radius: var(--mt-radius-md);
+        padding: var(--mt-space-lg);
+        margin-bottom: var(--mt-space-lg);
+    }
+    
+    .mt-widget h3,
+    .mt-award-widget h3,
+    .widget_mt_rankings h3,
+    .widget_mt_candidates h3 {
+        color: var(--mt-heading-color); /* Copper! */
+        font-size: var(--mt-font-size-xl);
+        margin-bottom: var(--mt-space-md);
+        text-align: center;
+    }
+    
+    /* Shortcode Support */
+    .mt-shortcode,
+    [class*="mt-shortcode-"] {
+        margin: var(--mt-space-lg) 0;
+    }
+    
+    .mt-shortcode-candidates {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: var(--mt-space-md);
+    }
+    
+    .mt-shortcode-rankings {
+        overflow-x: auto;
+    }
+    
+    .mt-shortcode-evaluation {
+        background: var(--mt-bg-beige);
+        padding: var(--mt-space-lg);
+        border-radius: var(--mt-radius-md);
+    }
+    
+    /* Completed State Theme */
+    .mt-completed {
+        border-color: var(--mt-success);
+        background-color: rgba(40, 167, 69, 0.05);
+    }
+    
+    .mt-header-completed {
+        position: relative;
+        overflow: visible;
+    }
+    
+    .mt-completion-badge {
+        background: linear-gradient(135deg, var(--mt-success) 0%, #22c55e 100%);
+        color: white;
+        padding: var(--mt-space-lg);
+        border-radius: var(--mt-radius-md);
+        margin-top: var(--mt-space-lg);
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    .mt-completion-icon-large {
+        font-size: 3em;
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    /* Dark Theme Support */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --mt-bg-base: #1a1a1a;
+            --mt-bg-beige: #2a2a2a;
+            --mt-text-primary: #f0f0f0;
+            --mt-body-text: #d0d0d0;
+            /* Keep headers copper in dark mode */
+            --mt-heading-color: #C1693C;
+        }
+    }
+}
+
+/* ===================================
+   LAYER: UTILITIES - Utility Classes
+   =================================== */
+@layer utilities {
+    /* Display utilities */
+    .mt-hidden { display: none; }
+    .mt-block { display: block; }
+    .mt-inline-block { display: inline-block; }
+    .mt-flex { display: flex; }
+    .mt-inline-flex { display: inline-flex; }
+    .mt-grid { display: grid; }
+    
+    /* Text alignment */
+    .mt-text-left { text-align: left; }
+    .mt-text-center { text-align: center; }
+    .mt-text-right { text-align: right; }
+    
+    /* Spacing utilities */
+    .mt-m-0 { margin: 0; }
+    .mt-p-0 { padding: 0; }
+    .mt-mt-0 { margin-top: 0; }
+    .mt-mb-0 { margin-bottom: 0; }
+    .mt-ml-0 { margin-left: 0; }
+    .mt-mr-0 { margin-right: 0; }
+    
+    .mt-m-auto { margin: auto; }
+    .mt-mx-auto { margin-left: auto; margin-right: auto; }
+    
+    /* Width utilities */
+    .mt-w-full { width: 100%; }
+    .mt-w-auto { width: auto; }
+    
+    /* Height utilities */
+    .mt-h-full { height: 100%; }
+    .mt-h-auto { height: auto; }
+    
+    /* Flexbox utilities */
+    .mt-flex-row { flex-direction: row; }
+    .mt-flex-col { flex-direction: column; }
+    .mt-justify-start { justify-content: flex-start; }
+    .mt-justify-center { justify-content: center; }
+    .mt-justify-end { justify-content: flex-end; }
+    .mt-justify-between { justify-content: space-between; }
+    .mt-items-start { align-items: flex-start; }
+    .mt-items-center { align-items: center; }
+    .mt-items-end { align-items: flex-end; }
+    .mt-flex-wrap { flex-wrap: wrap; }
+    .mt-flex-nowrap { flex-wrap: nowrap; }
+    .mt-flex-1 { flex: 1; }
+    
+    /* Gap utilities */
+    .mt-gap-xs { gap: var(--mt-space-xs); }
+    .mt-gap-sm { gap: var(--mt-space-sm); }
+    .mt-gap-md { gap: var(--mt-space-md); }
+    .mt-gap-lg { gap: var(--mt-space-lg); }
+    .mt-gap-xl { gap: var(--mt-space-xl); }
+    
+    /* Border radius utilities */
+    .mt-rounded-none { border-radius: 0; }
+    .mt-rounded-sm { border-radius: var(--mt-radius-sm); }
+    .mt-rounded-md { border-radius: var(--mt-radius-md); }
+    .mt-rounded-lg { border-radius: var(--mt-radius-lg); }
+    .mt-rounded-full { border-radius: var(--mt-radius-full); }
+    
+    /* Shadow utilities */
+    .mt-shadow-none { box-shadow: none; }
+    .mt-shadow-sm { box-shadow: var(--mt-shadow-sm); }
+    .mt-shadow-md { box-shadow: var(--mt-shadow-md); }
+    .mt-shadow-lg { box-shadow: var(--mt-shadow-lg); }
+    
+    /* Opacity utilities */
+    .mt-opacity-0 { opacity: 0; }
+    .mt-opacity-50 { opacity: 0.5; }
+    .mt-opacity-100 { opacity: 1; }
+    
+    /* Cursor utilities */
+    .mt-cursor-pointer { cursor: pointer; }
+    .mt-cursor-not-allowed { cursor: not-allowed; }
+    
+    /* Transition utilities */
+    .mt-transition {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+    
+    .mt-transition-none { transition: none; }
+    
+    /* Screen reader only */
+    .mt-sr-only,
+    .screen-reader-text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+}
+
+/* ===================================
+   LAYER: OVERRIDES - Critical Fixes
+   =================================== */
+@layer overrides {
+    /* WordPress Admin Bar Compatibility */
+    .admin-bar .mt-jury-dashboard {
+        margin-top: 32px;
+    }
+    
+    @media screen and (max-width: 782px) {
+        .admin-bar .mt-jury-dashboard {
+            margin-top: 46px;
+        }
+    }
+    
+    /* CRITICAL: Ensure headers are copper and centered */
+    body h1,
+    body h2,
+    body h3,
+    body .mt-jury-dashboard h1,
+    body .mt-jury-dashboard h2,
+    body .mt-jury-dashboard h3,
+    body .mt-candidates-page h1,
+    body .mt-candidates-page h2,
+    body .mt-candidates-page h3 {
+        color: #C1693C;
+        text-align: center;
+    }
+    
+    /* Allow specific exceptions for left alignment */
+    body .mt-candidate-card h3,
+    body .mt-candidate-name,
+    body .text-left h1,
+    body .text-left h2,
+    body .text-left h3 {
+        text-align: left;
+    }
+    
+    /* Ensure proper specificity for critical elements */
+    body .mt-jury-dashboard {
+        background-color: var(--mt-bg-beige);
+    }
+    
+    body .mt-candidate-card {
+        background: var(--mt-v3-card-bg);
+        border-color: var(--mt-v3-border-soft);
+        padding: 45px;
+        min-height: 440px;
+    }
+    
+    body .mt-dashboard-header {
+        background: linear-gradient(135deg, var(--mt-bg-beige) 0%, var(--mt-bg-base) 100%);
+        border-radius: var(--mt-radius-md);
+    }
+    
+    /* Fix for search box - ensure grid layout */
+    body .mt-search-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 15px;
+        width: 100%;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .mt-jury-dashboard {
+            padding: var(--mt-space-md);
+        }
+        
+        .mt-dashboard-header {
+            padding: var(--mt-space-lg);
+        }
+        
+        .mt-candidates-grid,
+        .mt-candidates-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .mt-grid--2-cols,
+        .mt-grid--3-cols,
+        .mt-grid--4-cols {
+            grid-template-columns: 1fr;
+        }
+        
+        .mt-winners-header h2 {
+            font-size: 1.8em;
+        }
+        
+        body .mt-search-box {
+            grid-template-columns: 1fr;
+        }
+        
+        body .mt-candidate-card {
+            padding: 32px;
+            min-height: 380px;
+        }
+    }
+    
+    /* Animation Classes */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes cardEntrance {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .mt-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    .mt-candidates-v3.animate-in .mt-candidate-card {
+        animation: cardEntrance 0.4s ease-out backwards;
+    }
+    
+    .mt-candidates-v3.animate-in .mt-candidate-card:nth-child(1) { animation-delay: 0.05s; }
+    .mt-candidates-v3.animate-in .mt-candidate-card:nth-child(2) { animation-delay: 0.1s; }
+    .mt-candidates-v3.animate-in .mt-candidate-card:nth-child(3) { animation-delay: 0.15s; }
+    .mt-candidates-v3.animate-in .mt-candidate-card:nth-child(4) { animation-delay: 0.2s; }
+    .mt-candidates-v3.animate-in .mt-candidate-card:nth-child(5) { animation-delay: 0.25s; }
+    .mt-candidates-v3.animate-in .mt-candidate-card:nth-child(6) { animation-delay: 0.3s; }
+    
+    /* Loading States */
+    .mt-loading {
+        position: relative;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+    
+    .mt-loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 24px;
+        height: 24px;
+        margin: -12px 0 0 -12px;
+        border: 3px solid var(--mt-color-primary);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: mt-spin 0.8s linear infinite;
+    }
+    
+    @keyframes mt-spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* No results message */
+    .mt-no-results-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: var(--mt-v3-space-xl);
+        background: var(--mt-v3-card-bg);
+        border-radius: var(--mt-v3-radius);
+        border: 1px solid var(--mt-v3-border-soft);
+        color: var(--mt-v3-text-secondary);
+    }
+    
+    /* Print Styles */
+    @media print {
+        .mt-no-print {
+            display: none;
+        }
+        
+        .mt-jury-dashboard {
+            background: white;
+            color: black;
+        }
+        
+        .mt-candidate-card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+        
+        .mt-evaluate-btn {
+            display: none;
+        }
+    }
+    
+    /* Accessibility Enhancements */
+    .mt-candidate-card:focus-within {
+        outline: 3px solid var(--mt-v3-accent);
+        outline-offset: 2px;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+        .mt-candidate-card,
+        .mt-evaluate-btn {
+            transition: none;
+        }
+    }
+    
+    @media (prefers-contrast: high) {
+        .mt-candidate-card {
+            border-width: 2px;
+        }
+        
+        .mt-candidate-name {
+            font-weight: 900;
+        }
+    }
+    
+    /* RTL Support */
+    [dir="rtl"] .mt-candidate-card {
+        text-align: right;
+    }
+    
+    [dir="rtl"] .mt-candidate-category {
+        align-self: flex-end;
+    }
+}
+
+/* ===================================
+   END OF PHASE 3 v4 CSS
+   Zero !important declarations achieved
+   All critical issues fixed:
+   - Headers are copper (#C1693C) and centered
+   - mt-candidate-card matches production
+   - Search box on one elegant line
+   - Widget and shortcode support included
+   =================================== */

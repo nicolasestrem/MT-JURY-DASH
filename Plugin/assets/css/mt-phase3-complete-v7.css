@@ -1,0 +1,786 @@
+/**
+ * Mobility Trailblazers - Phase 3 Complete CSS Architecture v7.0
+ * 
+ * PIXEL-PERFECT PRODUCTION MATCHING
+ * Based on exact measurements from production using Kapture MCP analysis
+ * 
+ * Production Card Specifications:
+ * - Card: 369px × 469px
+ * - Name: 44-52px height, TITLE CASE (not uppercase)
+ * - Category badges: 24-39px height (compact)
+ * - Status badges: 27-31px height (subtle)
+ * - Action buttons: 53px height
+ * - Padding: 24px (not 32px)
+ * 
+ * Created: 2025-08-30
+ * Version: 7.0.0 - Production Parity
+ */
+
+/* Define layer order for cascade management */
+@layer framework, base, components, modules, enhancements, overrides;
+
+/* ===================================
+   LAYER: FRAMEWORK - Core tokens only
+   =================================== */
+@layer framework {
+    /* Reset */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    
+    /* Framework tokens - minimal set needed */
+    :root {
+        /* Brand Colors - From framework */
+        --mt-primary: #003C3D;
+        --mt-secondary: #004C5F;
+        --mt-accent: #C1693C;
+        --mt-kupfer-bold: #AA4E2C;
+        
+        /* Status Colors */
+        --mt-success: #27ae60;
+        --mt-warning: #f39c12;
+        --mt-error: #e74c3c;
+        --mt-info: #3498db;
+        
+        /* Neutral Colors */
+        --mt-body-text: #302C37;
+        --mt-body-text-light: #666666;
+        --mt-bg-base: #ffffff;
+        --mt-bg-light: #f8f9fa;
+        --mt-bg-dark: #f1f3f5;
+        --mt-border-light: #e9ecef;
+        --mt-border-base: #dee2e6;
+        
+        /* Typography Scale */
+        --mt-text-xs: 0.75rem;
+        --mt-text-sm: 0.875rem;
+        --mt-text-base: 1rem;
+        --mt-text-lg: 1.125rem;
+        --mt-text-xl: 1.25rem;
+        --mt-text-2xl: 1.5rem;
+        --mt-text-3xl: 1.875rem;
+        --mt-text-4xl: 2.25rem;
+        
+        /* Transitions */
+        --mt-transition-fast: 150ms ease;
+        --mt-transition-base: 300ms ease;
+        --mt-transition: all var(--mt-transition-base);
+        
+        /* Framework font families */
+        --mt-font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        --mt-font-heading: "Poppins", var(--mt-font-base);
+        
+        /* User requirement: Headers copper */
+        --mt-heading-color: #C1693C;
+    }
+}
+
+/* ===================================
+   LAYER: BASE - Typography and basics
+   =================================== */
+@layer base {
+    /* Headers - Copper and Centered per user requirement */
+    h1, h2, h3, h4, h5, h6,
+    .mt-root h1,
+    .mt-root h2,
+    .mt-root h3 {
+        color: var(--mt-heading-color);
+        text-align: center;
+        font-family: var(--mt-font-heading);
+        font-weight: 700;
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+    
+    h1 { font-size: var(--mt-text-4xl); }
+    h2 { font-size: var(--mt-text-3xl); }
+    h3 { font-size: var(--mt-text-2xl); }
+    h4 { font-size: var(--mt-text-xl); }
+    h5 { font-size: var(--mt-text-lg); }
+    h6 { font-size: var(--mt-text-base); }
+}
+
+/* ===================================
+   LAYER: COMPONENTS - Core components
+   =================================== */
+@layer components {
+    /* Search Box - One elegant line with grid */
+    .mt-search-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 1rem;
+        align-items: center;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 1.5rem;
+    }
+    
+    .mt-search-input,
+    .mt-filter-select,
+    #mt-category-filter {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--mt-border-base);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        background: var(--mt-bg-base);
+        box-sizing: border-box;
+        font-family: var(--mt-font-base);
+        color: var(--mt-body-text);
+        transition: var(--mt-transition);
+    }
+    
+    .mt-search-input:focus,
+    .mt-filter-select:focus {
+        outline: none;
+        border-color: var(--mt-accent);
+        box-shadow: 0 0 0 3px rgba(193, 105, 60, 0.1);
+    }
+    
+    @media (max-width: 768px) {
+        .mt-search-box {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+    }
+    
+    /* CRITICAL: mt-evaluation-table */
+    .mt-evaluation-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 1rem;
+        background: var(--mt-bg-base);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    .mt-evaluation-table thead th {
+        background: var(--mt-bg-light);
+        color: var(--mt-primary);
+        font-weight: 700;
+        padding: 1rem 0.5rem;
+        text-align: center;
+        border-bottom: 2px solid var(--mt-border-base);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+    
+    .mt-evaluation-table tbody tr {
+        background: var(--mt-bg-base);
+        border-bottom: 1px solid var(--mt-border-light);
+        transition: var(--mt-transition);
+    }
+    
+    .mt-evaluation-table tbody tr:hover {
+        background-color: var(--mt-bg-light);
+    }
+    
+    .mt-evaluation-table tbody td {
+        padding: 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid var(--mt-border-light);
+        vertical-align: middle;
+        color: var(--mt-body-text);
+    }
+    
+    /* Evaluation score inputs */
+    .mt-eval-score-input {
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        height: 38px;
+        padding: 0.5rem 0.25rem;
+        text-align: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: 2px solid var(--mt-border-base);
+        border-radius: 0.5rem;
+        background: var(--mt-bg-base);
+        transition: var(--mt-transition);
+        color: var(--mt-body-text);
+    }
+    
+    .mt-eval-score-input:focus {
+        border-color: var(--mt-accent);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(193, 105, 60, 0.1);
+    }
+    
+    /* Score display in non-editable cells */
+    .mt-eval-score-display {
+        display: inline-block;
+        min-width: 40px;
+        padding: 0.25rem 0.5rem;
+        background: var(--mt-bg-light);
+        border: 1px solid var(--mt-border-base);
+        border-radius: 0.25rem;
+        font-weight: 600;
+        color: var(--mt-primary);
+    }
+}
+
+/* ===================================
+   LAYER: MODULES - Grid and list modules
+   =================================== */
+@layer modules {
+    /* CRITICAL: mt-candidates-grid */
+    .mt-candidates-grid {
+        display: grid;
+        gap: 1.5rem;
+        padding: 1.5rem 0;
+        width: 100%;
+        max-width: 1400px;
+        margin: 2rem auto;
+    }
+    
+    /* Grid Column Layouts - Dynamic Options */
+    .mt-candidates-grid.columns-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    
+    .mt-candidates-grid.columns-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    
+    /* Default auto-fit layout */
+    .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    /* CRITICAL: mt-candidates-list */
+    .mt-candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        background-color: transparent;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+    }
+    
+    body .mt-jury-dashboard .mt-candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        background-color: transparent;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+    }
+    
+    /* Candidates v3 specific */
+    .mt-candidates-v3 {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1.5rem;
+        padding: 1.5rem 0;
+    }
+    
+    /* Responsive breakpoints */
+    @media (max-width: 1200px) {
+        .mt-candidates-grid.columns-5,
+        .mt-candidates-grid.columns-4 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .mt-candidates-grid.columns-5,
+        .mt-candidates-grid.columns-4,
+        .mt-candidates-grid.columns-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        
+        .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .mt-candidates-grid,
+        .mt-candidates-list {
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+        
+        .mt-candidates-grid.columns-5,
+        .mt-candidates-grid.columns-4,
+        .mt-candidates-grid.columns-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .mt-candidates-grid,
+        .mt-candidates-list {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+/* ===================================
+   LAYER: ENHANCEMENTS - Production exact candidate cards
+   =================================== */
+@layer enhancements {
+    /* Enhanced dashboard styles - Production background */
+    .mt-jury-dashboard {
+        background-color: #F8F0E3; /* Production beige background */
+        padding: 2rem;
+        border-radius: 1rem;
+        min-height: 100vh;
+    }
+    
+    /* Dashboard wrapper background */
+    .mt-dashboard-v3,
+    .mt-candidates-v3 {
+        background-color: #F8F0E3; /* Production beige */
+    }
+    
+    .mt-dashboard-header {
+        background: linear-gradient(135deg, var(--mt-bg-light) 0%, var(--mt-bg-base) 100%);
+        border-bottom: 3px solid var(--mt-accent);
+        padding: 3rem;
+        margin-bottom: 2rem;
+        border-radius: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* PRODUCTION EXACT: Candidate card structure */
+    .mt-candidate-card {
+        background: var(--mt-bg-base);
+        border: 1px solid #E8DCC9; /* Production soft beige border */
+        border-radius: 16px; /* Production exact radius */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07); /* Production exact shadow */
+        padding: 24px; /* PRODUCTION MEASUREMENT: 24px not 32px */
+        width: 369px; /* PRODUCTION EXACT WIDTH */
+        height: 469px; /* PRODUCTION EXACT HEIGHT */
+        display: flex;
+        flex-direction: column;
+        transition: var(--mt-transition);
+        position: relative;
+        overflow: visible;
+        box-sizing: border-box;
+        text-align: center; /* Center everything by default */
+    }
+    
+    .mt-candidate-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12); /* Production hover shadow */
+        border-color: var(--mt-accent);
+    }
+    
+    /* Card Header - Production structure */
+    .mt-candidate-header {
+        border-bottom: 2px solid #E8DCC9; /* Soft beige border */
+        padding-bottom: 16px; /* Tighter than before */
+        margin-bottom: 16px; /* Tighter than before */
+        flex-shrink: 0;
+        overflow: visible;
+        min-height: auto;
+        display: block;
+    }
+    
+    /* CRITICAL FIX: Name should be TITLE CASE, not uppercase */
+    .mt-candidate-name,
+    .mt-candidate-card h3 {
+        font-size: 16px; /* Slightly smaller for better fit */
+        font-weight: 700;
+        color: var(--mt-primary);
+        margin: 0 0 8px 0; /* Tight spacing */
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        overflow: visible;
+        display: block;
+        width: 100%;
+        text-align: center; /* CENTER the name */
+        text-transform: none; /* PRODUCTION: Title case, NOT uppercase */
+        letter-spacing: normal; /* Remove extra spacing */
+        min-height: 44px; /* Production measurement range */
+        max-height: 52px; /* Production measurement range */
+    }
+    
+    .mt-candidate-org {
+        font-size: 14px; /* Small but readable */
+        color: #6C757D; /* Subtle gray */
+        margin: 0;
+        padding: 0;
+        line-height: 1.4;
+        font-weight: 400;
+        font-style: italic; /* Subtle italic */
+        display: block;
+        width: 100%;
+        opacity: 0.85;
+        overflow: visible;
+        word-wrap: break-word;
+        hyphens: auto;
+        text-align: center; /* CENTER the organization */
+    }
+    
+    /* Card Body - Production structure */
+    .mt-candidate-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0;
+        overflow: visible;
+        padding: 0;
+    }
+    
+    /* Category container - PRODUCTION EXACT height range */
+    .mt-candidate-category-container {
+        height: 60px; /* Consistent height for layout */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+        margin: 12px 0; /* Some spacing */
+    }
+    
+    /* PRODUCTION EXACT: Smaller, subtle category badges */
+    .mt-candidate-category {
+        display: inline-block;
+        padding: 6px 12px; /* MUCH smaller padding */
+        border-radius: 6px; /* Smaller radius */
+        font-size: 10px; /* MUCH smaller font */
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #F5E6D3; /* Subtle beige background */
+        color: #003C3D; /* Dark text */
+        border: 1px solid #E8DCC9; /* Subtle border */
+        line-height: 1.2;
+        max-width: 100%;
+        word-wrap: break-word;
+        hyphens: auto;
+        text-align: center;
+        /* Remove webkit line clamp - let it be natural size */
+    }
+    
+    /* Category colors - subtle variations */
+    .mt-candidate-card[data-category="startups"] .mt-candidate-category {
+        background: #E8F5E8; /* Soft green */
+        color: #1B5E20;
+        border-color: #C8E6C9;
+    }
+    
+    .mt-candidate-card[data-category="etablierte"] .mt-candidate-category {
+        background: #E3F2FD; /* Soft blue */
+        color: #0D47A1;
+        border-color: #BBDEFB;
+    }
+    
+    .mt-candidate-card[data-category="governance"] .mt-candidate-category {
+        background: #F3E5F5; /* Soft purple */
+        color: #4A148C;
+        border-color: #E1BEE7;
+    }
+    
+    /* Status - Production exact small badges */
+    .mt-evaluation-status {
+        margin-top: auto;
+        margin-bottom: 16px; /* Tight spacing */
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    /* PRODUCTION EXACT: Very small status badges */
+    .mt-status-badge {
+        display: inline-block;
+        padding: 4px 8px; /* MUCH smaller padding */
+        border-radius: 12px; /* Smaller radius */
+        font-size: 10px; /* MUCH smaller font */
+        font-weight: 500; /* Less bold */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--mt-transition);
+        min-height: 24px; /* Production min height */
+        max-height: 31px; /* Production max height */
+    }
+    
+    .mt-status-badge.mt-status-draft {
+        background-color: #FFF3CD; /* Soft yellow */
+        color: #856404;
+        border: 1px solid #FFEAA7;
+    }
+    
+    .mt-status-badge.mt-status-completed {
+        background-color: #D4EDDA; /* Soft green */
+        color: #155724;
+        border: 1px solid #C3E6CB;
+    }
+    
+    .mt-status-badge.mt-status-pending {
+        background-color: #F5E6D3; /* Soft beige */
+        color: #003C3D;
+        border: 1px solid #E8DCC9;
+    }
+    
+    /* PRODUCTION EXACT: Action button */
+    .mt-evaluate-btn {
+        display: inline-block;
+        width: 100%;
+        height: 53px; /* PRODUCTION EXACT HEIGHT */
+        padding: 0 24px; /* Horizontal padding only */
+        background: #004C5F; /* Solid color like production */
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px; /* Smaller radius */
+        font-weight: 600;
+        font-size: 13px; /* Smaller font */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--mt-transition);
+        border: none;
+        margin-top: auto;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+    
+    .mt-evaluate-btn:hover {
+        background: #003C3D; /* Darker on hover */
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 60, 61, 0.2);
+    }
+    
+    /* Mobile adjustments - Production responsive */
+    @media (max-width: 768px) {
+        .mt-candidate-card {
+            width: auto; /* Let it be responsive */
+            height: auto;
+            min-height: 400px;
+            padding: 20px;
+        }
+        
+        .mt-candidate-category-container {
+            height: 50px;
+        }
+        
+        .mt-candidate-category {
+            font-size: 9px;
+            padding: 4px 8px;
+        }
+        
+        .mt-status-badge {
+            font-size: 9px;
+            padding: 3px 6px;
+        }
+    }
+}
+
+/* ===================================
+   LAYER: OVERRIDES - Critical overrides
+   =================================== */
+@layer overrides {
+    /* Ensure headers are copper and centered */
+    body h1,
+    body h2,
+    body h3,
+    body .mt-jury-dashboard h1,
+    body .mt-jury-dashboard h2,
+    body .mt-jury-dashboard h3 {
+        color: #C1693C;
+        text-align: center;
+    }
+    
+    /* Exception for candidate names - keep them as title case and centered */
+    body .mt-candidate-card h3,
+    body .mt-candidate-name {
+        text-align: center; /* Keep centered */
+        color: var(--mt-primary);
+        text-transform: none; /* NO UPPERCASE - title case */
+    }
+    
+    /* Ensure grid layouts work */
+    body .mt-candidates-grid {
+        display: grid;
+    }
+    
+    body .mt-candidates-grid.columns-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    
+    @media (max-width: 992px) {
+        body .mt-candidates-grid.columns-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    
+    @media (max-width: 576px) {
+        body .mt-candidates-grid.columns-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Ensure search box grid layout */
+    body .mt-search-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        body .mt-search-box {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Rankings container overrides */
+    .mt-rankings-container {
+        background: var(--mt-bg-base);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin: 1.5rem 0;
+    }
+    
+    .mt-rankings-container h2 {
+        color: var(--mt-heading-color);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--mt-accent);
+    }
+    
+    /* Widget support */
+    .elementor-widget-mt_candidates_grid .mt-candidates-grid,
+    .widget_mt_candidates .mt-candidates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+    
+    @media (min-width: 1024px) {
+        .elementor-widget-mt_candidates_grid .mt-candidates-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    /* Responsive table fixes */
+    @media (max-width: 1200px) {
+        .mt-evaluation-table {
+            font-size: 0.875rem;
+        }
+        
+        .mt-eval-score-input {
+            width: 55px;
+            min-width: 55px;
+            font-size: 0.75rem;
+            padding: 0.25rem;
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .mt-evaluation-table {
+            font-size: 0.75rem;
+        }
+        
+        .mt-eval-score-input {
+            width: 50px;
+            min-width: 50px;
+            font-size: 0.75rem;
+        }
+    }
+    
+    /* Mobile-specific fixes for candidate display */
+    @media screen and (max-width: 768px) {
+        .mt-jury-dashboard .mt-candidates-list {
+            display: grid;
+            visibility: visible;
+            opacity: 1;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+        
+        .mt-search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .mt-search-box > * {
+            width: 100%;
+        }
+    }
+    
+    /* Grid specific fixes */
+    body .mt-candidates-grid * {
+        box-sizing: border-box;
+    }
+    
+    body .mt-candidates-grid img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    body.page .mt-candidates-grid {
+        max-width: 1400px;
+        margin: 2rem auto;
+    }
+    
+    .mt-candidates-grid > * {
+        min-width: 0;
+    }
+    
+    /* Jury dashboard specific */
+    body .mt-jury-dashboard .mt-candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    /* Print styles */
+    @media print {
+        .mt-evaluation-table {
+            border: 1px solid #000;
+        }
+        
+        .mt-evaluation-table th {
+            background: #f0f0f0;
+            color: #000;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .mt-eval-score-input {
+            border: none;
+            background: none;
+        }
+        
+        .mt-candidate-card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            box-shadow: none;
+            border: 1px solid var(--mt-border-base);
+        }
+        
+        .mt-evaluate-btn {
+            display: none;
+        }
+    }
+}
+
+/* ===================================
+   END OF PHASE 3 v7 CSS
+   PRODUCTION PIXEL-PERFECT MATCHING
+   Based on exact measurements from Kapture analysis
+   Zero !important declarations achieved
+   =================================== */

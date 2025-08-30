@@ -1,0 +1,1017 @@
+/**
+ * Mobility Trailblazers - Phase 3 Complete CSS Architecture v3.0
+ * 
+ * Zero !important architecture using CSS cascade layers
+ * Incorporates mt-core.css as foundation with all fixes applied
+ * 
+ * Fixes in v3:
+ * - Dashboard rounded corners
+ * - Search/filter full width alignment
+ * - Correct brand colors on candidate cards
+ * - Candidates page styling
+ * - Standardized typography and buttons
+ * 
+ * Brand Colors:
+ * - Primary: #003C3D (deep teal)
+ * - Accent: #C1693C (warm terracotta)
+ * - Background: #F8F0E3 (soft cream)
+ * 
+ * Created: 2025-08-30
+ * Version: 3.0.0
+ */
+
+/* Define layer order for specificity management */
+@layer reset, tokens, base, components, layouts, patterns, pages, themes, utilities, overrides;
+
+/* ===================================
+   LAYER: RESET - Browser Normalization
+   =================================== */
+@layer reset {
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    
+    .mt-root *,
+    .mt-root *::before,
+    .mt-root *::after {
+        box-sizing: border-box;
+    }
+    
+    /* Reset margins and paddings */
+    h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Set core body defaults */
+    body {
+        min-height: 100vh;
+        scroll-behavior: smooth;
+        text-rendering: optimizeSpeed;
+        line-height: 1.5;
+    }
+    
+    /* Remove list styles */
+    ul, ol {
+        list-style: none;
+    }
+    
+    /* Remove default button styles */
+    button {
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+    
+    /* Make images easier to work with */
+    img, picture {
+        max-width: 100%;
+        display: block;
+    }
+    
+    /* Inherit fonts for inputs and buttons */
+    input, button, textarea, select {
+        font: inherit;
+    }
+}
+
+/* ===================================
+   LAYER: TOKENS - CSS Variables
+   =================================== */
+@layer tokens {
+    :root {
+        /* ===================================
+           BRAND COLORS - From mt-core.css
+        =================================== */
+        
+        /* Primary Brand Colors */
+        --mt-primary: #003C3D;          /* Dark Petrol */
+        --mt-secondary: #004C5F;         /* Dark Indigo */
+        --mt-accent: #C1693C;            /* Copper/Terracotta */
+        --mt-body-text: #302C37;         /* Dark Gray */
+        
+        /* Extended Palette */
+        --mt-kupfer-soft: #B86F52;       /* Soft Copper */
+        --mt-kupfer-bold: #C1693C;       /* Bold Copper */
+        --mt-blue-accent: #A4DCD5;       /* Light Turquoise */
+        --mt-bg-beige: #F8F0E3;          /* Soft Cream Background */
+        --mt-bg-base: #FFFFFF;           /* White */
+        --mt-overlay-bg: #004C5FCC;      /* Indigo Overlay */
+        
+        /* Utility Colors */
+        --mt-success: #28a745;
+        --mt-warning: #ffc107;
+        --mt-error: #dc3545;
+        --mt-info: #17a2b8;
+        
+        /* Neutral Colors */
+        --mt-gray-100: #f8f9fa;
+        --mt-gray-200: #e9ecef;
+        --mt-gray-300: #dee2e6;
+        --mt-gray-400: #ced4da;
+        --mt-gray-500: #adb5bd;
+        --mt-gray-600: #6c757d;
+        --mt-gray-700: #495057;
+        --mt-gray-800: #343a40;
+        --mt-gray-900: #212529;
+        
+        /* ===================================
+           DESIGN TOKENS - From mt-core.css
+        =================================== */
+        
+        /* Typography */
+        --mt-font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        --mt-font-heading: 'Poppins', var(--mt-font-base);
+        --mt-font-mono: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        
+        /* Font Sizes */
+        --mt-font-size-xs: 0.75rem;      /* 12px */
+        --mt-font-size-sm: 0.875rem;     /* 14px */
+        --mt-font-size-base: 1rem;       /* 16px */
+        --mt-font-size-lg: 1.125rem;     /* 18px */
+        --mt-font-size-xl: 1.25rem;      /* 20px */
+        --mt-font-size-xxl: 1.5rem;      /* 24px */
+        --mt-font-size-xxxl: 1.875rem;   /* 30px */
+        
+        /* Font Weights */
+        --mt-font-weight-light: 300;
+        --mt-font-weight-normal: 400;
+        --mt-font-weight-medium: 500;
+        --mt-font-weight-bold: 700;
+        
+        /* Line Heights */
+        --mt-line-height-tight: 1.25;
+        --mt-line-height-base: 1.5;
+        --mt-line-height-relaxed: 1.75;
+        
+        /* Spacing */
+        --mt-space-xs: 0.25rem;
+        --mt-space-sm: 0.5rem;
+        --mt-space-md: 1rem;
+        --mt-space-lg: 1.5rem;
+        --mt-space-xl: 2rem;
+        --mt-space-2xl: 3rem;
+        
+        /* Border Radius - Standardized */
+        --mt-radius-sm: 0.25rem;    /* 4px */
+        --mt-radius-md: 0.5rem;     /* 8px */
+        --mt-radius-lg: 0.75rem;    /* 12px */
+        --mt-radius-xl: 1rem;       /* 16px */
+        --mt-radius-full: 9999px;
+        
+        /* Shadows */
+        --mt-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --mt-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --mt-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        
+        /* Transitions */
+        --mt-transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        
+        /* Additional tokens for specific components */
+        --mt-color-primary-alpha: rgba(0, 60, 61, 0.1);
+        --mt-color-primary-dark: #002a2b;
+        --mt-bg-primary: #ffffff;
+        --mt-bg-secondary: #f8f9fa;
+        --mt-bg-tertiary: #e9ecef;
+        --mt-border-light: #e9ecef;
+        --mt-border-medium: #dee2e6;
+        --mt-border-dark: #adb5bd;
+        --mt-text-primary: #003C3D;
+        --mt-text-secondary: #6c757d;
+    }
+}
+
+/* ===================================
+   LAYER: BASE - Typography & Elements
+   =================================== */
+@layer base {
+    /* Plugin root container */
+    .mt-root {
+        font-family: var(--mt-font-base);
+        font-size: var(--mt-font-size-base);
+        line-height: var(--mt-line-height-base);
+        color: var(--mt-text-primary);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Standardized Typography - From mt-core.css */
+    .mt-root h1,
+    .mt-root h2,
+    .mt-root h3,
+    .mt-root h4,
+    .mt-root h5,
+    .mt-root h6,
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--mt-font-heading);
+        font-weight: var(--mt-font-weight-bold);
+        line-height: var(--mt-line-height-tight);
+        color: var(--mt-text-primary);
+        margin-top: 0;
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    .mt-root h1, h1 { font-size: var(--mt-font-size-xxxl); }
+    .mt-root h2, h2 { font-size: var(--mt-font-size-xxl); }
+    .mt-root h3, h3 { font-size: var(--mt-font-size-xl); }
+    .mt-root h4, h4 { font-size: var(--mt-font-size-lg); }
+    .mt-root h5, h5 { font-size: var(--mt-font-size-base); }
+    .mt-root h6, h6 { font-size: var(--mt-font-size-sm); }
+    
+    .mt-root p {
+        margin-top: 0;
+        margin-bottom: var(--mt-space-md);
+        line-height: var(--mt-line-height-base);
+    }
+    
+    .mt-root a {
+        color: var(--mt-color-primary);
+        text-decoration: none;
+        transition: var(--mt-transition);
+    }
+    
+    .mt-root a:hover {
+        color: var(--mt-color-primary-dark);
+        text-decoration: underline;
+    }
+    
+    /* Standardized Forms */
+    .mt-root input[type="text"],
+    .mt-root input[type="email"],
+    .mt-root input[type="password"],
+    .mt-root input[type="number"],
+    .mt-root input[type="tel"],
+    .mt-root input[type="url"],
+    .mt-root input[type="search"],
+    .mt-root input[type="date"],
+    .mt-root select,
+    .mt-root textarea,
+    input[type="text"],
+    input[type="email"],
+    input[type="search"],
+    select,
+    textarea {
+        width: 100%;
+        padding: var(--mt-space-sm) var(--mt-space-md);
+        font-family: var(--mt-font-base);
+        font-size: var(--mt-font-size-base);
+        line-height: var(--mt-line-height-base);
+        color: var(--mt-text-primary);
+        background-color: var(--mt-bg-primary);
+        border: 1px solid var(--mt-border-medium);
+        border-radius: var(--mt-radius-sm);
+        transition: var(--mt-transition);
+    }
+    
+    .mt-root input:focus,
+    .mt-root select:focus,
+    .mt-root textarea:focus,
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--mt-color-primary);
+        box-shadow: 0 0 0 3px var(--mt-color-primary-alpha);
+    }
+    
+    /* Standardized Buttons - From mt-core.css */
+    .mt-root button,
+    .mt-root .mt-btn,
+    .mt-btn,
+    .mt-evaluate-btn,
+    .mt-submit-btn,
+    button[type="submit"],
+    input[type="submit"] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--mt-space-sm) var(--mt-space-lg);
+        font-family: var(--mt-font-base);
+        font-size: var(--mt-font-size-base);
+        font-weight: var(--mt-font-weight-medium);
+        line-height: var(--mt-line-height-base);
+        color: white;
+        background: linear-gradient(90deg, var(--mt-accent) 0%, var(--mt-primary) 100%);
+        border: none;
+        border-radius: var(--mt-radius-md);
+        cursor: pointer;
+        transition: var(--mt-transition);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    
+    .mt-root button:hover,
+    .mt-root .mt-btn:hover,
+    .mt-btn:hover,
+    .mt-evaluate-btn:hover,
+    .mt-submit-btn:hover,
+    button[type="submit"]:hover {
+        background: linear-gradient(90deg, var(--mt-kupfer-bold) 0%, var(--mt-secondary) 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--mt-shadow-md);
+    }
+    
+    .mt-root button:active,
+    .mt-root .mt-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--mt-shadow-sm);
+    }
+    
+    .mt-root button:disabled,
+    .mt-root .mt-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    /* Button Variants */
+    .mt-root .mt-btn--secondary,
+    .mt-btn-secondary {
+        background: var(--mt-bg-secondary);
+        color: var(--mt-text-primary);
+        border: 1px solid var(--mt-border-medium);
+    }
+    
+    .mt-root .mt-btn--secondary:hover {
+        background: var(--mt-bg-tertiary);
+        border-color: var(--mt-border-dark);
+    }
+    
+    .mt-root .mt-btn--ghost {
+        background: transparent;
+        color: var(--mt-color-primary);
+        border: 2px solid var(--mt-color-primary);
+    }
+    
+    .mt-root .mt-btn--ghost:hover {
+        background: var(--mt-color-primary);
+        color: white;
+    }
+}
+
+/* ===================================
+   LAYER: COMPONENTS - Reusable UI
+   =================================== */
+@layer components {
+    /* Dashboard Container - WITH ROUNDED CORNERS FIX */
+    .mt-jury-dashboard,
+    .mt-dashboard-v3 {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+        border-radius: var(--mt-radius-lg); /* FIX: Added rounded corners */
+    }
+    
+    /* Dashboard Header - Preserve beloved background image */
+    .mt-dashboard-header {
+        background: linear-gradient(135deg, var(--mt-bg-beige) 0%, var(--mt-bg-base) 100%);
+        border-bottom: 3px solid var(--mt-accent);
+        padding: var(--mt-space-2xl);
+        margin-bottom: var(--mt-space-xl);
+        border-radius: var(--mt-radius-md); /* FIX: Added rounded corners */
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Header with image background support */
+    .mt-header-image {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+    }
+    
+    .mt-header-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(0, 60, 61, 0.8) 0%, rgba(0, 76, 95, 0.6) 100%);
+        z-index: 1;
+    }
+    
+    .mt-header-image > * {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .mt-header-image h1,
+    .mt-header-image p {
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Search and Filter Components - FIX: Full width alignment */
+    .mt-candidate-search,
+    .mt-status-filter,
+    .mt-category-filter,
+    .mt-search-wrapper,
+    .mt-filter-wrapper {
+        width: 100%; /* FIX: Occupy full width */
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    .mt-search-filters {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mt-space-md);
+        width: 100%;
+    }
+    
+    @media (min-width: 768px) {
+        .mt-search-filters {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .mt-candidate-search,
+        .mt-status-filter,
+        .mt-category-filter {
+            flex: 1;
+        }
+    }
+    
+    /* Candidate Cards - FIX: Correct brand colors */
+    .mt-candidate-card {
+        background: var(--mt-bg-base);
+        border: 2px solid var(--mt-border-light);
+        border-radius: var(--mt-radius-lg);
+        padding: var(--mt-space-lg);
+        transition: var(--mt-transition);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .mt-candidate-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--mt-accent) 0%, var(--mt-primary) 100%);
+    }
+    
+    .mt-candidate-card:hover {
+        border-color: var(--mt-accent);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(193, 105, 60, 0.15);
+    }
+    
+    .mt-candidate-card h3,
+    .mt-candidate-card .mt-candidate-name {
+        color: var(--mt-primary); /* FIX: Correct brand color */
+        font-family: var(--mt-font-heading);
+        font-size: var(--mt-font-size-xl);
+        margin-bottom: var(--mt-space-sm);
+    }
+    
+    .mt-candidate-card .mt-candidate-org,
+    .mt-candidate-card .mt-candidate-meta {
+        color: var(--mt-secondary); /* FIX: Correct secondary color */
+        font-size: var(--mt-font-size-sm);
+        margin-bottom: var(--mt-space-xs);
+    }
+    
+    .mt-candidate-card .mt-candidate-description {
+        color: var(--mt-body-text);
+        line-height: var(--mt-line-height-base);
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    .mt-candidate-card .mt-candidate-actions {
+        display: flex;
+        gap: var(--mt-space-sm);
+        margin-top: var(--mt-space-md);
+    }
+    
+    /* Stat Cards */
+    .mt-stat-card {
+        background: var(--mt-bg-base);
+        border: 1px solid var(--mt-accent);
+        border-radius: var(--mt-radius-md);
+        padding: var(--mt-space-lg);
+        transition: var(--mt-transition);
+        text-align: center;
+    }
+    
+    .mt-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(193, 105, 60, 0.2);
+        border-color: var(--mt-primary);
+    }
+    
+    .mt-stat-number {
+        color: var(--mt-accent);
+        font-size: 2.5em;
+        font-weight: var(--mt-font-weight-bold);
+        display: block;
+    }
+    
+    .mt-stat-label {
+        color: var(--mt-primary);
+        text-transform: uppercase;
+        font-size: var(--mt-font-size-sm);
+        letter-spacing: 1px;
+        margin-top: var(--mt-space-sm);
+    }
+    
+    /* Progress Bars */
+    .mt-progress-bar {
+        background-color: var(--mt-gray-200);
+        border-radius: var(--mt-radius-full);
+        overflow: hidden;
+        height: 25px;
+        position: relative;
+    }
+    
+    .mt-progress-fill {
+        background: linear-gradient(90deg, var(--mt-accent) 0%, var(--mt-primary) 100%);
+        height: 100%;
+        transition: width 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: var(--mt-space-sm);
+    }
+    
+    .mt-progress-text {
+        color: white;
+        font-weight: var(--mt-font-weight-bold);
+        font-size: var(--mt-font-size-sm);
+    }
+    
+    /* Rankings Table */
+    .mt-rankings-table {
+        background: var(--mt-bg-base);
+        border: 2px solid var(--mt-border-light);
+        border-radius: var(--mt-radius-md);
+        overflow: hidden;
+        width: 100%;
+    }
+    
+    .mt-rankings-table th {
+        background: linear-gradient(135deg, var(--mt-primary) 0%, var(--mt-secondary) 100%);
+        color: white;
+        padding: var(--mt-space-md);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: var(--mt-font-heading);
+        font-size: var(--mt-font-size-sm);
+    }
+    
+    .mt-rankings-table td {
+        padding: var(--mt-space-md);
+        border-bottom: 1px solid var(--mt-border-light);
+        color: var(--mt-text-primary);
+    }
+    
+    .mt-rankings-table tr:hover {
+        background-color: var(--mt-bg-beige);
+    }
+    
+    /* Evaluation Forms */
+    .mt-criterion-card {
+        background: var(--mt-bg-base);
+        border: 2px solid var(--mt-border-light);
+        border-radius: var(--mt-radius-md);
+        padding: var(--mt-space-lg);
+        margin-bottom: var(--mt-space-lg);
+        transition: var(--mt-transition);
+    }
+    
+    .mt-criterion-card:hover {
+        border-color: var(--mt-accent);
+        box-shadow: 0 5px 20px rgba(0, 60, 61, 0.1);
+    }
+    
+    .mt-score-slider {
+        accent-color: var(--mt-accent);
+    }
+    
+    .mt-score-display {
+        background-color: var(--mt-accent);
+        color: white;
+        padding: var(--mt-space-sm) var(--mt-space-md);
+        border-radius: var(--mt-radius-sm);
+        font-weight: var(--mt-font-weight-bold);
+        display: inline-block;
+    }
+}
+
+/* ===================================
+   LAYER: LAYOUTS - Page Layouts
+   =================================== */
+@layer layouts {
+    /* Main container layouts */
+    .mt-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--mt-space-lg);
+    }
+    
+    .mt-container--wide {
+        max-width: 1400px;
+    }
+    
+    .mt-container--narrow {
+        max-width: 800px;
+    }
+    
+    /* Grid Layouts */
+    .mt-grid {
+        display: grid;
+        gap: var(--mt-space-lg);
+    }
+    
+    .mt-grid--2-cols {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mt-grid--3-cols {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .mt-grid--4-cols {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .mt-candidates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--mt-space-lg);
+        margin-top: var(--mt-space-lg);
+    }
+    
+    /* Flex Layouts */
+    .mt-flex {
+        display: flex;
+    }
+    
+    .mt-flex--wrap {
+        flex-wrap: wrap;
+    }
+    
+    .mt-flex--center {
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .mt-flex--between {
+        justify-content: space-between;
+    }
+    
+    .mt-flex--gap {
+        gap: var(--mt-space-md);
+    }
+}
+
+/* ===================================
+   LAYER: PAGES - Page-specific Styles
+   =================================== */
+@layer pages {
+    /* Jury Dashboard Page */
+    .mt-jury-dashboard-page {
+        background-color: var(--mt-bg-beige);
+        min-height: 100vh;
+        padding: var(--mt-space-xl) 0;
+    }
+    
+    /* Candidates Page - FIX: Ensure proper styling */
+    .mt-candidates-page,
+    .page-template-candidates {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+    }
+    
+    .mt-candidates-page h1,
+    .page-template-candidates h1 {
+        color: var(--mt-primary);
+        font-size: var(--mt-font-size-xxxl);
+        text-align: center;
+        margin-bottom: var(--mt-space-2xl);
+        font-family: var(--mt-font-heading);
+    }
+    
+    .mt-candidates-list {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-lg);
+        border-radius: var(--mt-radius-md);
+    }
+    
+    /* Evaluation Page */
+    .mt-evaluation-page {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-2xl);
+    }
+    
+    /* Rankings Page */
+    .mt-rankings-page {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+    }
+    
+    /* Winners Page */
+    .mt-winners-page {
+        background-color: var(--mt-bg-beige);
+        padding: var(--mt-space-xl);
+    }
+    
+    .mt-winners-header {
+        background: linear-gradient(135deg, var(--mt-bg-beige) 0%, var(--mt-bg-base) 50%, var(--mt-bg-beige) 100%);
+        border-bottom: 4px solid var(--mt-accent);
+        padding: var(--mt-space-2xl);
+        text-align: center;
+        border-radius: var(--mt-radius-lg);
+        margin-bottom: var(--mt-space-2xl);
+    }
+    
+    .mt-winners-header h2 {
+        color: var(--mt-primary);
+        font-family: var(--mt-font-heading);
+        font-size: 2.5em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: var(--mt-space-sm);
+        position: relative;
+    }
+    
+    .mt-winners-header h2::after {
+        content: '';
+        display: block;
+        width: 100px;
+        height: 4px;
+        background: var(--mt-accent);
+        margin: var(--mt-space-lg) auto 0;
+        border-radius: 2px;
+    }
+}
+
+/* ===================================
+   LAYER: THEMES - Theme Variations
+   =================================== */
+@layer themes {
+    /* Completed State Theme */
+    .mt-completed {
+        border-color: var(--mt-success);
+        background-color: rgba(40, 167, 69, 0.05);
+    }
+    
+    .mt-header-completed {
+        position: relative;
+        overflow: visible;
+    }
+    
+    .mt-completion-badge {
+        background: linear-gradient(135deg, var(--mt-success) 0%, #22c55e 100%);
+        color: white;
+        padding: var(--mt-space-lg);
+        border-radius: var(--mt-radius-md);
+        margin-top: var(--mt-space-lg);
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    .mt-completion-icon-large {
+        font-size: 3em;
+        margin-bottom: var(--mt-space-md);
+    }
+    
+    /* Dark Theme Support */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --mt-bg-base: #1a1a1a;
+            --mt-bg-beige: #2a2a2a;
+            --mt-text-primary: #f0f0f0;
+            --mt-body-text: #d0d0d0;
+        }
+    }
+}
+
+/* ===================================
+   LAYER: UTILITIES - Utility Classes
+   =================================== */
+@layer utilities {
+    /* Display utilities */
+    .mt-hidden { display: none; }
+    .mt-block { display: block; }
+    .mt-inline-block { display: inline-block; }
+    .mt-flex { display: flex; }
+    .mt-inline-flex { display: inline-flex; }
+    .mt-grid { display: grid; }
+    
+    /* Text alignment */
+    .mt-text-left { text-align: left; }
+    .mt-text-center { text-align: center; }
+    .mt-text-right { text-align: right; }
+    
+    /* Spacing utilities */
+    .mt-m-0 { margin: 0; }
+    .mt-p-0 { padding: 0; }
+    .mt-mt-0 { margin-top: 0; }
+    .mt-mb-0 { margin-bottom: 0; }
+    .mt-ml-0 { margin-left: 0; }
+    .mt-mr-0 { margin-right: 0; }
+    
+    .mt-m-auto { margin: auto; }
+    .mt-mx-auto { margin-left: auto; margin-right: auto; }
+    
+    /* Width utilities */
+    .mt-w-full { width: 100%; }
+    .mt-w-auto { width: auto; }
+    
+    /* Height utilities */
+    .mt-h-full { height: 100%; }
+    .mt-h-auto { height: auto; }
+    
+    /* Flexbox utilities */
+    .mt-flex-row { flex-direction: row; }
+    .mt-flex-col { flex-direction: column; }
+    .mt-justify-start { justify-content: flex-start; }
+    .mt-justify-center { justify-content: center; }
+    .mt-justify-end { justify-content: flex-end; }
+    .mt-justify-between { justify-content: space-between; }
+    .mt-items-start { align-items: flex-start; }
+    .mt-items-center { align-items: center; }
+    .mt-items-end { align-items: flex-end; }
+    .mt-flex-wrap { flex-wrap: wrap; }
+    .mt-flex-nowrap { flex-wrap: nowrap; }
+    .mt-flex-1 { flex: 1; }
+    
+    /* Gap utilities */
+    .mt-gap-xs { gap: var(--mt-space-xs); }
+    .mt-gap-sm { gap: var(--mt-space-sm); }
+    .mt-gap-md { gap: var(--mt-space-md); }
+    .mt-gap-lg { gap: var(--mt-space-lg); }
+    .mt-gap-xl { gap: var(--mt-space-xl); }
+    
+    /* Border radius utilities */
+    .mt-rounded-none { border-radius: 0; }
+    .mt-rounded-sm { border-radius: var(--mt-radius-sm); }
+    .mt-rounded-md { border-radius: var(--mt-radius-md); }
+    .mt-rounded-lg { border-radius: var(--mt-radius-lg); }
+    .mt-rounded-full { border-radius: var(--mt-radius-full); }
+    
+    /* Shadow utilities */
+    .mt-shadow-none { box-shadow: none; }
+    .mt-shadow-sm { box-shadow: var(--mt-shadow-sm); }
+    .mt-shadow-md { box-shadow: var(--mt-shadow-md); }
+    .mt-shadow-lg { box-shadow: var(--mt-shadow-lg); }
+    
+    /* Opacity utilities */
+    .mt-opacity-0 { opacity: 0; }
+    .mt-opacity-50 { opacity: 0.5; }
+    .mt-opacity-100 { opacity: 1; }
+    
+    /* Cursor utilities */
+    .mt-cursor-pointer { cursor: pointer; }
+    .mt-cursor-not-allowed { cursor: not-allowed; }
+    
+    /* Transition utilities */
+    .mt-transition {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+    
+    .mt-transition-none { transition: none; }
+    
+    /* Screen reader only */
+    .mt-sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+}
+
+/* ===================================
+   LAYER: OVERRIDES - Critical Fixes
+   =================================== */
+@layer overrides {
+    /* WordPress Admin Bar Compatibility */
+    .admin-bar .mt-jury-dashboard {
+        margin-top: 32px;
+    }
+    
+    @media screen and (max-width: 782px) {
+        .admin-bar .mt-jury-dashboard {
+            margin-top: 46px;
+        }
+    }
+    
+    /* Ensure proper specificity for critical elements */
+    body .mt-jury-dashboard {
+        background-color: var(--mt-bg-beige);
+    }
+    
+    body .mt-candidate-card {
+        background: var(--mt-bg-base);
+        border-color: var(--mt-border-light);
+    }
+    
+    body .mt-dashboard-header {
+        background: linear-gradient(135deg, var(--mt-bg-beige) 0%, var(--mt-bg-base) 100%);
+        border-radius: var(--mt-radius-md);
+    }
+    
+    /* Fix for search and filter components */
+    body .mt-candidate-search,
+    body .mt-status-filter,
+    body .mt-category-filter {
+        width: 100%;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .mt-jury-dashboard {
+            padding: var(--mt-space-md);
+        }
+        
+        .mt-dashboard-header {
+            padding: var(--mt-space-lg);
+        }
+        
+        .mt-candidates-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .mt-grid--2-cols,
+        .mt-grid--3-cols,
+        .mt-grid--4-cols {
+            grid-template-columns: 1fr;
+        }
+        
+        .mt-winners-header h2 {
+            font-size: 1.8em;
+        }
+    }
+    
+    /* Animation Classes */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .mt-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    /* Loading States */
+    .mt-loading {
+        position: relative;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+    
+    .mt-loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 24px;
+        height: 24px;
+        margin: -12px 0 0 -12px;
+        border: 3px solid var(--mt-color-primary);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: mt-spin 0.8s linear infinite;
+    }
+    
+    @keyframes mt-spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Print Styles */
+    @media print {
+        .mt-no-print {
+            display: none;
+        }
+        
+        .mt-jury-dashboard {
+            background: white;
+            color: black;
+        }
+    }
+}
+
+/* ===================================
+   END OF PHASE 3 v3 CSS
+   Zero !important declarations achieved
+   All issues fixed with proper cascade layers
+   =================================== */
