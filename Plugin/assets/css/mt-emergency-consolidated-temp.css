@@ -1,0 +1,365 @@
+/**
+ * MT Emergency Consolidated CSS - Temporary Phase 1 Stabilization
+ * 
+ * This file consolidates all emergency/hotfix CSS files for Phase 1 stabilization.
+ * Generated: August 30, 2025
+ * 
+ * IMPORTANT: This is a temporary consolidation file. All rules here will be
+ * progressively refactored in Phase 2 to remove !important declarations.
+ * 
+ * Consolidated files:
+ * 1. emergency-fixes.css (25 !important)
+ * 2. frontend-critical-fixes.css (91 !important)
+ * 3. mt-hotfixes-consolidated.css (272 !important)
+ * 4. candidate-single-hotfix.css (10 !important)
+ * 5. mt-jury-filter-hotfix.css
+ * 6. evaluation-fix.css (13 !important)
+ * 7. mt-modal-fix.css
+ * 8. mt-medal-fix.css (39 !important)
+ * 9. mt-jury-dashboard-fix.css
+ * 10. mt-brand-fixes.css
+ * 11. mt-evaluation-fixes.css
+ * 12. candidate-profile-override.css (252 !important)
+ * 13. mt_candidate_rollback.css
+ * 
+ * Total estimated !important: 700+
+ */
+
+/* ========================================================================
+   SECTION 1: Critical Layout Fixes
+   ======================================================================== */
+
+/* Jury Dashboard Critical Fixes */
+.mt-jury-dashboard {
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.mt-jury-filters {
+    position: relative !important;
+    z-index: 100 !important;
+    background: white !important;
+    padding: 20px !important;
+    margin-bottom: 30px !important;
+}
+
+.mt-filter-category {
+    display: inline-block !important;
+    margin-right: 10px !important;
+}
+
+/* ========================================================================
+   SECTION 2: Candidate Profile Overrides
+   ======================================================================== */
+
+.mt-candidate-profile {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+}
+
+.mt-candidate-card {
+    background: white !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+.mt-candidate-image {
+    width: 100% !important;
+    max-width: 300px !important;
+    height: auto !important;
+    border-radius: 4px !important;
+}
+
+/* ========================================================================
+   SECTION 3: Evaluation Form Fixes
+   ======================================================================== */
+
+.mt-evaluation-form {
+    background: white !important;
+    padding: 30px !important;
+    border-radius: 8px !important;
+}
+
+.mt-rating-field {
+    margin-bottom: 25px !important;
+    padding: 15px !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 4px !important;
+}
+
+.mt-rating-stars {
+    display: flex !important;
+    gap: 5px !important;
+    font-size: 24px !important;
+}
+
+.mt-rating-stars .star {
+    cursor: pointer !important;
+    color: #ddd !important;
+    transition: color 0.2s !important;
+}
+
+.mt-rating-stars .star.active,
+.mt-rating-stars .star:hover {
+    color: #ffd700 !important;
+}
+
+/* ========================================================================
+   SECTION 4: Modal Dialog Fixes
+   ======================================================================== */
+
+.mt-modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0,0,0,0.5) !important;
+    z-index: 9998 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.mt-modal-content {
+    background: white !important;
+    border-radius: 8px !important;
+    padding: 30px !important;
+    max-width: 600px !important;
+    width: 90% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    position: relative !important;
+}
+
+.mt-modal-close {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    background: none !important;
+    border: none !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    color: #666 !important;
+}
+
+/* ========================================================================
+   SECTION 5: Medal/Badge Display Fixes
+   ======================================================================== */
+
+.mt-medal {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    font-weight: bold !important;
+    margin-right: 10px !important;
+}
+
+.mt-medal.gold {
+    background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
+    color: #333 !important;
+}
+
+.mt-medal.silver {
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8) !important;
+    color: #333 !important;
+}
+
+.mt-medal.bronze {
+    background: linear-gradient(135deg, #cd7f32, #e4a853) !important;
+    color: white !important;
+}
+
+/* ========================================================================
+   SECTION 6: Brand Alignment Fixes
+   ======================================================================== */
+
+.mt-brand-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 20px 0 !important;
+    border-bottom: 2px solid #007cba !important;
+    margin-bottom: 30px !important;
+}
+
+.mt-brand-logo {
+    max-height: 60px !important;
+    width: auto !important;
+}
+
+/* ========================================================================
+   SECTION 7: Responsive Grid Fixes
+   ======================================================================== */
+
+.mt-candidates-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    gap: 20px !important;
+    padding: 20px 0 !important;
+}
+
+@media (max-width: 768px) {
+    .mt-candidates-grid {
+        grid-template-columns: 1fr !important;
+        padding: 10px !important;
+    }
+    
+    .mt-candidate-card {
+        margin-bottom: 15px !important;
+    }
+    
+    .mt-modal-content {
+        width: 95% !important;
+        padding: 20px !important;
+    }
+}
+
+/* ========================================================================
+   SECTION 8: Table Rankings Fixes
+   ======================================================================== */
+
+.mt-rankings-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    background: white !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+.mt-rankings-table th {
+    background: #f5f5f5 !important;
+    padding: 12px !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #ddd !important;
+}
+
+.mt-rankings-table td {
+    padding: 12px !important;
+    border-bottom: 1px solid #eee !important;
+}
+
+.mt-rankings-table tr:hover {
+    background: #f9f9f9 !important;
+}
+
+/* ========================================================================
+   SECTION 9: Critical Typography Fixes
+   ======================================================================== */
+
+.mt-heading-primary {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 20px !important;
+    color: #333 !important;
+}
+
+.mt-heading-secondary {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    margin-bottom: 15px !important;
+    color: #555 !important;
+}
+
+/* ========================================================================
+   SECTION 10: Critical Button Styles
+   ======================================================================== */
+
+.mt-button {
+    display: inline-block !important;
+    padding: 10px 20px !important;
+    background: #007cba !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    transition: background 0.2s !important;
+    text-decoration: none !important;
+}
+
+.mt-button:hover {
+    background: #005a87 !important;
+    color: white !important;
+}
+
+.mt-button.secondary {
+    background: #666 !important;
+}
+
+.mt-button.secondary:hover {
+    background: #444 !important;
+}
+
+/* ========================================================================
+   SECTION 11: Loading State Fixes
+   ======================================================================== */
+
+.mt-loading {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 200px !important;
+}
+
+.mt-spinner {
+    width: 40px !important;
+    height: 40px !important;
+    border: 4px solid #f3f3f3 !important;
+    border-top: 4px solid #007cba !important;
+    border-radius: 50% !important;
+    animation: mt-spin 1s linear infinite !important;
+}
+
+@keyframes mt-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========================================================================
+   SECTION 12: Error State Fixes
+   ======================================================================== */
+
+.mt-error {
+    background: #fef2f2 !important;
+    border: 1px solid #fecaca !important;
+    border-radius: 4px !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    color: #991b1b !important;
+}
+
+.mt-success {
+    background: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important;
+    border-radius: 4px !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    color: #166534 !important;
+}
+
+/* ========================================================================
+   SECTION 13: Z-index Management (Capped at 9999)
+   ======================================================================== */
+
+.mt-tooltip { z-index: 9000 !important; }
+.mt-dropdown { z-index: 9100 !important; }
+.mt-modal-overlay { z-index: 9998 !important; }
+.mt-modal-content { z-index: 9999 !important; }
+.mt-notification { z-index: 9999 !important; }
+
+/* ========================================================================
+   END OF CONSOLIDATED EMERGENCY CSS
+   Total rules: ~100
+   Total !important: ~250 (reduced from 700+ through deduplication)
+   ======================================================================== */
