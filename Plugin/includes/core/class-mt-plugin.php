@@ -403,9 +403,9 @@ class MT_Plugin {
      * @return void
      */
     public function enqueue_frontend_assets() {
-        // CSS Feature Flags Support (Phase 1 Stabilization - Added 2025-08-30)
-        // Check database first, then constant, then default
-        $css_version = get_option('mt_css_version', 'legacy');
+        // CSS Feature Flags Support - Using latest Phase 3 refactoring
+        // Check database first, then constant, then default to phase3
+        $css_version = get_option('mt_css_version', 'phase3');
         if (defined('MT_CSS_VERSION')) {
             $css_version = MT_CSS_VERSION;
         }
@@ -950,14 +950,14 @@ class MT_Plugin {
      * @return void
      */
     private function load_migration_css() {
-        // Check CSS version from database or constant
+        // Check CSS version from database or constant - Always use latest Phase 3
         $css_version = get_option('mt_css_version', 'phase3');
         
         if (defined('MT_CSS_VERSION')) {
             $css_version = MT_CSS_VERSION;
         }
         
-        // Load Phase 3 CSS if enabled
+        // Load Phase 3 CSS - Latest refactoring efforts
         if ($css_version === 'phase3') {
             $this->load_phase3_css();
             return;
