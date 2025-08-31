@@ -1,21 +1,28 @@
 /**
  * Mobility Trailblazers v4 CSS Framework
  * Design Tokens - CSS Custom Properties
- * Version: 4.0.0
+ * Version: 4.0.1
+ * Updated: August 31, 2025 - Fixed brand color conflict (removed teal, using petrol)
+ * 
+ * NOTE: mt-variables-unified.css is loaded separately via wp_enqueue_style
+ * to prevent CSS injection vulnerabilities via @import manipulation
  */
 
+/* Variables from ../core/mt-variables-unified.css are available as they're loaded first */
+
 :root {
-  /* Brand Colors */
-  --mt-color-primary: #26a69a;
-  --mt-color-primary-dark: #00897b;
-  --mt-color-primary-light: #4db6ac;
+  /* Brand Colors - Now using unified system */
+  /* FIXED: Replaced teal #26a69a with correct brand petrol #003C3D */
+  --mt-color-primary: var(--mt-primary-700); /* #003C3D */
+  --mt-color-primary-dark: var(--mt-primary-800); /* #003435 */
+  --mt-color-primary-light: var(--mt-primary-500); /* #4A9B9F */
   --mt-color-bg: #f8f0e3;
-  --mt-text: #302c37;
-  --mt-border: #a4dcd5;
+  --mt-text: var(--mt-text-primary);
+  --mt-border: var(--mt-border-default);
   
   /* Secondary Colors */
-  --mt-color-secondary: #004c5f;
-  --mt-color-accent: #c1693c;
+  --mt-color-secondary: var(--mt-primary-600); /* #004c5f */
+  --mt-color-accent: var(--mt-accent-600); /* #c1693c */
   --mt-color-success: #4caf50;
   --mt-color-warning: #ff9800;
   --mt-color-error: #f44336;

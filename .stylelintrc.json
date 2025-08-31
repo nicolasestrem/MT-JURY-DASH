@@ -7,19 +7,19 @@
   ],
   "rules": {
     "declaration-no-important": [true, {
-      "severity": "warning"
+      "severity": "error"
     }],
-    "selector-max-specificity": ["0,4,0", {
-      "severity": "warning"
+    "selector-max-specificity": ["0,3,0", {
+      "severity": "error"
     }],
-    "selector-max-compound-selectors": [4, {
-      "severity": "warning"
+    "selector-max-compound-selectors": [3, {
+      "severity": "error"
     }],
     "selector-max-id": [0, {
       "severity": "error"
     }],
     "max-nesting-depth": [3, {
-      "severity": "warning"
+      "severity": "error"
     }],
     "declaration-block-single-line-max-declarations": 1,
     "color-hex-length": "short",
@@ -27,7 +27,7 @@
     "declaration-block-no-redundant-longhand-properties": true,
     "no-duplicate-selectors": true,
     "no-descending-specificity": [true, {
-      "severity": "warning"
+      "severity": "error"
     }],
     "font-weight-notation": "numeric",
     "number-max-precision": 2,
