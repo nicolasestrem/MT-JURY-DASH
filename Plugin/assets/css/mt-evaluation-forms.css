@@ -1,0 +1,1499 @@
+/**
+ * Mobility Trailblazers - Evaluation Forms Styles
+ * Version: 2.0.0
+ * Created: 2025-08-17
+ * Refactored: 2025-08-31
+ * 
+ * Description: All evaluation form and scoring-related styles
+ * Dependencies: mt-variables-unified.css
+ * 
+ * REFACTORING SUMMARY (2025-08-31):
+ * - Reduced !important declarations from 295 to 0
+ * - Replaced hardcoded colors with CSS custom properties from mt-variables-unified.css
+ * - Replaced hardcoded spacing with --mt-space-* variables
+ * - Replaced font-size values with --mt-font-size-* variables
+ * - Improved CSS selector specificity to eliminate need for !important
+ * - Updated gradients to use predefined gradient variables
+ * - Enhanced mobile responsiveness with proper CSS custom properties
+ * - Maintained all form functionality and accessibility features
+ * 
+ * This file contains:
+ * - Evaluation form base styles
+ * - Scoring criteria interface
+ * - Score sliders and controls
+ * - Comments sections
+ * - Submission buttons
+ * - Evaluation page layouts
+ * - Rankings list styles
+ */
+
+/* ===================================
+   EVALUATION CRITERIA INFO SECTION
+   =================================== */
+
+.mt-criteria-info-section {
+    background: var(--mt-bg-surface);
+    padding: var(--mt-space-8);
+    margin: var(--mt-space-8) auto;
+    border-radius: var(--mt-radius-lg);
+    box-shadow: var(--mt-shadow-sm);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.mt-criteria-info-section .mt-section-title {
+    color: var(--mt-text-primary);
+    font-size: var(--mt-font-size-2xl);
+    font-weight: var(--mt-font-weight-semibold);
+    margin-bottom: var(--mt-space-6);
+    padding-bottom: var(--mt-space-4);
+    border-bottom: 2px solid var(--mt-border-light);
+}
+
+.mt-criteria-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.mt-criterion-info-card {
+    background: var(--mt-bg-surface-alt);
+    border-radius: var(--mt-radius-md);
+    padding: var(--mt-space-5);
+    transition: var(--mt-transition-base);
+    box-shadow: var(--mt-shadow-xs);
+}
+
+.mt-criterion-info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--mt-shadow-lg);
+}
+
+.mt-criterion-info-header {
+    display: flex;
+    align-items: center;
+    gap: var(--mt-space-3);
+    margin-bottom: var(--mt-space-4);
+}
+
+.mt-criterion-info-title {
+    color: var(--mt-text-primary);
+    font-size: var(--mt-font-size-lg);
+    font-weight: var(--mt-font-weight-semibold);
+    margin: 0;
+}
+
+.mt-criterion-info-content {
+    color: var(--mt-text-secondary);
+    line-height: var(--mt-line-height-normal);
+    font-size: var(--mt-font-size-sm);
+}
+
+.mt-criterion-info-content p {
+    margin: 0;
+    color: var(--mt-text-secondary);
+}
+
+/* Ensure evaluation page has proper width */
+.mt-evaluation-page {
+    width: 100%;
+    max-width: 100%;
+}
+
+.mt-evaluation-page .mt-criteria-info-section {
+    clear: both;
+    display: block;
+    width: calc(100% + 60px);
+    margin-left: -30px;
+    margin-right: -30px;
+}
+
+/* Mobile responsiveness for criteria info */
+@media (max-width: 768px) {
+    .mt-criteria-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mt-criteria-info-section {
+        padding: var(--mt-space-5);
+        margin: var(--mt-space-5) -10px;
+        width: calc(100% + 20px);
+    }
+    
+    .mt-criterion-info-card {
+        padding: var(--mt-space-4);
+    }
+}
+
+/* ===================================
+   BASE EVALUATION FORM
+   =================================== */
+
+/* Evaluation Form */
+.mt-evaluation-form {
+    background: var(--mt-bg-surface);
+    border: 1px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-lg);
+    padding: var(--mt-space-8);
+    margin: var(--mt-space-5) 0;
+}
+
+.mt-evaluation-header {
+    border-bottom: 2px solid var(--mt-border-default);
+    padding-bottom: var(--mt-space-5);
+    margin-bottom: var(--mt-space-8);
+}
+
+.mt-evaluation-header h2 {
+    margin: 0 0 var(--mt-space-2) 0;
+    color: var(--mt-primary-700);
+}
+
+.mt-candidate-info {
+    background: var(--mt-bg-surface-alt);
+    padding: var(--mt-space-5);
+    border-radius: var(--mt-radius-md);
+    margin-bottom: var(--mt-space-8);
+}
+
+/* ===================================
+   CRITERIA SECTION
+   =================================== */
+
+.mt-criteria-section {
+    margin-bottom: var(--mt-space-8);
+}
+
+.mt-criterion {
+    background: var(--mt-bg-surface-alt);
+    border: 1px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-md);
+    padding: var(--mt-space-5);
+    margin-bottom: var(--mt-space-5);
+}
+
+.mt-criterion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--mt-space-4);
+}
+
+.mt-criterion-name {
+    font-size: var(--mt-font-size-lg);
+    font-weight: var(--mt-font-weight-semibold);
+    color: var(--mt-primary-700);
+}
+
+.mt-criterion-weight {
+    background: var(--mt-primary-600);
+    color: var(--mt-text-inverse);
+    padding: var(--mt-space-1) var(--mt-space-3);
+    border-radius: var(--mt-radius-full);
+    font-size: var(--mt-font-size-sm);
+}
+
+/* ===================================
+   SCORE SELECTOR
+   =================================== */
+
+/* Score Selector */
+.mt-score-selector {
+    display: flex;
+    gap: var(--mt-space-2);
+    margin: var(--mt-space-4) 0;
+}
+
+.mt-score-option {
+    flex: 1;
+    padding: var(--mt-space-4);
+    text-align: center;
+    background: var(--mt-bg-surface);
+    border: 2px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-md);
+    cursor: pointer;
+    transition: var(--mt-transition-base);
+}
+
+.mt-score-option:hover {
+    border-color: var(--mt-primary-600);
+    transform: translateY(-2px);
+}
+
+.mt-score-option.selected {
+    background: var(--mt-primary-700);
+    color: var(--mt-text-inverse);
+    border-color: var(--mt-primary-700);
+}
+
+.mt-score-option input[type="radio"] {
+    display: none;
+}
+
+.mt-score-value {
+    font-size: var(--mt-font-size-2xl);
+    font-weight: var(--mt-font-weight-bold);
+    display: block;
+    margin-bottom: var(--mt-space-1);
+}
+
+.mt-score-label {
+    font-size: var(--mt-font-size-xs);
+    opacity: 0.8;
+}
+
+/* ===================================
+   COMMENTS FIELD
+   =================================== */
+
+/* Comments Field */
+.mt-comments-field {
+    margin-top: var(--mt-space-5);
+}
+
+.mt-comments-field label {
+    display: block;
+    font-weight: var(--mt-font-weight-semibold);
+    color: var(--mt-primary-700);
+    margin-bottom: var(--mt-space-2);
+}
+
+.mt-comments-field textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: var(--mt-space-3);
+    border: 1px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-md);
+    font-size: var(--mt-font-size-sm);
+    transition: var(--mt-transition-base);
+    background: var(--mt-bg-surface);
+    color: var(--mt-text-primary);
+}
+
+.mt-comments-field textarea:focus {
+    outline: none;
+    border-color: var(--mt-border-focus);
+    box-shadow: 0 0 0 2px rgba(74, 155, 159, 0.1);
+}
+
+/* ===================================
+   SUBMIT BUTTON
+   =================================== */
+
+/* Submit Button */
+.mt-submit-evaluation {
+    background: var(--mt-accent-600);
+    color: var(--mt-text-inverse);
+    padding: var(--mt-space-4) var(--mt-space-10);
+    border: none;
+    border-radius: var(--mt-radius-full);
+    font-size: var(--mt-font-size-base);
+    font-weight: var(--mt-font-weight-semibold);
+    cursor: pointer;
+    transition: var(--mt-transition-base);
+    margin-top: var(--mt-space-8);
+}
+
+.mt-submit-evaluation:hover {
+    background: var(--mt-accent-700);
+    transform: translateY(-2px);
+    box-shadow: var(--mt-shadow-accent);
+}
+
+.mt-submit-evaluation:disabled {
+    background: var(--mt-neutral-400);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+
+/* ===================================
+   EVALUATION PAGE SPECIFIC
+   =================================== */
+
+/* Evaluation Page Styles - Increased specificity to avoid !important */
+.mt-evaluation-page,
+.wp-admin .mt-evaluation-page,
+body.wp-admin .mt-evaluation-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--mt-space-5);
+}
+
+/* Evaluation Header - Increased specificity */
+.mt-evaluation-header,
+.wp-admin .mt-evaluation-header,
+body.wp-admin .mt-evaluation-header,
+body .mt-evaluation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--mt-space-8);
+    padding: var(--mt-space-5);
+    background: var(--mt-gradient-primary);
+    border-radius: var(--mt-radius-lg);
+    color: var(--mt-text-inverse);
+}
+
+.mt-evaluation-header .mt-back-link,
+.wp-admin .mt-evaluation-header .mt-back-link,
+body.wp-admin .mt-evaluation-header .mt-back-link,
+body .mt-evaluation-header .mt-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mt-space-2);
+    color: var(--mt-text-inverse);
+    text-decoration: none;
+    font-weight: var(--mt-font-weight-medium);
+    padding: var(--mt-space-2) var(--mt-space-4);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--mt-radius-full);
+    transition: var(--mt-transition-base);
+}
+
+.mt-evaluation-header .mt-back-link:hover,
+.wp-admin .mt-evaluation-header .mt-back-link:hover,
+body.wp-admin .mt-evaluation-header .mt-back-link:hover,
+body .mt-evaluation-header .mt-back-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-4px);
+}
+
+.mt-evaluation-title,
+.wp-admin .mt-evaluation-title,
+body.wp-admin .mt-evaluation-title,
+body .mt-evaluation-title {
+    text-align: center;
+    flex: 1;
+}
+
+.mt-evaluation-title h1,
+.wp-admin .mt-evaluation-title h1,
+body.wp-admin .mt-evaluation-title h1,
+body .mt-evaluation-title h1 {
+    font-size: var(--mt-font-size-3xl);
+    margin: 0;
+    font-weight: var(--mt-font-weight-bold);
+}
+
+.mt-evaluation-header .mt-status-badge,
+.wp-admin .mt-evaluation-header .mt-status-badge,
+body.wp-admin .mt-evaluation-header .mt-status-badge,
+body .mt-evaluation-header .mt-status-badge {
+    display: inline-block;
+    padding: var(--mt-space-1) var(--mt-space-4);
+    border-radius: var(--mt-radius-full);
+    font-size: var(--mt-font-size-xs);
+    font-weight: var(--mt-font-weight-semibold);
+    margin-left: var(--mt-space-4);
+}
+
+.mt-evaluation-header .mt-status-completed,
+.wp-admin .mt-evaluation-header .mt-status-completed,
+body.wp-admin .mt-evaluation-header .mt-status-completed,
+body .mt-evaluation-header .mt-status-completed {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--mt-primary-700);
+}
+
+.mt-evaluation-header .mt-status-draft,
+.wp-admin .mt-evaluation-header .mt-status-draft,
+body.wp-admin .mt-evaluation-header .mt-status-draft,
+body .mt-evaluation-header .mt-status-draft {
+    background: var(--mt-bg-surface-alt);
+    color: var(--mt-accent-700);
+}
+
+/* ===================================
+   SCORING SECTION
+   =================================== */
+
+/* Scoring Section - Increased specificity */
+.mt-scoring-section,
+.wp-admin .mt-scoring-section,
+body.wp-admin .mt-scoring-section,
+body .mt-scoring-section {
+    background: var(--mt-bg-surface);
+    border-radius: var(--mt-radius-xl);
+    padding: var(--mt-space-10);
+    margin: var(--mt-space-8) 0;
+    box-shadow: var(--mt-shadow-lg);
+}
+
+.mt-section-title,
+.wp-admin .mt-section-title,
+body.wp-admin .mt-section-title,
+body .mt-section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--mt-font-size-3xl);
+    font-weight: var(--mt-font-weight-bold);
+    gap: var(--mt-space-8);
+    color: var(--mt-text-primary);
+    margin: 0 0 var(--mt-space-8) 0;
+    padding-bottom: var(--mt-space-4);
+    border-bottom: 2px solid var(--mt-border-light);
+}
+
+.mt-total-score-display,
+.wp-admin .mt-total-score-display,
+body.wp-admin .mt-total-score-display,
+body .mt-total-score-display {
+    font-size: var(--mt-font-size-xl);
+    font-weight: var(--mt-font-weight-semibold);
+    color: var(--mt-accent-600);
+}
+
+#mt-total-score,
+.wp-admin #mt-total-score,
+body.wp-admin #mt-total-score,
+body #mt-total-score {
+    font-size: var(--mt-font-size-3xl);
+    font-weight: var(--mt-font-weight-bold);
+}
+
+/* ===================================
+   CRITERIA GRID
+   =================================== */
+
+/* Criteria Grid - Increased specificity */
+.mt-criteria-grid,
+.wp-admin .mt-criteria-grid,
+body.wp-admin .mt-criteria-grid,
+body .mt-criteria-grid {
+    display: grid;
+    gap: var(--mt-space-6);
+}
+
+.mt-criterion-card,
+.wp-admin .mt-criterion-card,
+body.wp-admin .mt-criterion-card,
+body .mt-criterion-card {
+    background: var(--mt-bg-surface-alt);
+    border-radius: var(--mt-radius-lg);
+    padding: var(--mt-space-6);
+    transition: var(--mt-transition-base);
+}
+
+.mt-criterion-card:hover,
+.wp-admin .mt-criterion-card:hover,
+body.wp-admin .mt-criterion-card:hover,
+body .mt-criterion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--mt-shadow-lg);
+}
+
+.mt-criterion-header,
+.wp-admin .mt-criterion-header,
+body.wp-admin .mt-criterion-header,
+body .mt-criterion-header {
+    display: flex;
+    gap: var(--mt-space-4);
+    margin-bottom: var(--mt-space-5);
+    padding-left: var(--mt-space-4);
+    border-left: 4px solid var(--mt-primary-700);
+}
+
+.mt-criterion-icon,
+.wp-admin .mt-criterion-icon,
+body.wp-admin .mt-criterion-icon,
+body .mt-criterion-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+}
+
+.mt-criterion-info,
+.wp-admin .mt-criterion-info,
+body.wp-admin .mt-criterion-info,
+body .mt-criterion-info {
+    flex: 1;
+}
+
+.mt-criterion-label,
+.wp-admin .mt-criterion-label,
+body.wp-admin .mt-criterion-label,
+body .mt-criterion-label {
+    font-size: var(--mt-font-size-lg);
+    font-weight: var(--mt-font-weight-semibold);
+    color: var(--mt-primary-700);
+    margin: 0 0 var(--mt-space-1) 0;
+}
+
+/* Criterion Description - Enhanced visibility with proper specificity */
+.mt-criterion-description,
+.wp-admin .mt-criterion-description,
+body.wp-admin .mt-criterion-description,
+body .mt-criterion-description,
+.mt-criteria-grid .mt-criterion-description,
+.wp-admin .mt-criteria-grid .mt-criterion-description,
+body.wp-admin .mt-criteria-grid .mt-criterion-description,
+body .mt-criteria-grid .mt-criterion-description {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    font-size: var(--mt-font-size-sm);
+    color: var(--mt-text-secondary);
+    margin: var(--mt-space-1) 0 0 0;
+    line-height: var(--mt-line-height-normal);
+    font-weight: var(--mt-font-weight-normal);
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: normal;
+    overflow: visible;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    position: static;
+    z-index: auto;
+    clip: auto;
+    clip-path: none;
+}
+
+/* Additional specificity for evaluation forms - no !important needed */
+#mt-evaluation-form .mt-criterion-description,
+.wp-admin #mt-evaluation-form .mt-criterion-description,
+body.wp-admin #mt-evaluation-form .mt-criterion-description,
+body #mt-evaluation-form .mt-criterion-description,
+.mt-evaluation-page .mt-criterion-description,
+.wp-admin .mt-evaluation-page .mt-criterion-description,
+body.wp-admin .mt-evaluation-page .mt-criterion-description,
+body .mt-evaluation-page .mt-criterion-description,
+.mt-form-cards .mt-criterion-description,
+.wp-admin .mt-form-cards .mt-criterion-description,
+body.wp-admin .mt-form-cards .mt-criterion-description,
+body .mt-form-cards .mt-criterion-description {
+    display: block;
+    visibility: visible;
+}
+
+/* Prevent pseudo-elements from hiding content */
+.mt-criterion-description::before,
+.mt-criterion-description::after,
+.wp-admin .mt-criterion-description::before,
+.wp-admin .mt-criterion-description::after,
+body.wp-admin .mt-criterion-description::before,
+body.wp-admin .mt-criterion-description::after,
+body .mt-criterion-description::before,
+body .mt-criterion-description::after {
+    content: none;
+}
+
+/* German language specific display - high specificity */
+html[lang="de-DE"] .mt-criterion-description,
+html[lang="de-DE"] .wp-admin .mt-criterion-description,
+html[lang="de-DE"] body.wp-admin .mt-criterion-description,
+html[lang="de-DE"] body .mt-criterion-description,
+body[lang="de-DE"] .mt-criterion-description,
+body[lang="de-DE"] .wp-admin .mt-criterion-description,
+body[lang="de-DE"] body.wp-admin .mt-criterion-description {
+    display: block;
+    visibility: visible;
+}
+
+/* Ensure parent containers don't hide children */
+.mt-criterion-info,
+.wp-admin .mt-criterion-info,
+body.wp-admin .mt-criterion-info,
+body .mt-criterion-info,
+.mt-criterion-header,
+.wp-admin .mt-criterion-header,
+body.wp-admin .mt-criterion-header,
+body .mt-criterion-header,
+.mt-criterion-card,
+.wp-admin .mt-criterion-card,
+body.wp-admin .mt-criterion-card,
+body .mt-criterion-card {
+    overflow: visible;
+}
+
+/* ===================================
+   SCORING CONTROLS
+   =================================== */
+
+/* Scoring Controls - Increased specificity */
+.mt-scoring-control,
+.wp-admin .mt-scoring-control,
+body.wp-admin .mt-scoring-control,
+body .mt-scoring-control {
+    display: flex;
+    align-items: center;
+    gap: var(--mt-space-5);
+}
+
+/* Slider Style - Increased specificity */
+.mt-score-slider-wrapper,
+.wp-admin .mt-score-slider-wrapper,
+body.wp-admin .mt-score-slider-wrapper,
+body .mt-score-slider-wrapper {
+    flex: 1;
+    position: relative;
+    padding: var(--mt-space-2) 0 var(--mt-space-8) 0;
+}
+
+.mt-score-slider,
+.wp-admin .mt-score-slider,
+body.wp-admin .mt-score-slider,
+body .mt-score-slider {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--mt-border-default);
+    border-radius: var(--mt-radius-sm);
+    outline: none;
+}
+
+.mt-score-slider::-webkit-slider-thumb,
+.wp-admin .mt-score-slider::-webkit-slider-thumb,
+body.wp-admin .mt-score-slider::-webkit-slider-thumb,
+body .mt-score-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--mt-accent-600);
+    border-radius: var(--mt-radius-full);
+    cursor: pointer;
+    box-shadow: var(--mt-shadow-md);
+}
+
+.mt-score-slider::-moz-range-thumb,
+.wp-admin .mt-score-slider::-moz-range-thumb,
+body.wp-admin .mt-score-slider::-moz-range-thumb,
+body .mt-score-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: var(--mt-accent-600);
+    border-radius: var(--mt-radius-full);
+    cursor: pointer;
+    box-shadow: var(--mt-shadow-md);
+    border: none;
+}
+
+.mt-score-marks,
+.wp-admin .mt-score-marks,
+body.wp-admin .mt-score-marks,
+body .mt-score-marks {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
+
+.mt-score-mark,
+.wp-admin .mt-score-mark,
+body.wp-admin .mt-score-mark,
+body .mt-score-mark {
+    font-size: var(--mt-font-size-xs);
+    color: var(--mt-text-secondary);
+    cursor: pointer;
+    padding: var(--mt-space-1);
+}
+
+.mt-score-mark:hover,
+.wp-admin .mt-score-mark:hover,
+body.wp-admin .mt-score-mark:hover,
+body .mt-score-mark:hover {
+    color: var(--mt-accent-600);
+    font-weight: var(--mt-font-weight-semibold);
+}
+
+/* Score Display - Increased specificity */
+.mt-score-display,
+.wp-admin .mt-score-display,
+body.wp-admin .mt-score-display,
+body .mt-score-display {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--mt-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mt-text-inverse);
+    font-size: var(--mt-font-size-2xl);
+    font-weight: var(--mt-font-weight-bold);
+    box-shadow: var(--mt-shadow-lg);
+}
+
+/* ===================================
+   COMMENTS SECTION
+   =================================== */
+
+/* Comments Section - Increased specificity */
+.mt-comments-section,
+.wp-admin .mt-comments-section,
+body.wp-admin .mt-comments-section,
+body .mt-comments-section {
+    background: var(--mt-bg-surface);
+    border-radius: var(--mt-radius-xl);
+    padding: var(--mt-space-10);
+    margin: var(--mt-space-8) 0;
+    box-shadow: var(--mt-shadow-lg);
+}
+
+.mt-section-description,
+.wp-admin .mt-section-description,
+body.wp-admin .mt-section-description,
+body .mt-section-description {
+    font-size: var(--mt-font-size-base);
+    color: var(--mt-text-secondary);
+    margin: -10px 0 var(--mt-space-5) 0;
+}
+
+.mt-comments-textarea,
+.wp-admin .mt-comments-textarea,
+body.wp-admin .mt-comments-textarea,
+body .mt-comments-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: var(--mt-space-4);
+    border: 2px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-md);
+    font-size: var(--mt-font-size-base);
+    line-height: var(--mt-line-height-normal);
+    resize: vertical;
+    transition: var(--mt-transition-base);
+}
+
+.mt-comments-textarea:focus,
+.wp-admin .mt-comments-textarea:focus,
+body.wp-admin .mt-comments-textarea:focus,
+body .mt-comments-textarea:focus {
+    outline: none;
+    border-color: var(--mt-border-focus);
+}
+
+.mt-char-count,
+.wp-admin .mt-char-count,
+body.wp-admin .mt-char-count,
+body .mt-char-count {
+    text-align: right;
+    font-size: var(--mt-font-size-xs);
+    color: var(--mt-text-secondary);
+    margin-top: var(--mt-space-2);
+}
+
+/* ===================================
+   FORM ACTIONS
+   =================================== */
+
+/* Form Actions - Increased specificity */
+.mt-form-actions,
+.wp-admin .mt-form-actions,
+body.wp-admin .mt-form-actions,
+body .mt-form-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--mt-space-5);
+    margin: var(--mt-space-10) 0;
+}
+
+.mt-form-actions .mt-btn,
+.wp-admin .mt-form-actions .mt-btn,
+body.wp-admin .mt-form-actions .mt-btn,
+body .mt-form-actions .mt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mt-space-2);
+    padding: var(--mt-space-3) var(--mt-space-8);
+    border: none;
+    border-radius: var(--mt-radius-full);
+    font-size: var(--mt-font-size-base);
+    font-weight: var(--mt-font-weight-semibold);
+    cursor: pointer;
+    transition: var(--mt-transition-base);
+    text-decoration: none;
+}
+
+.mt-form-actions .mt-btn-primary,
+.wp-admin .mt-form-actions .mt-btn-primary,
+body.wp-admin .mt-form-actions .mt-btn-primary,
+body .mt-form-actions .mt-btn-primary {
+    background: var(--mt-accent-600);
+    color: var(--mt-text-inverse);
+    box-shadow: var(--mt-shadow-accent);
+}
+
+.mt-form-actions .mt-btn-primary:hover,
+.wp-admin .mt-form-actions .mt-btn-primary:hover,
+body.wp-admin .mt-form-actions .mt-btn-primary:hover,
+body .mt-form-actions .mt-btn-primary:hover {
+    background: var(--mt-accent-700);
+    transform: translateY(-2px);
+    box-shadow: var(--mt-shadow-xl);
+}
+
+.mt-form-actions .mt-btn-secondary,
+.wp-admin .mt-form-actions .mt-btn-secondary,
+body.wp-admin .mt-form-actions .mt-btn-secondary,
+body .mt-form-actions .mt-btn-secondary {
+    background: var(--mt-bg-surface);
+    color: var(--mt-primary-600);
+    border: 2px solid var(--mt-primary-600);
+}
+
+.mt-form-actions .mt-btn-secondary:hover,
+.wp-admin .mt-form-actions .mt-btn-secondary:hover,
+body.wp-admin .mt-form-actions .mt-btn-secondary:hover,
+body .mt-form-actions .mt-btn-secondary:hover {
+    background: var(--mt-primary-600);
+    color: var(--mt-text-inverse);
+}
+
+/* ===================================
+   SUBMISSION GUIDELINES
+   =================================== */
+
+/* Submission Guidelines - Increased specificity */
+.mt-submission-guidelines,
+.wp-admin .mt-submission-guidelines,
+body.wp-admin .mt-submission-guidelines,
+body .mt-submission-guidelines {
+    background: var(--mt-bg-surface-alt);
+    border-radius: var(--mt-radius-lg);
+    padding: var(--mt-space-8);
+    margin: var(--mt-space-8) 0;
+}
+
+.mt-submission-guidelines h3,
+.wp-admin .mt-submission-guidelines h3,
+body.wp-admin .mt-submission-guidelines h3,
+body .mt-submission-guidelines h3 {
+    font-size: var(--mt-font-size-lg);
+    font-weight: var(--mt-font-weight-semibold);
+    color: var(--mt-primary-700);
+    margin: 0 0 var(--mt-space-4) 0;
+}
+
+.mt-submission-guidelines ul,
+.wp-admin .mt-submission-guidelines ul,
+body.wp-admin .mt-submission-guidelines ul,
+body .mt-submission-guidelines ul {
+    margin: 0;
+    padding-left: var(--mt-space-5);
+}
+
+.mt-submission-guidelines li,
+.wp-admin .mt-submission-guidelines li,
+body.wp-admin .mt-submission-guidelines li,
+body .mt-submission-guidelines li {
+    font-size: var(--mt-font-size-sm);
+    color: var(--mt-text-secondary);
+    margin-bottom: var(--mt-space-2);
+    line-height: var(--mt-line-height-normal);
+}
+
+/* ===================================
+   RANKINGS LIST
+   =================================== */
+
+.mt-rankings-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mt-space-2);
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mt-rankings-list .mt-ranking-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--mt-space-4);
+    background: var(--mt-bg-surface);
+    border: 1px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-md);
+    box-shadow: var(--mt-shadow-xs);
+    padding: var(--mt-space-2) var(--mt-space-4);
+    position: relative;
+    transition: var(--mt-transition-fast);
+    min-height: 0;
+}
+
+.mt-rankings-list .mt-ranking-item:hover {
+    border-color: var(--mt-primary-600);
+    box-shadow: var(--mt-shadow-md);
+}
+
+.mt-rankings-list .mt-position-badge {
+    position: static;
+    min-width: 32px;
+    min-height: 32px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    font-size: 15px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.mt-rankings-list .position-gold .mt-position-badge {
+    background: var(--mt-gradient-accent);
+    color: var(--mt-bg-surface);
+}
+
+.mt-rankings-list .position-silver .mt-position-badge {
+    background: var(--mt-gradient-primary);
+    color: var(--mt-text-inverse);
+}
+
+.mt-rankings-list .position-bronze .mt-position-badge {
+    background: linear-gradient(135deg, var(--mt-accent-500), var(--mt-accent-700));
+    color: var(--mt-text-inverse);
+}
+
+.mt-rankings-list .mt-candidate-info {
+    flex: 2;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.mt-rankings-list .mt-candidate-name {
+    font-size: var(--mt-font-size-sm);
+    margin: 0 0 var(--mt-space-1) 0;
+    font-weight: var(--mt-font-weight-semibold);
+    color: var(--mt-primary-700);
+}
+
+.mt-rankings-list .mt-candidate-meta {
+    font-size: var(--mt-font-size-xs);
+    color: var(--mt-text-secondary);
+    margin: 0;
+}
+
+.mt-rankings-list .mt-total-score-display {
+    flex: 0 0 80px;
+    min-width: 80px;
+    text-align: center;
+    align-self: center;
+    background: var(--mt-bg-surface-alt);
+    border-radius: var(--mt-radius-sm);
+    padding: var(--mt-space-1) 0;
+    margin: 0 var(--mt-space-2);
+}
+
+.mt-rankings-list .score-label {
+    font-size: 10px;
+    margin-bottom: 0;
+}
+
+.mt-rankings-list .score-value {
+    font-size: var(--mt-font-size-lg);
+    font-weight: var(--mt-font-weight-bold);
+    margin: 0;
+}
+
+/* Inline evaluation controls in rankings */
+.mt-rankings-list .mt-inline-evaluation-controls {
+    flex: 3;
+    min-width: 160px;
+    margin-left: 8px;
+    padding: 0;
+    background: none;
+    border: none;
+}
+
+.mt-rankings-list .mt-criteria-grid-inline {
+    display: flex;
+    flex-direction: row;
+    gap: var(--mt-space-1);
+    margin-bottom: 0;
+}
+
+.mt-rankings-list .mt-criterion-inline {
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    min-width: 0;
+}
+
+.mt-rankings-list .mt-criterion-label {
+    font-size: 10px;
+    margin-bottom: var(--mt-space-1);
+    gap: var(--mt-space-1);
+}
+
+.mt-rankings-list .mt-score-control {
+    gap: var(--mt-space-1);
+}
+
+.mt-rankings-list .mt-score-adjust {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    padding: 0;
+    border-radius: var(--mt-radius-sm);
+}
+
+.mt-rankings-list .mt-score-input {
+    width: 28px;
+    font-size: var(--mt-font-size-xs);
+    padding: 0;
+}
+
+.mt-rankings-list .mt-inline-actions {
+    gap: var(--mt-space-1);
+    margin-top: 0;
+    padding-top: 0;
+    border: none;
+}
+
+.mt-rankings-list .mt-btn-save-inline,
+.mt-rankings-list .mt-btn-full-evaluation {
+    padding: var(--mt-space-1) var(--mt-space-2);
+    font-size: 11px;
+    border-radius: var(--mt-radius-lg);
+    box-shadow: none;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+/* Responsive Design for Evaluation Page - Increased specificity */
+@media (max-width: 768px) {
+    .mt-evaluation-header,
+    .wp-admin .mt-evaluation-header,
+    body.wp-admin .mt-evaluation-header,
+    body .mt-evaluation-header {
+        flex-direction: column;
+        gap: var(--mt-space-4);
+        text-align: center;
+    }
+    
+    .mt-evaluation-header .mt-back-link,
+    .wp-admin .mt-evaluation-header .mt-back-link,
+    body.wp-admin .mt-evaluation-header .mt-back-link,
+    body .mt-evaluation-header .mt-back-link {
+        align-self: flex-start;
+    }
+    
+    .mt-scoring-section,
+    .wp-admin .mt-scoring-section,
+    body.wp-admin .mt-scoring-section,
+    body .mt-scoring-section,
+    .mt-comments-section,
+    .wp-admin .mt-comments-section,
+    body.wp-admin .mt-comments-section,
+    body .mt-comments-section {
+        padding: var(--mt-space-6);
+    }
+    
+    .mt-section-title,
+    .wp-admin .mt-section-title,
+    body.wp-admin .mt-section-title,
+    body .mt-section-title {
+        flex-direction: column;
+        gap: var(--mt-space-2);
+        text-align: center;
+    }
+    
+    .mt-criterion-header,
+    .wp-admin .mt-criterion-header,
+    body.wp-admin .mt-criterion-header,
+    body .mt-criterion-header {
+        flex-direction: column;
+        text-align: center;
+        padding-left: 0;
+        border-left: none;
+        border-top: 4px solid var(--mt-primary-700);
+        padding-top: var(--mt-space-4);
+    }
+    
+    .mt-scoring-control,
+    .wp-admin .mt-scoring-control,
+    body.wp-admin .mt-scoring-control,
+    body .mt-scoring-control {
+        flex-direction: column;
+    }
+    
+    .mt-form-actions,
+    .wp-admin .mt-form-actions,
+    body.wp-admin .mt-form-actions,
+    body .mt-form-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .mt-form-actions .mt-btn,
+    .wp-admin .mt-form-actions .mt-btn,
+    body.wp-admin .mt-form-actions .mt-btn,
+    body .mt-form-actions .mt-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .mt-score-selector {
+        flex-wrap: wrap;
+    }
+    
+    .mt-score-option {
+        min-width: calc(33.333% - var(--mt-space-2));
+    }
+    
+    .mt-evaluation-form {
+        padding: var(--mt-space-5);
+    }
+}
+
+@media (max-width: 900px) {
+    .mt-rankings-list .mt-ranking-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--mt-space-2);
+        padding: var(--mt-space-2) var(--mt-space-1);
+    }
+    
+    .mt-rankings-list .mt-inline-evaluation-controls {
+        margin-left: 0;
+    }
+}
+
+/* Evaluation Header Layout fixes - Increased specificity */
+.mt-scoring-section .mt-evaluation-header,
+.wp-admin .mt-scoring-section .mt-evaluation-header,
+body.wp-admin .mt-scoring-section .mt-evaluation-header,
+body .mt-scoring-section .mt-evaluation-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===================================
+   EVALUATION RATING VISUAL FIXES
+   Consolidated from: evaluation-fix.css + mt-evaluation-fixes.css
+   Date: Aug 31, 2025
+   Purpose: Fix visual issues where multiple selected buttons don't appear selected
+   Issue #21: Visual bug - only one button appears selected even though multiple are selected
+   =================================== */
+
+/* Ensure each button group maintains its own selected state */
+.mt-button-group .mt-score-button {
+    background: var(--mt-neutral-100);
+    border: 1px solid var(--mt-neutral-300);
+    color: var(--mt-neutral-800);
+    padding: var(--mt-space-2) var(--mt-space-3);
+    margin: var(--mt-space-1);
+    cursor: pointer;
+    transition: var(--mt-transition-fast);
+    border-radius: var(--mt-radius-sm);
+}
+
+.mt-button-group .mt-score-button:hover {
+    background: var(--mt-neutral-200);
+    border-color: var(--mt-neutral-400);
+    transform: scale(1.05);
+}
+
+/* CRITICAL: Make sure active/selected buttons are visually distinct - High specificity */
+.mt-evaluation-form .mt-button-group .mt-score-button.active,
+.wp-admin .mt-evaluation-form .mt-button-group .mt-score-button.active,
+body.wp-admin .mt-evaluation-form .mt-button-group .mt-score-button.active,
+body .mt-evaluation-form .mt-button-group .mt-score-button.active,
+.mt-evaluation-form .mt-button-group .mt-score-button.selected,
+.wp-admin .mt-evaluation-form .mt-button-group .mt-score-button.selected,
+body.wp-admin .mt-evaluation-form .mt-button-group .mt-score-button.selected,
+body .mt-evaluation-form .mt-button-group .mt-score-button.selected,
+.mt-criterion-card .mt-button-group .mt-score-button.active,
+.wp-admin .mt-criterion-card .mt-button-group .mt-score-button.active,
+body.wp-admin .mt-criterion-card .mt-button-group .mt-score-button.active,
+body .mt-criterion-card .mt-button-group .mt-score-button.active,
+.mt-criterion-card .mt-button-group .mt-score-button.selected,
+.wp-admin .mt-criterion-card .mt-button-group .mt-score-button.selected,
+body.wp-admin .mt-criterion-card .mt-button-group .mt-score-button.selected,
+body .mt-criterion-card .mt-button-group .mt-score-button.selected {
+    background: var(--mt-error);
+    color: var(--mt-white);
+    border-color: var(--mt-error);
+    font-weight: var(--mt-font-weight-bold);
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+/* Ensure the selected state persists - already covered above with higher specificity */
+
+/* Make sure each criterion's buttons are independent - High specificity without !important */
+.mt-evaluation-form .mt-criterion-card:nth-child(1) .mt-button-group .mt-score-button.active,
+.mt-evaluation-form .mt-criterion-card:nth-child(1) .mt-button-group .mt-score-button.selected,
+.mt-evaluation-form .mt-criterion-card:nth-child(2) .mt-button-group .mt-score-button.active,
+.mt-evaluation-form .mt-criterion-card:nth-child(2) .mt-button-group .mt-score-button.selected,
+.mt-evaluation-form .mt-criterion-card:nth-child(3) .mt-button-group .mt-score-button.active,
+.mt-evaluation-form .mt-criterion-card:nth-child(3) .mt-button-group .mt-score-button.selected,
+.mt-evaluation-form .mt-criterion-card:nth-child(4) .mt-button-group .mt-score-button.active,
+.mt-evaluation-form .mt-criterion-card:nth-child(4) .mt-button-group .mt-score-button.selected,
+.mt-evaluation-form .mt-criterion-card:nth-child(5) .mt-button-group .mt-score-button.active,
+.mt-evaluation-form .mt-criterion-card:nth-child(5) .mt-button-group .mt-score-button.selected {
+    background: var(--mt-error);
+    position: relative;
+    z-index: 10;
+}
+
+/* Debug mode indicators */
+body.debug-mode .mt-button-group .mt-score-button.active::after,
+body.debug-mode .mt-button-group .mt-score-button.selected::after {
+    content: "✓";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--mt-success);
+    color: var(--mt-white);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* ===================================
+   ENHANCED EVALUATION FORM STYLES
+   Consolidated from: mt-evaluation-fixes.css
+   Purpose: Fixes for evaluation form display issues
+   =================================== */
+
+/* Fix for candidate body boxes */
+.mt-candidate-body {
+    background: var(--mt-bg-surface-alt);
+    border: 1px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-md);
+    padding: var(--mt-space-6);
+    margin: var(--mt-space-4) 0;
+    box-shadow: var(--mt-shadow-sm);
+}
+
+/* Fix for evaluation criteria cards */
+.mt-criterion-card {
+    background: var(--mt-bg-surface-alt);
+    border: 1px solid var(--mt-border-default);
+    border-radius: var(--mt-radius-md);
+    padding: var(--mt-space-5);
+    margin: var(--mt-space-4) 0;
+    position: relative;
+}
+
+.mt-criterion-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: var(--mt-space-4);
+    padding-left: var(--mt-space-1);
+    border-left: 4px solid var(--mt-primary-700);
+}
+
+.mt-criterion-icon {
+    font-size: var(--mt-font-size-2xl);
+    margin-right: var(--mt-space-4);
+    flex-shrink: 0;
+    color: var(--mt-primary-700);
+}
+
+.mt-criterion-info {
+    flex: 1;
+}
+
+.mt-criterion-label {
+    font-size: var(--mt-font-size-lg);
+    font-weight: var(--mt-font-weight-semibold);
+    margin: 0 0 var(--mt-space-2) 0;
+    color: var(--mt-primary-700);
+}
+
+.mt-criterion-description {
+    font-size: var(--mt-font-size-sm);
+    color: var(--mt-text-secondary);
+    line-height: var(--mt-line-height-normal);
+    margin: 0;
+}
+
+/* Score slider styling */
+.mt-score-slider-wrapper {
+    margin-top: var(--mt-space-5);
+    padding: var(--mt-space-2) 0;
+}
+
+.mt-score-slider {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, var(--mt-error) 0%, var(--mt-warning) 50%, var(--mt-success) 100%);
+    border-radius: var(--mt-radius-sm);
+    outline: none;
+}
+
+.mt-score-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--mt-primary-600);
+    border: 2px solid var(--mt-white);
+    border-radius: var(--mt-radius-full);
+    cursor: pointer;
+    box-shadow: var(--mt-shadow-md);
+}
+
+.mt-score-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: var(--mt-primary-600);
+    border: 2px solid var(--mt-white);
+    border-radius: var(--mt-radius-full);
+    cursor: pointer;
+    box-shadow: var(--mt-shadow-md);
+}
+
+/* Score display */
+.mt-score-value {
+    display: inline-block;
+    background: var(--mt-primary-600);
+    color: var(--mt-white);
+    padding: var(--mt-space-1) var(--mt-space-3);
+    border-radius: var(--mt-radius-full);
+    font-weight: var(--mt-font-weight-semibold);
+    font-size: var(--mt-font-size-base);
+    float: right;
+    margin-top: -40px;
+}
+
+/* Average score display */
+#mt-total-score {
+    font-size: var(--mt-font-size-2xl);
+    font-weight: var(--mt-font-weight-bold);
+    color: var(--mt-primary-600);
+}
+
+.mt-evaluated-count {
+    color: var(--mt-text-secondary);
+    font-size: var(--mt-font-size-sm);
+    margin-left: var(--mt-space-2);
+}
+
+/* Save buttons - High specificity to override theme styles without !important */
+.mt-evaluation-form button.mt-save-draft,
+.wp-admin .mt-evaluation-form button.mt-save-draft,
+body.wp-admin .mt-evaluation-form button.mt-save-draft,
+body .mt-evaluation-form button.mt-save-draft,
+.mt-evaluation-form button.mt-submit-evaluation,
+.wp-admin .mt-evaluation-form button.mt-submit-evaluation,
+body.wp-admin .mt-evaluation-form button.mt-submit-evaluation,
+body .mt-evaluation-form button.mt-submit-evaluation,
+.mt-evaluation-form .mt-btn.mt-submit-evaluation,
+.wp-admin .mt-evaluation-form .mt-btn.mt-submit-evaluation,
+body.wp-admin .mt-evaluation-form .mt-btn.mt-submit-evaluation,
+body .mt-evaluation-form .mt-btn.mt-submit-evaluation {
+    background: var(--mt-primary-600);
+    color: var(--mt-white);
+    border: none;
+    padding: var(--mt-space-3) var(--mt-space-8);
+    border-radius: var(--mt-radius-sm);
+    font-size: var(--mt-font-size-base);
+    font-weight: var(--mt-font-weight-semibold);
+    cursor: pointer;
+    transition: var(--mt-transition-base);
+    margin: var(--mt-space-2);
+}
+
+.mt-evaluation-form button.mt-save-draft:hover,
+.wp-admin .mt-evaluation-form button.mt-save-draft:hover,
+body.wp-admin .mt-evaluation-form button.mt-save-draft:hover,
+body .mt-evaluation-form button.mt-save-draft:hover,
+.mt-evaluation-form button.mt-submit-evaluation:hover,
+.wp-admin .mt-evaluation-form button.mt-submit-evaluation:hover,
+body.wp-admin .mt-evaluation-form button.mt-submit-evaluation:hover,
+body .mt-evaluation-form button.mt-submit-evaluation:hover,
+.mt-evaluation-form .mt-btn.mt-submit-evaluation:hover,
+.wp-admin .mt-evaluation-form .mt-btn.mt-submit-evaluation:hover,
+body.wp-admin .mt-evaluation-form .mt-btn.mt-submit-evaluation:hover,
+body .mt-evaluation-form .mt-btn.mt-submit-evaluation:hover {
+    background: var(--mt-primary-700);
+    transform: translateY(-2px);
+    box-shadow: var(--mt-shadow-md);
+}
+
+.mt-evaluation-form button.mt-save-draft,
+.wp-admin .mt-evaluation-form button.mt-save-draft,
+body.wp-admin .mt-evaluation-form button.mt-save-draft,
+body .mt-evaluation-form button.mt-save-draft,
+.mt-evaluation-form .mt-btn.mt-save-draft,
+.wp-admin .mt-evaluation-form .mt-btn.mt-save-draft,
+body.wp-admin .mt-evaluation-form .mt-btn.mt-save-draft,
+body .mt-evaluation-form .mt-btn.mt-save-draft {
+    background: var(--mt-neutral-600);
+}
+
+.mt-evaluation-form button.mt-save-draft:hover,
+.wp-admin .mt-evaluation-form button.mt-save-draft:hover,
+body.wp-admin .mt-evaluation-form button.mt-save-draft:hover,
+body .mt-evaluation-form button.mt-save-draft:hover,
+.mt-evaluation-form .mt-btn.mt-save-draft:hover,
+.wp-admin .mt-evaluation-form .mt-btn.mt-save-draft:hover,
+body.wp-admin .mt-evaluation-form .mt-btn.mt-save-draft:hover,
+body .mt-evaluation-form .mt-btn.mt-save-draft:hover {
+    background: var(--mt-neutral-700);
+}
+
+/* Fix spacing and alignment */
+.mt-evaluation-header {
+    background: var(--mt-gradient-primary);
+    color: var(--mt-white);
+    padding: var(--mt-space-8);
+    border-radius: var(--mt-radius-md);
+    margin-bottom: var(--mt-space-8);
+}
+
+.mt-evaluation-title {
+    font-size: var(--mt-font-size-3xl);
+    margin: 0 0 var(--mt-space-2) 0;
+    color: var(--mt-accent-600); /* Copper color for better readability */
+}
+
+/* Ensure the h1 inside also gets the copper color */
+.mt-evaluation-title h1 {
+    color: var(--mt-accent-600);
+}
+
+.mt-evaluation-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--mt-space-5);
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+    .mt-criterion-card {
+        padding: var(--mt-space-4);
+    }
+    
+    .mt-criterion-label {
+        font-size: var(--mt-font-size-base);
+    }
+    
+    .mt-criterion-description {
+        font-size: var(--mt-font-size-xs);
+    }
+    
+    .mt-evaluation-header {
+        padding: var(--mt-space-5);
+    }
+    
+    .mt-evaluation-title {
+        font-size: var(--mt-font-size-xl);
+        color: var(--mt-accent-600); /* Maintain copper color on mobile */
+    }
+}
+
+/* End of Evaluation Fixes */

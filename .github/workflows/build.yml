@@ -1,0 +1,177 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-assets:
+    name: Build Production Assets
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: gettext
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Clean previous builds
+        run: npm run build:clean
+      
+      - name: Build CSS assets
+        run: npm run build:css
+      
+      - name: Build JavaScript assets
+        run: npm run build:js
+      
+      - name: Compile translation files
+        run: |
+          if [ -f "languages/mobility-trailblazers-de_DE.po" ]; then
+            msgfmt -o languages/mobility-trailblazers-de_DE.mo languages/mobility-trailblazers-de_DE.po
+            echo "Translation files compiled successfully"
+          fi
+      
+      - name: Verify build
+        run: |
+          echo "Checking minified CSS files..."
+          ls -la Plugin/assets/css/*.min.css 2>/dev/null || echo "No minified CSS files found"
+          echo "Checking minified JS files..."
+          ls -la Plugin/assets/js/*.min.js 2>/dev/null || echo "No minified JS files found"
+          echo "Checking translation files..."
+          ls -la languages/*.mo 2>/dev/null || echo "No compiled translation files found"
+      
+      - name: Create build artifact
+        run: |
+          mkdir -p build
+          cp -r Plugin build/mobility-trailblazers
+          cp -r languages build/mobility-trailblazers/
+          cp readme.txt build/mobility-trailblazers/
+          cd build
+          zip -r mobility-trailblazers.zip mobility-trailblazers/
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-build
+          path: build/mobility-trailblazers.zip
+          retention-days: 30
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-assets
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-build
+          path: ./
+      
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: mobility-trailblazers.zip
+          name: Release v${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Mobility Trailblazers WordPress Plugin v${{ steps.version.outputs.VERSION }}
+            
+            ### Installation
+            1. Download `mobility-trailblazers.zip`
+            2. Upload to WordPress via Plugins → Add New → Upload Plugin
+            3. Activate the plugin
+            
+            ### What's Changed
+            See [CHANGELOG.md](CHANGELOG.md) for details
+            
+            ### Requirements
+            - WordPress 5.8+
+            - PHP 7.4+ (8.2+ recommended)
+            - MySQL 5.7+ / MariaDB 10.3+
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-assets
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+    
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-build
+          path: ./
+      
+      - name: Deploy to staging server
+        run: |
+          echo "Deploy to staging server would happen here"
+          echo "This step requires server credentials and deployment scripts"
+      
+      - name: Run post-deployment checks
+        run: |
+          echo "Verify deployment on staging"
+          # curl -I ${{ secrets.STAGING_URL }} || exit 1
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-assets
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-build
+          path: ./
+      
+      - name: Create backup
+        run: |
+          echo "Creating production backup..."
+          echo "Backup timestamp: $(date +%Y%m%d_%H%M%S)"
+      
+      - name: Deploy to production server
+        run: |
+          echo "Deploy to production server would happen here"
+          echo "This step requires server credentials and deployment scripts"
+      
+      - name: Run post-deployment checks
+        run: |
+          echo "Verify deployment on production"
+          # curl -I ${{ secrets.PRODUCTION_URL }} || exit 1
+      
+      - name: Notify team
+        if: always()
+        run: |
+          echo "Send deployment notification to team"
+          # This could use Slack, email, or other notification services
