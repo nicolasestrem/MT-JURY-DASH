@@ -1,0 +1,146 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "plugins": [
+    "stylelint-order"
+  ],
+  "rules": {
+    "declaration-no-important": [true, {
+      "severity": "warning"
+    }],
+    "selector-max-specificity": ["0,4,0", {
+      "severity": "warning"
+    }],
+    "selector-max-compound-selectors": [4, {
+      "severity": "warning"
+    }],
+    "selector-max-id": [0, {
+      "severity": "error"
+    }],
+    "max-nesting-depth": [3, {
+      "severity": "warning"
+    }],
+    "declaration-block-single-line-max-declarations": 1,
+    "color-hex-length": "short",
+    "shorthand-property-no-redundant-values": true,
+    "declaration-block-no-redundant-longhand-properties": true,
+    "no-duplicate-selectors": true,
+    "no-descending-specificity": [true, {
+      "severity": "warning"
+    }],
+    "font-weight-notation": "numeric",
+    "number-max-precision": 2,
+    "selector-class-pattern": "^[a-z][a-z0-9-]*(__[a-z][a-z0-9-]*)?(--[a-z][a-z0-9-]*)?$",
+    "selector-id-pattern": "^[a-z][a-z0-9-]*$",
+    "keyframes-name-pattern": "^[a-z][a-z0-9-]*$",
+    "custom-property-pattern": "^mt-[a-z][a-z0-9-]*$",
+    "at-rule-no-unknown": [true, {
+      "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen"]
+    }],
+    "property-no-unknown": [true, {
+      "ignoreProperties": ["composes"]
+    }],
+    "unit-allowed-list": ["px", "em", "rem", "%", "vh", "vw", "deg", "s", "ms", "fr"],
+    "order/properties-order": [
+      "position",
+      "top",
+      "right",
+      "bottom",
+      "left",
+      "z-index",
+      "display",
+      "flex",
+      "flex-direction",
+      "flex-wrap",
+      "justify-content",
+      "align-items",
+      "align-content",
+      "order",
+      "flex-grow",
+      "flex-shrink",
+      "flex-basis",
+      "align-self",
+      "grid",
+      "grid-template",
+      "grid-template-columns",
+      "grid-template-rows",
+      "grid-template-areas",
+      "grid-gap",
+      "grid-column",
+      "grid-row",
+      "float",
+      "clear",
+      "width",
+      "min-width",
+      "max-width",
+      "height",
+      "min-height",
+      "max-height",
+      "margin",
+      "margin-top",
+      "margin-right",
+      "margin-bottom",
+      "margin-left",
+      "padding",
+      "padding-top",
+      "padding-right",
+      "padding-bottom",
+      "padding-left",
+      "overflow",
+      "overflow-x",
+      "overflow-y",
+      "font",
+      "font-family",
+      "font-size",
+      "font-weight",
+      "line-height",
+      "text-align",
+      "text-transform",
+      "text-decoration",
+      "letter-spacing",
+      "color",
+      "background",
+      "background-color",
+      "background-image",
+      "background-repeat",
+      "background-position",
+      "background-size",
+      "border",
+      "border-width",
+      "border-style",
+      "border-color",
+      "border-radius",
+      "box-shadow",
+      "opacity",
+      "transition",
+      "animation",
+      "transform",
+      "cursor"
+    ],
+    "comment-empty-line-before": ["always", {
+      "except": ["first-nested"],
+      "ignore": ["stylelint-commands"]
+    }],
+    "at-rule-empty-line-before": ["always", {
+      "except": ["blockless-after-same-name-blockless", "first-nested"],
+      "ignore": ["after-comment"]
+    }],
+    "custom-property-empty-line-before": ["always", {
+      "except": ["after-custom-property", "first-nested"],
+      "ignore": ["after-comment", "inside-single-line-block"]
+    }],
+    "declaration-empty-line-before": ["always", {
+      "except": ["after-declaration", "first-nested"],
+      "ignore": ["after-comment", "inside-single-line-block"]
+    }],
+    "block-closing-brace-empty-line-before": "never",
+    "rule-empty-line-before": ["always-multi-line", {
+      "except": ["first-nested"],
+      "ignore": ["after-comment"]
+    }]
+  },
+  "reportDescriptionlessDisables": true,
+  "reportInvalidScopeDisables": true,
+  "reportNeedlessDisables": true
+}
