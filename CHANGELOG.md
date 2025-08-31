@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release of version 2.5.41
 - Complete evaluation system with 5-criteria scoring
-- Support for 490+ candidates and 24 jury members
+- Support for 50 candidates and 24 jury members
 - Comprehensive admin dashboard
 - German localization support
 

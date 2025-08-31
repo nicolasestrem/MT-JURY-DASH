@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Mobility Trailblazers WordPress Plugin v2.5.41** - Enterprise award management platform for DACH mobility innovators. 490+ candidates, 24 jury members, complete evaluation system with 5-criteria scoring.
+**Mobility Trailblazers WordPress Plugin v2.5.41** - Enterprise award management platform for DACH mobility innovators. 50 candidates, 24 jury members, complete evaluation system with 5-criteria scoring.
 
 **URLs:** Production: https://mobilitytrailblazers.de/vote/ | Staging: http://localhost:8080/  
 **Dates:** Launch Aug 18, 2025 | Ceremony Oct 30, 2025  
