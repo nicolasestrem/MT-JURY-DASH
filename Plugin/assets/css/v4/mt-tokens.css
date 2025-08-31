@@ -5,20 +5,40 @@
  */
 
 :root {
-  /* Brand Colors */
-  --mt-color-primary: #26a69a;
-  --mt-color-primary-dark: #00897b;
-  --mt-color-primary-light: #4db6ac;
-  --mt-color-bg: #f8f0e3;
-  --mt-text: #302c37;
-  --mt-border: #a4dcd5;
+  /* Brand Colors - Standardized to match Phase 3 */
+  --mt-primary: #003C3D;  /* Changed from #26a69a to match Phase 3 */
+  --mt-primary-dark: #00897b;
+  --mt-primary-light: #4db6ac;
+  --mt-secondary: #004C5F;  /* Matches Phase 3 */
+  --mt-accent: #C1693C;  /* Matches Phase 3 */
   
-  /* Secondary Colors */
-  --mt-color-secondary: #004c5f;
-  --mt-color-accent: #c1693c;
-  --mt-color-success: #4caf50;
-  --mt-color-warning: #ff9800;
-  --mt-color-error: #f44336;
+  /* Legacy aliases for backward compatibility */
+  --mt-color-primary: var(--mt-primary);
+  --mt-color-primary-dark: var(--mt-primary-dark);
+  --mt-color-primary-light: var(--mt-primary-light);
+  --mt-color-secondary: var(--mt-secondary);
+  --mt-color-accent: var(--mt-accent);
+  
+  /* Base Colors */
+  --mt-bg-base: #FFFFFF;
+  --mt-bg-beige: #F5E6D3;
+  --mt-body-text: #302C37;
+  --mt-body-text-light: #666666;
+  --mt-blue-accent: #A4DCD5;
+  --mt-kupfer-bold: #AA4E2C;
+  --mt-border-base: #dee2e6;
+  --mt-border-light: #e9ecef;
+  
+  /* Status Colors */
+  --mt-success: #28a745;
+  --mt-warning: #ffc107;
+  --mt-error: #dc3545;
+  --mt-info: #17a2b8;
+  
+  /* Legacy status aliases */
+  --mt-color-success: var(--mt-success);
+  --mt-color-warning: var(--mt-warning);
+  --mt-color-error: var(--mt-error);
   
   /* Neutral Colors */
   --mt-color-white: #ffffff;
