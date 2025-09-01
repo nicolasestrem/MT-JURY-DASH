@@ -84,9 +84,10 @@
         var ajaxUrl = (typeof mt_admin !== 'undefined' && mt_admin.ajax_url) 
             ? mt_admin.ajax_url 
             : ajaxurl;
-        var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
-            ? mt_admin.nonce 
-            : $('#mt_admin_nonce').val();
+        var nonce = $('#mt_auto_assign_nonce').val() || 
+            (typeof mt_admin !== 'undefined' && mt_admin.auto_assign_nonce) || 
+            (typeof mt_admin !== 'undefined' && mt_admin.nonce) || 
+            $('#mt_admin_nonce').val();
         $.ajax({
             url: ajaxUrl,
             type: 'POST',
@@ -136,9 +137,10 @@
         var ajaxUrl = (typeof mt_admin !== 'undefined' && mt_admin.ajax_url) 
             ? mt_admin.ajax_url 
             : ajaxurl;
-        var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
-            ? mt_admin.nonce 
-            : $('#mt_admin_nonce').val();
+        var nonce = $('#mt_manual_assign_nonce').val() || 
+            (typeof mt_admin !== 'undefined' && mt_admin.manual_assign_nonce) || 
+            (typeof mt_admin !== 'undefined' && mt_admin.nonce) || 
+            $('#mt_admin_nonce').val();
         $.ajax({
             url: ajaxUrl,
             type: 'POST',
@@ -184,9 +186,10 @@
         var ajaxUrl = (typeof mt_admin !== 'undefined' && mt_admin.ajax_url) 
             ? mt_admin.ajax_url 
             : ajaxurl;
-        var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
-            ? mt_admin.nonce 
-            : $('#mt_admin_nonce').val();
+        var nonce = $('#mt_remove_assignment_nonce').val() || 
+            (typeof mt_admin !== 'undefined' && mt_admin.remove_assignment_nonce) || 
+            (typeof mt_admin !== 'undefined' && mt_admin.nonce) || 
+            $('#mt_admin_nonce').val();
         $.ajax({
             url: ajaxUrl,
             type: 'POST',
@@ -232,9 +235,10 @@
         var ajaxUrl = (typeof mt_admin !== 'undefined' && mt_admin.ajax_url) 
             ? mt_admin.ajax_url 
             : ajaxurl;
-        var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
-            ? mt_admin.nonce 
-            : $('#mt_admin_nonce').val();
+        var nonce = $('#mt_clear_assignments_nonce').val() || 
+            (typeof mt_admin !== 'undefined' && mt_admin.clear_assignments_nonce) || 
+            (typeof mt_admin !== 'undefined' && mt_admin.nonce) || 
+            $('#mt_admin_nonce').val();
         $.ajax({
             url: ajaxUrl,
             type: 'POST',
