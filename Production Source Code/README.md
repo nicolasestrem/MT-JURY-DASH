@@ -16,7 +16,7 @@ The Mobility Trailblazers Award System is an enterprise-grade WordPress plugin t
 To create a transparent, efficient, and engaging platform that identifies and celebrates the 25 most impactful mobility innovators who are shaping the future of transportation and urban mobility in the DACH region.
 
 ### Award Statistics
-- **50 Candidates**: Nominated across various mobility sectors
+- **490+ Candidates**: Nominated across various mobility sectors
 - **24 Expert Jury Members**: Industry leaders and innovation experts  
 - **3 Award Categories**: Comprehensive coverage of the mobility ecosystem
 - **5 Evaluation Criteria**: Holistic assessment framework (0-10 scale with 0.5 increments)
