@@ -161,7 +161,8 @@ playwright-report/
 /.internal/
 /node_modules/
 /screenshots/
-/tests/
+# Keep test sources tracked; ignore only artifacts and secrets
+# tests/
 nul
 
 # ===== Auto-generated minified files =====
@@ -173,3 +174,6 @@ nul
 #assets/js/*.min.js
 august-2025-daily-activities.xlsx
 /Production Files
+
+.gemini/
+gha-creds-*.json

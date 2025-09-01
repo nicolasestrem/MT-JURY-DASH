@@ -16,7 +16,7 @@
             autoSaveDelay: 2000, // Auto-save after 2 seconds of inactivity
             minScore: 0,
             maxScore: 10,
-            scoreStep: 0.5  // Changed from 0.1 to 0.5 for consistency
+            scoreStep: 1    // Increment/decrement by whole numbers on dashboard
         };
         // Track unsaved changes per row
         const unsavedRows = new Map();
@@ -130,11 +130,12 @@
          */
         function animateScoreChange($input, oldValue, newValue) {
             const diff = newValue - oldValue;
+            const decimals = (CONFIG.scoreStep % 1 === 0) ? 0 : 1;
             const $indicator = $('<span class="mt-score-change-indicator"></span>');
             if (diff > 0) {
-                $indicator.text('+' + diff.toFixed(1)).addClass('positive');
+                $indicator.text('+' + diff.toFixed(decimals)).addClass('positive');
             } else if (diff < 0) {
-                $indicator.text(diff.toFixed(1)).addClass('negative');
+                $indicator.text(diff.toFixed(decimals)).addClass('negative');
             } else {
                 return; // No change
             }
@@ -436,4 +437,3 @@
         init();
     });
 })(jQuery);
-

@@ -1,0 +1,76 @@
+name: Playwright Visual Regression
+
+on:
+  pull_request:
+    branches: [ develop, staging ]
+  workflow_dispatch:
+
+concurrency:
+  group: playwright-visual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual-frontend:
+    if: ${{ (secrets.TEST_URL != '' || vars.TEST_URL != '') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TEST_URL: ${{ secrets.TEST_URL || vars.TEST_URL }}
+      TEST_PATH_JURY_DASHBOARD: ${{ secrets.TEST_PATH_JURY_DASHBOARD || vars.TEST_PATH_JURY_DASHBOARD }}
+      TEST_PATH_GRID: ${{ secrets.TEST_PATH_GRID || vars.TEST_PATH_GRID }}
+      TEST_PATH_WINNERS: ${{ secrets.TEST_PATH_WINNERS || vars.TEST_PATH_WINNERS }}
+      TEST_PATH_EVALUATION: ${{ secrets.TEST_PATH_EVALUATION || vars.TEST_PATH_EVALUATION }}
+      TEST_PATH_CANDIDATE: ${{ secrets.TEST_PATH_CANDIDATE || vars.TEST_PATH_CANDIDATE }}
+      TEST_JURY_USER: ${{ secrets.TEST_JURY_USER || vars.TEST_JURY_USER }}
+      TEST_JURY_PASS: ${{ secrets.TEST_JURY_PASS || vars.TEST_JURY_PASS }}
+      PLAYWRIGHT_HTML_REPORT: tests/reports/playwright-report
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Seed auth storage (jury)
+        run: npm run test:auth
+      - name: Run visual tests (frontend)
+        run: npx playwright test --project=visual-frontend
+      - name: Upload Playwright report (frontend)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-frontend
+          path: tests/reports/playwright-report
+
+  visual-admin:
+    if: ${{ (secrets.TEST_URL != '' || vars.TEST_URL != '') && (secrets.TEST_ADMIN_USER != '' || vars.TEST_ADMIN_USER != '') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TEST_URL: ${{ secrets.TEST_URL || vars.TEST_URL }}
+      TEST_ADMIN_USER: ${{ secrets.TEST_ADMIN_USER || vars.TEST_ADMIN_USER }}
+      TEST_ADMIN_PASS: ${{ secrets.TEST_ADMIN_PASS || vars.TEST_ADMIN_PASS }}
+      PLAYWRIGHT_HTML_REPORT: tests/reports/playwright-report
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Seed auth storage (admin)
+        run: npm run test:auth
+      - name: Run visual tests (admin)
+        run: npx playwright test --project=visual-admin
+      - name: Upload Playwright report (admin)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-admin
+          path: tests/reports/playwright-report
