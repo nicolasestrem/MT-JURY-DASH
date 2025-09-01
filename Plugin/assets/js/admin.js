@@ -769,8 +769,9 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                 // Focus on modal body for screen readers
                 $modal.find('.mt-modal-body').focus();
             });
-            // Fetch evaluation details via AJAX
-            $.ajax({
+            // Fetch evaluation details via AJAX (abort previous if present)
+            if (this._detailsXhr && this._detailsXhr.readyState !== 4) { try { this._detailsXhr.abort(); } catch(e) {} }
+            this._detailsXhr = $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
                 timeout: 15000,
@@ -805,14 +806,14 @@ function initMediaUpload() { /* ... media upload logic ... */ }
             if ($modal.length === 0) {
                 // Create modal HTML with accessibility attributes
                 const modalHtml = `
-                    <div id="mt-evaluation-modal" class="mt-modal" role="dialog" aria-modal="true" aria-labelledby="mt-modal-title" style="display:none;">
+                    <div id="mt-evaluation-modal" class="mt-modal" role="dialog" aria-modal="true" aria-labelledby="mt-modal-title" style="display:none;" data-test="evaluation-modal">
                         <div class="mt-modal-overlay" aria-hidden="true"></div>
-                        <div class="mt-modal-content">
+                        <div class="mt-modal-content" tabindex="-1" data-test="evaluation-modal-content">
                             <div class="mt-modal-header">
                                 <h2 id="mt-modal-title">Evaluation Details</h2>
-                                <button class="mt-modal-close" aria-label="Close dialog" type="button">&times;</button>
+                                <button class="mt-modal-close" aria-label="Close dialog" type="button" data-test="evaluation-modal-close">&times;</button>
                             </div>
-                            <div class="mt-modal-body" tabindex="0"></div>
+                            <div class="mt-modal-body" tabindex="0" data-test="evaluation-modal-body"></div>
                         </div>
                     </div>
                 `;
@@ -838,6 +839,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                     $modal.data('trigger').focus();
                 }
             });
+            if (this._detailsXhr && this._detailsXhr.readyState !== 4) { try { this._detailsXhr.abort(); } catch(e) {} }
         },
         renderEvaluationDetails: function(data) {
             let scoresHtml = '';
