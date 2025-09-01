@@ -4,6 +4,8 @@
  */
 (function($) {
     'use strict';
+    // Signal ownership so admin.js can avoid double-binding on Assignments page
+    try { window.MT_ASSIGNMENTS_OWNED = true; } catch(e) {}
     // Wait for DOM ready
     $(document).ready(function() {
         // Initialize assignment functionality
@@ -15,53 +17,53 @@
             return;
         }
         // Auto-assign button handler
-        $('#mt-auto-assign-btn').off('click').on('click', function(e) {
+        $('#mt-auto-assign-btn').off('click.mtAssign').on('click.mtAssign', function(e) {
             e.preventDefault();
             openAutoAssignModal();
         });
         // Manual assignment button handler
-        $('#mt-manual-assign-btn').off('click').on('click', function(e) {
+        $('#mt-manual-assign-btn').off('click.mtAssign').on('click.mtAssign', function(e) {
             e.preventDefault();
             openManualAssignModal();
         });
         // Modal close button handler
-        $('.mt-modal-close').off('click').on('click', function(e) {
+        $('.mt-modal-close').off('click.mtAssign').on('click.mtAssign', function(e) {
             e.preventDefault();
             closeModal($(this).closest('.mt-modal'));
         });
         // Click outside modal to close
-        $('.mt-modal').off('click').on('click', function(e) {
+        $('.mt-modal').off('click.mtAssign').on('click.mtAssign', function(e) {
             if ($(e.target).hasClass('mt-modal')) {
                 closeModal($(this));
             }
         });
         // Auto-assign form submission
-        $('#mt-auto-assign-modal form').off('submit').on('submit', function(e) {
+        $('#mt-auto-assign-modal form').off('submit.mtAssign').on('submit.mtAssign', function(e) {
             e.preventDefault();
             submitAutoAssignment();
         });
         // Manual assignment form submission
-        $('#mt-manual-assignment-form').off('submit').on('submit', function(e) {
+        $('#mt-manual-assignment-form').off('submit.mtAssign').on('submit.mtAssign', function(e) {
             e.preventDefault();
             submitManualAssignment();
         });
         // Remove assignment button handler
-        $(document).on('click', '.mt-remove-assignment', function(e) {
+        $(document).off('click.mtAssign', '.mt-remove-assignment').on('click.mtAssign', '.mt-remove-assignment', function(e) {
             e.preventDefault();
             removeAssignment($(this));
         });
         // Clear all button handler
-        $('#mt-clear-all-btn').off('click').on('click', function(e) {
+        $('#mt-clear-all-btn').off('click.mtAssign').on('click.mtAssign', function(e) {
             e.preventDefault();
             clearAllAssignments();
         });
         // Export button handler
-        $('#mt-export-btn').off('click').on('click', function(e) {
+        $('#mt-export-btn').off('click.mtAssign').on('click.mtAssign', function(e) {
             e.preventDefault();
             exportAssignments();
         });
         // Bulk actions button handler
-        $('#mt-bulk-actions-btn').off('click').on('click', function(e) {
+        $('#mt-bulk-actions-btn').off('click.mtAssign').on('click.mtAssign', function(e) {
             e.preventDefault();
             toggleBulkActions();
         });
