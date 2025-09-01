@@ -991,7 +991,7 @@ if (typeof mt_admin.i18n === 'undefined') {
         }
         // --- Conditional Initialization for Page-Specific Managers ---
         // Check for the Assignment Management page
-        if ($('#mt-auto-assign-btn').length > 0 || $('.mt-assignments-table').length > 0) {
+        if (!window.MT_ASSIGNMENTS_OWNED && ($('#mt-auto-assign-btn').length > 0 || $('.mt-assignments-table').length > 0)) {
             MTAssignmentManager.init();
         }
         // Check for the Evaluations page using body class (more reliable than checking page title)
