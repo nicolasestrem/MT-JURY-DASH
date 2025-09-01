@@ -399,76 +399,94 @@ class MT_Plugin {
     public function enqueue_frontend_assets() {
         // Check if v4 CSS is enabled (can be disabled via filter)
         $use_v4_css = apply_filters('mt_enable_css_v4', true);
-        // Detect if current request is a plugin route via shared filter
-        $is_plugin_route = (bool) apply_filters('mt_is_plugin_route', false);
-        // Allow deployments to keep legacy CSS while validating v4 visually
-        $dequeue_legacy_on_v4 = (bool) apply_filters('mt_dequeue_legacy_on_v4', true);
-
-        // When v4 is enabled, rely on MT_Public_Assets to register+enqueue v4
-        // Skip v4 enqueues here to prevent duplication
+        
         if ($use_v4_css) {
-            // no-op: MT_Public_Assets handles v4 on plugin routes
-        }
-
-        // Legacy CSS stack (variables + components + modules)
-        // Load only if NOT on a plugin route with v4 active and legacy dequeuing enabled
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            // Core CSS Variables (loaded first)
+            // Load v4 CSS framework
+            $v4_base_url = MT_PLUGIN_URL . 'assets/css/v4/';
+            
             wp_enqueue_style(
-                'mt-variables',
-                MT_PLUGIN_URL . 'assets/css/mt-variables.css',
+                'mt-v4-tokens',
+                $v4_base_url . 'mt-tokens.css',
                 [],
                 MT_VERSION
             );
             
-            // Component Library (loaded second)
             wp_enqueue_style(
-                'mt-components',
-                MT_PLUGIN_URL . 'assets/css/mt-components.css',
-                ['mt-variables'],
+                'mt-v4-reset',
+                $v4_base_url . 'mt-reset.css',
+                ['mt-v4-tokens'],
+                MT_VERSION
+            );
+            
+            wp_enqueue_style(
+                'mt-v4-base',
+                $v4_base_url . 'mt-base.css',
+                ['mt-v4-reset'],
+                MT_VERSION
+            );
+            
+            wp_enqueue_style(
+                'mt-v4-components',
+                $v4_base_url . 'mt-components.css',
+                ['mt-v4-base'],
+                MT_VERSION
+            );
+            
+            wp_enqueue_style(
+                'mt-v4-pages',
+                $v4_base_url . 'mt-pages.css',
+                ['mt-v4-components'],
                 MT_VERSION
             );
         }
+        
+        // Core CSS Variables (loaded first)
+        wp_enqueue_style(
+            'mt-variables',
+            MT_PLUGIN_URL . 'assets/css/mt-variables.css',
+            [],
+            MT_VERSION
+        );
+        
+        // Component Library (loaded second)
+        wp_enqueue_style(
+            'mt-components',
+            MT_PLUGIN_URL . 'assets/css/mt-components.css',
+            ['mt-variables'],
+            MT_VERSION
+        );
         
         // Main Frontend Styles (core styles only)
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            wp_enqueue_style(
-                'mt-frontend',
-                MT_PLUGIN_URL . 'assets/css/frontend-new.css',
-                ['mt-variables', 'mt-components'],
-                MT_VERSION
-            );
-        }
+        wp_enqueue_style(
+            'mt-frontend',
+            MT_PLUGIN_URL . 'assets/css/frontend-new.css',
+            ['mt-variables', 'mt-components'],
+            MT_VERSION
+        );
         
         // Candidate Grid Module
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            wp_enqueue_style(
-                'mt-candidate-grid',
-                MT_PLUGIN_URL . 'assets/css/mt-candidate-grid.css',
-                ['mt-variables', 'mt-components'],
-                MT_VERSION
-            );
-        }
+        wp_enqueue_style(
+            'mt-candidate-grid',
+            MT_PLUGIN_URL . 'assets/css/mt-candidate-grid.css',
+            ['mt-variables', 'mt-components'],
+            MT_VERSION
+        );
         
         // Evaluation Forms Module
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            wp_enqueue_style(
-                'mt-evaluation-forms',
-                MT_PLUGIN_URL . 'assets/css/mt-evaluation-forms.css',
-                ['mt-variables', 'mt-components'],
-                MT_VERSION
-            );
-        }
+        wp_enqueue_style(
+            'mt-evaluation-forms',
+            MT_PLUGIN_URL . 'assets/css/mt-evaluation-forms.css',
+            ['mt-variables', 'mt-components'],
+            MT_VERSION
+        );
         
         // Jury Dashboard Enhanced Module
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            wp_enqueue_style(
-                'mt-jury-dashboard-enhanced',
-                MT_PLUGIN_URL . 'assets/css/mt-jury-dashboard-enhanced.css',
-                ['mt-variables', 'mt-components'],
-                MT_VERSION
-            );
-        }
+        wp_enqueue_style(
+            'mt-jury-dashboard-enhanced',
+            MT_PLUGIN_URL . 'assets/css/mt-jury-dashboard-enhanced.css',
+            ['mt-variables', 'mt-components'],
+            MT_VERSION
+        );
         
         // Enhanced candidate profile styles (includes all fixes)
         wp_enqueue_style(
@@ -503,14 +521,12 @@ class MT_Plugin {
         );
         
         // Evaluation form fixes (v2.5.20.1)
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            wp_enqueue_style(
-                'mt-evaluation-fixes',
-                MT_PLUGIN_URL . 'assets/css/mt-evaluation-fixes.css',
-                ['mt-frontend', 'mt-evaluation-forms'],
-                MT_VERSION
-            );
-        }
+        wp_enqueue_style(
+            'mt-evaluation-fixes',
+            MT_PLUGIN_URL . 'assets/css/mt-evaluation-fixes.css',
+            ['mt-frontend', 'mt-evaluation-forms'],
+            MT_VERSION
+        );
         
         // Design enhancements JavaScript (v1.0.0)
         wp_enqueue_script(
@@ -550,27 +566,23 @@ class MT_Plugin {
         
         // New Candidate Cards v3 CSS - Modern redesign following CSS v3 specifications  
         // IMPORTANT: Load v3 CSS BEFORE hotfixes to establish base styles first
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            wp_enqueue_style(
-                'mt-candidate-cards-v3',
-                MT_PLUGIN_URL . 'assets/css/mt-candidate-cards-v3.css',
-                ['mt-frontend', 'mt-candidate-grid', 'mt-evaluation-fixes'],
-                MT_VERSION
-            );
-        }
+        wp_enqueue_style(
+            'mt-candidate-cards-v3',
+            MT_PLUGIN_URL . 'assets/css/mt-candidate-cards-v3.css',
+            ['mt-frontend', 'mt-candidate-grid', 'mt-evaluation-fixes'],
+            MT_VERSION
+        );
         
         // Consolidated Hotfixes CSS - Combines multiple small hotfix files for better performance
         // Includes: photo-adjustments.css, candidate-image-adjustments.css, evaluation-fix.css, 
         // language-switcher-enhanced.css, mt-jury-dashboard-fix.css, emergency-fixes.css
         // IMPORTANT: Loaded after v3 CSS to provide targeted fixes without breaking v3 design
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4)) {
-            wp_enqueue_style(
-                'mt-hotfixes-consolidated',
-                MT_PLUGIN_URL . 'assets/css/mt-hotfixes-consolidated.css',
-                ['mt-candidate-cards-v3'],
-                MT_VERSION
-            );
-        }
+        wp_enqueue_style(
+            'mt-hotfixes-consolidated',
+            MT_PLUGIN_URL . 'assets/css/mt-hotfixes-consolidated.css',
+            ['mt-candidate-cards-v3'],
+            MT_VERSION
+        );
         
         // BACKUP: Individual hotfix files (kept as backup, uncomment if needed)
         /*
@@ -608,7 +620,7 @@ class MT_Plugin {
         */
         
         // Legacy jury dashboard styles (for backward compatibility)
-        if (!($use_v4_css && $is_plugin_route && $dequeue_legacy_on_v4) && (is_page('jury-dashboard') || (isset($_GET['evaluate']) && !empty($_GET['evaluate'])))) {
+        if (is_page('jury-dashboard') || (isset($_GET['evaluate']) && !empty($_GET['evaluate']))) {
             wp_enqueue_style(
                 'mt-jury-dashboard',
                 MT_PLUGIN_URL . 'assets/css/jury-dashboard.css',

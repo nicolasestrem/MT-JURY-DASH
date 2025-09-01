@@ -206,13 +206,7 @@ class MT_Public_Assets {
         wp_enqueue_style('mt-v4-base');
         wp_enqueue_style('mt-v4-components');
         wp_enqueue_style('mt-v4-pages');
-
-        // Optionally dequeue legacy CSS when v4 is active on plugin routes
-        $should_dequeue_legacy = (bool) apply_filters('mt_dequeue_legacy_on_v4', true);
-        if ($should_dequeue_legacy) {
-            $this->dequeue_legacy_assets();
-        }
-
+        
         // HOTFIX: Jury dashboard filter fix - Critical for category filtering
         wp_enqueue_style(
             'mt-jury-filter-hotfix',
@@ -226,21 +220,6 @@ class MT_Public_Assets {
         
         // Add inline styles for dynamic adjustments
         $this->add_inline_styles();
-    }
-
-    /**
-     * Dequeue legacy CSS handles to avoid duplication/conflicts when v4 is active
-     * Runs after core enqueues, leveraging hook priority ordering
-     *
-     * @return void
-     */
-    private function dequeue_legacy_assets() {
-        $handles = $this->get_legacy_css_handles();
-        foreach ($handles as $handle) {
-            if (wp_style_is($handle, 'enqueued')) {
-                wp_dequeue_style($handle);
-            }
-        }
     }
     
     /**
