@@ -6,6 +6,8 @@ Asset Bloat & Duplication
   - In `Plugin/includes/public/class-mt-public-assets.php` (conditionally on plugin routes), and
   - In `Plugin/includes/core/class-mt-plugin.php` (unconditionally when filter `mt_enable_css_v4` is true).
   - Additionally, legacy CSS bundles are loaded alongside v4, increasing CSS payload and causing specificity conflicts.
+ - Admin page enqueues overlap with template enqueues:
+   - `Plugin/includes/admin/class-mt-admin.php` enqueues `mt-admin` globally on plugin pages, while `Plugin/templates/admin/assignments.php` directly enqueues `mt-assignments.js`, `mt-modal-fix.css`, and a debug script. Prefer centralized enqueues to avoid duplicates and ensure consistent cache-busting.
 
 Opportunities
 
@@ -19,10 +21,11 @@ Opportunities
 - JS loading:
   - Most scripts load in footer; continue ensuring per-screen enqueues (e.g., only load `mt-assignments.js` on the assignments admin screen).
   - Split large admin bundles if possible; avoid binding handlers for screens that are not active.
- - Remove debug-only assets in production:
+- Remove debug-only assets in production:
    - `mt-modal-debug.js` should not load on production; wrap in `WP_DEBUG` check and guard logs.
- - Remove unused/duplicate CSS:
-   - Investigate `Plugin/assets/css/frontend.css` and `Plugin/assets/css/frontend/frontend.css` which appear minimal and possibly superseded by `frontend-new.css`.
+- Remove unused/duplicate CSS:
+  - Investigate `Plugin/assets/css/frontend.css` and `Plugin/assets/css/frontend/frontend.css` which appear minimal and possibly superseded by `frontend-new.css`.
+   - Review `mt-modal-fix.css`: it is enqueued from the assignments template; if consolidated fixes exist (e.g., in v4/components), avoid a global modal fix file.
 
 Quick Wins Checklist
 

@@ -54,6 +54,7 @@ Assets (enqueue order, duplication)
 - Public v4 CSS is registered/enqueued in `MT_Public_Assets` and again in `MT_Plugin::enqueue_frontend_assets()`.
 - Legacy CSS is enqueued even when v4 is enabled. This defeats the purpose of v4 isolation and introduces specificity battles.
 - Suggestion: When v4 is enabled on a route, do not enqueue legacy bundles; and consider dequeuing known legacy handles returned by `MT_Public_Assets::get_legacy_css_handles()`.
+ - Note: Legacy v3 paths referenced in `class-mt-shortcode-renderer.php` (`assets/css/v3/*`) do not exist under `Plugin/assets/css/`. If v4 is disabled via filter, these references may 404; ensure legacy assets are present or deprecate the fallback.
 
 Localization
 
