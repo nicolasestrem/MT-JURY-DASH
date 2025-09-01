@@ -76,6 +76,7 @@ export default defineConfig({
         storageState: 'tests/.auth/admin.json'
       },
       dependencies: ['setup'],
+      testIgnore: ['**/visual/**'],
     },
 
     // Firefox tests (optional)
@@ -121,6 +122,26 @@ export default defineConfig({
       },
       dependencies: ['setup'],
       testMatch: /.*admin.*\.spec\.ts/,
+      testIgnore: ['**/visual/**'],
+    },
+    // Visual regression projects
+    {
+      name: 'visual-frontend',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'tests/.auth/jury.json',
+      },
+      dependencies: ['setup'],
+      testMatch: ['**/visual/visual-frontend.spec.ts'],
+    },
+    {
+      name: 'visual-admin',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'tests/.auth/admin.json',
+      },
+      dependencies: ['setup'],
+      testMatch: ['**/visual/visual-admin.spec.ts'],
     },
   ],
 
@@ -138,5 +159,9 @@ export default defineConfig({
   /* Expect timeout */
   expect: {
     timeout: 10000,
+    toHaveScreenshot: {
+      // Global visual regression cap: ≤ 3% pixel ratio difference
+      maxDiffPixelRatio: 0.03,
+    },
   },
 });
