@@ -199,6 +199,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
         $.ajax({
             url: mt_admin.ajax_url,
             type: 'POST',
+            timeout: 15000,
             data: {
                 action: 'mt_refresh_widget',
                 widget: widgetId,
@@ -216,7 +217,8 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                     if (callback) callback(false);
                 }
             },
-            error: function() {
+            error: function(xhr) {
+                window.mtHandleAjaxError(xhr);
                 if (callback) callback(false);
             },
             complete: function() {
@@ -338,6 +340,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_auto_assign',
                     nonce: mt_admin.nonce,
@@ -360,8 +363,8 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $('#mt-auto-assign-modal button[type="submit"]').prop('disabled', false).text('Run Auto-Assignment');
@@ -381,6 +384,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_manual_assign',
                     nonce: mt_admin.nonce,
@@ -401,8 +405,8 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $('#mt-manual-assignment-form button[type="submit"]').prop('disabled', false).text(mt_admin.i18n.assign_selected);
@@ -419,6 +423,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_remove_assignment',
                     nonce: mt_admin.nonce,
@@ -441,8 +446,8 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $button.prop('disabled', false).text(mt_admin && mt_admin.i18n && mt_admin.i18n.remove ? mt_admin.i18n.remove : 'Entfernen');
@@ -459,6 +464,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_clear_all_assignments',
                     nonce: mt_admin.nonce
@@ -474,8 +480,8 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $('#mt-clear-all-btn').prop('disabled', false).html('<span class="dashicons dashicons-trash"></span> ' + mt_admin.i18n.clear_all);
