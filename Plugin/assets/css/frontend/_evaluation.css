@@ -162,341 +162,341 @@
 }
 
 /* Evaluation Page Styles */
-body .mt-evaluation-page {
-    max-width: 1200px !important;
-    margin: 0 auto !important;
-    padding: 20px !important;
+#mt-plugin-wrapper .mt-evaluation-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 /* Evaluation Header */
-body .mt-evaluation-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-bottom: 30px !important;
-    padding: 20px !important;
-    background: linear-gradient(135deg, var(--mt-primary) 0%, var(--mt-secondary) 100%) !important;
-    border-radius: 12px !important;
-    color: white !important;
+#mt-plugin-wrapper .mt-evaluation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--mt-primary) 0%, var(--mt-secondary) 100%);
+    border-radius: 12px;
+    color: white;
 }
 
-body .mt-evaluation-header .mt-back-link {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    color: white !important;
-    text-decoration: none !important;
-    font-weight: 500 !important;
-    padding: 8px 16px !important;
-    background: rgba(255, 255, 255, 0.2) !important;
-    border-radius: 25px !important;
-    transition: all 0.3s ease !important;
+#mt-plugin-wrapper .mt-evaluation-header .mt-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    transition: all 0.3s ease;
 }
 
-body .mt-evaluation-header .mt-back-link:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
-    transform: translateX(-4px) !important;
+#mt-plugin-wrapper .mt-evaluation-header .mt-back-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-4px);
 }
 
-body .mt-evaluation-title {
-    text-align: center !important;
-    flex: 1 !important;
+#mt-plugin-wrapper .mt-evaluation-title {
+    text-align: center;
+    flex: 1;
 }
 
-body .mt-evaluation-title h1 {
-    font-size: 28px !important;
-    margin: 0 !important;
-    font-weight: 700 !important;
+#mt-plugin-wrapper .mt-evaluation-title h1 {
+    font-size: 28px;
+    margin: 0;
+    font-weight: 700;
 }
 
-body .mt-evaluation-header .mt-status-badge {
-    display: inline-block !important;
-    padding: 6px 16px !important;
-    border-radius: 20px !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    margin-left: 15px !important;
+#mt-plugin-wrapper .mt-evaluation-header .mt-status-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 15px;
 }
 
-body .mt-evaluation-header .mt-status-completed {
-    background: rgba(255, 255, 255, 0.9) !important;
-    color: var(--mt-primary) !important;
+#mt-plugin-wrapper .mt-evaluation-header .mt-status-completed {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--mt-primary);
 }
 
-body .mt-evaluation-header .mt-status-draft {
-    background: var(--mt-bg-beige) !important;
-    color: var(--mt-kupfer-bold) !important;
+#mt-plugin-wrapper .mt-evaluation-header .mt-status-draft {
+    background: var(--mt-bg-beige);
+    color: var(--mt-kupfer-bold);
 }
 
 /* Scoring Section */
-body .mt-scoring-section {
-    background: white !important;
-    border-radius: 16px !important;
-    padding: 40px !important;
-    margin: 30px 0 !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+#mt-plugin-wrapper .mt-scoring-section {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    margin: 30px 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-body .mt-section-title {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    font-size: 28px !important;
-    font-weight: 700 !important;
-    gap: 30px !important;
-    color: #212529 !important;
-    margin: 0 0 30px 0 !important;
-    padding-bottom: 15px !important;
-    border-bottom: 2px solid #dee2e6 !important;
+#mt-plugin-wrapper .mt-section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 28px;
+    font-weight: 700;
+    gap: 30px;
+    color: #212529;
+    margin: 0 0 30px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #dee2e6;
 }
 
-body .mt-total-score-display {
-    font-size: 20px !important;
-    font-weight: 600 !important;
-    color: var(--mt-accent) !important;
+#mt-plugin-wrapper .mt-total-score-display {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--mt-accent);
 }
 
 body #mt-total-score {
-    font-size: 28px !important;
-    font-weight: 700 !important;
+    font-size: 28px;
+    font-weight: 700;
 }
 
 /* Criteria Grid */
-body .mt-criteria-grid {
-    display: grid !important;
-    gap: 25px !important;
+#mt-plugin-wrapper .mt-criteria-grid {
+    display: grid;
+    gap: 25px;
 }
 
-body .mt-criterion-card {
-    background: var(--mt-bg-beige) !important;
-    border-radius: 12px !important;
-    padding: 25px !important;
-    transition: all 0.3s ease !important;
+#mt-plugin-wrapper .mt-criterion-card {
+    background: var(--mt-bg-beige);
+    border-radius: 12px;
+    padding: 25px;
+    transition: all 0.3s ease;
 }
 
-body .mt-criterion-card:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1) !important;
+#mt-plugin-wrapper .mt-criterion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
-body .mt-criterion-header {
-    display: flex !important;
-    gap: 15px !important;
-    margin-bottom: 20px !important;
-    padding-left: 15px !important;
-    border-left: 4px solid !important;
+#mt-plugin-wrapper .mt-criterion-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-left: 15px;
+    border-left: 4px solid;
 }
 
-body .mt-criterion-icon {
-    font-size: 32px !important;
-    width: 32px !important;
-    height: 32px !important;
+#mt-plugin-wrapper .mt-criterion-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
 }
 
-body .mt-criterion-info {
-    flex: 1 !important;
+#mt-plugin-wrapper .mt-criterion-info {
+    flex: 1;
 }
 
-body .mt-criterion-label {
-    font-size: 18px !important;
-    font-weight: 600 !important;
-    color: var(--mt-primary) !important;
-    margin: 0 0 5px 0 !important;
+#mt-plugin-wrapper .mt-criterion-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--mt-primary);
+    margin: 0 0 5px 0;
 }
 
-body .mt-criterion-description {
-    font-size: 14px !important;
-    color: var(--mt-body-text) !important;
-    margin: 0 !important;
-    line-height: 1.5 !important;
+#mt-plugin-wrapper .mt-criterion-description {
+    font-size: 14px;
+    color: var(--mt-body-text);
+    margin: 0;
+    line-height: 1.5;
 }
 
 /* Scoring Controls */
-body .mt-scoring-control {
-    display: flex !important;
-    align-items: center !important;
-    gap: 20px !important;
+#mt-plugin-wrapper .mt-scoring-control {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 /* Slider Style */
-body .mt-score-slider-wrapper {
-    flex: 1 !important;
-    position: relative !important;
-    padding: 10px 0 30px 0 !important;
+#mt-plugin-wrapper .mt-score-slider-wrapper {
+    flex: 1;
+    position: relative;
+    padding: 10px 0 30px 0;
 }
 
-body .mt-score-slider {
-    width: 100% !important;
-    height: 8px !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    background: var(--mt-blue-accent) !important;
-    border-radius: 4px !important;
-    outline: none !important;
+#mt-plugin-wrapper .mt-score-slider {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--mt-blue-accent);
+    border-radius: 4px;
+    outline: none;
 }
 
-body .mt-score-slider::-webkit-slider-thumb {
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    width: 24px !important;
-    height: 24px !important;
-    background: var(--mt-accent) !important;
-    border-radius: 50% !important;
-    cursor: pointer !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+#mt-plugin-wrapper .mt-score-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--mt-accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-body .mt-score-slider::-moz-range-thumb {
-    width: 24px !important;
-    height: 24px !important;
-    background: var(--mt-accent) !important;
-    border-radius: 50% !important;
-    cursor: pointer !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-    border: none !important;
+#mt-plugin-wrapper .mt-score-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: var(--mt-accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: none;
 }
 
-body .mt-score-marks {
-    display: flex !important;
-    justify-content: space-between !important;
-    position: absolute !important;
-    width: 100% !important;
-    bottom: 0 !important;
+#mt-plugin-wrapper .mt-score-marks {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
 }
 
-body .mt-score-mark {
-    font-size: 12px !important;
-    color: var(--mt-body-text) !important;
-    cursor: pointer !important;
-    padding: 2px 4px !important;
+#mt-plugin-wrapper .mt-score-mark {
+    font-size: 12px;
+    color: var(--mt-body-text);
+    cursor: pointer;
+    padding: 2px 4px;
 }
 
-body .mt-score-mark:hover {
-    color: var(--mt-accent) !important;
-    font-weight: 600 !important;
+#mt-plugin-wrapper .mt-score-mark:hover {
+    color: var(--mt-accent);
+    font-weight: 600;
 }
 
 /* Score Display */
-body .mt-score-display {
-    width: 60px !important;
-    height: 60px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: white !important;
-    font-size: 24px !important;
-    font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+#mt-plugin-wrapper .mt-score-display {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Comments Section */
-body .mt-comments-section {
-    background: white !important;
-    border-radius: 16px !important;
-    padding: 40px !important;
-    margin: 30px 0 !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+#mt-plugin-wrapper .mt-comments-section {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    margin: 30px 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-body .mt-section-description {
-    font-size: 16px !important;
-    color: var(--mt-body-text) !important;
-    margin: -10px 0 20px 0 !important;
+#mt-plugin-wrapper .mt-section-description {
+    font-size: 16px;
+    color: var(--mt-body-text);
+    margin: -10px 0 20px 0;
 }
 
-body .mt-comments-textarea {
-    width: 100% !important;
-    min-height: 150px !important;
-    padding: 15px !important;
-    border: 2px solid var(--mt-blue-accent) !important;
-    border-radius: 8px !important;
-    font-size: 16px !important;
-    line-height: 1.6 !important;
-    resize: vertical !important;
-    transition: border-color 0.3s ease !important;
+#mt-plugin-wrapper .mt-comments-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 15px;
+    border: 2px solid var(--mt-blue-accent);
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.3s ease;
 }
 
-body .mt-comments-textarea:focus {
-    outline: none !important;
-    border-color: var(--mt-accent) !important;
+#mt-plugin-wrapper .mt-comments-textarea:focus {
+    outline: none;
+    border-color: var(--mt-accent);
 }
 
-body .mt-char-count {
-    text-align: right !important;
-    font-size: 13px !important;
-    color: var(--mt-body-text) !important;
-    margin-top: 8px !important;
+#mt-plugin-wrapper .mt-char-count {
+    text-align: right;
+    font-size: 13px;
+    color: var(--mt-body-text);
+    margin-top: 8px;
 }
 
 /* Form Actions */
-body .mt-form-actions {
-    display: flex !important;
-    justify-content: center !important;
-    gap: 20px !important;
-    margin: 40px 0 !important;
+#mt-plugin-wrapper .mt-form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 40px 0;
 }
 
-body .mt-form-actions .mt-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 12px 30px !important;
-    border: none !important;
-    border-radius: 30px !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    text-decoration: none !important;
+#mt-plugin-wrapper .mt-form-actions .mt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
 }
 
-body .mt-form-actions .mt-btn-primary {
-    background: var(--mt-accent) !important;
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(193, 105, 60, 0.3) !important;
+#mt-plugin-wrapper .mt-form-actions .mt-btn-primary {
+    background: var(--mt-accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(193, 105, 60, 0.3);
 }
 
-body .mt-form-actions .mt-btn-primary:hover {
-    background: var(--mt-kupfer-bold) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(193, 105, 60, 0.4) !important;
+#mt-plugin-wrapper .mt-form-actions .mt-btn-primary:hover {
+    background: var(--mt-kupfer-bold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(193, 105, 60, 0.4);
 }
 
-body .mt-form-actions .mt-btn-secondary {
-    background: white !important;
-    color: var(--mt-secondary) !important;
-    border: 2px solid var(--mt-secondary) !important;
+#mt-plugin-wrapper .mt-form-actions .mt-btn-secondary {
+    background: white;
+    color: var(--mt-secondary);
+    border: 2px solid var(--mt-secondary);
 }
 
-body .mt-form-actions .mt-btn-secondary:hover {
-    background: var(--mt-secondary) !important;
-    color: white !important;
+#mt-plugin-wrapper .mt-form-actions .mt-btn-secondary:hover {
+    background: var(--mt-secondary);
+    color: white;
 }
 
 /* Submission Guidelines */
-body .mt-submission-guidelines {
-    background: var(--mt-bg-beige) !important;
-    border-radius: 12px !important;
-    padding: 30px !important;
-    margin: 30px 0 !important;
+#mt-plugin-wrapper .mt-submission-guidelines {
+    background: var(--mt-bg-beige);
+    border-radius: 12px;
+    padding: 30px;
+    margin: 30px 0;
 }
 
-body .mt-submission-guidelines h3 {
-    font-size: 18px !important;
-    font-weight: 600 !important;
-    color: var(--mt-primary) !important;
-    margin: 0 0 15px 0 !important;
+#mt-plugin-wrapper .mt-submission-guidelines h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--mt-primary);
+    margin: 0 0 15px 0;
 }
 
-body .mt-submission-guidelines ul {
-    margin: 0 !important;
-    padding-left: 20px !important;
+#mt-plugin-wrapper .mt-submission-guidelines ul {
+    margin: 0;
+    padding-left: 20px;
 }
 
-body .mt-submission-guidelines li {
-    font-size: 15px !important;
-    color: var(--mt-body-text) !important;
-    margin-bottom: 10px !important;
-    line-height: 1.6 !important;
+#mt-plugin-wrapper .mt-submission-guidelines li {
+    font-size: 15px;
+    color: var(--mt-body-text);
+    margin-bottom: 10px;
+    line-height: 1.6;
 }
