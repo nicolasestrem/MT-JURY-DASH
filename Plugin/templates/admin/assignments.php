@@ -202,24 +202,24 @@ function testAjax() {
     
     <!-- Action Buttons -->
     <div class="mt-action-bar">
-        <button id="mt-auto-assign-btn" class="button button-primary">
+        <button id="mt-auto-assign-btn" class="button button-primary" data-test="auto-assign-btn">
             <span class="dashicons dashicons-randomize"></span>
             <?php _e('Auto-Assign', 'mobility-trailblazers'); ?>
         </button>
-        <button id="mt-manual-assign-btn" class="button">
+        <button id="mt-manual-assign-btn" class="button" data-test="manual-assign-btn">
             <span class="dashicons dashicons-plus-alt"></span>
             <?php _e('Manual Assignment', 'mobility-trailblazers'); ?>
         </button>
-        <button id="mt-bulk-actions-btn" class="button">
+        <button id="mt-bulk-actions-btn" class="button" data-test="bulk-actions-btn">
             <span class="dashicons dashicons-admin-generic"></span>
             <?php _e('Bulk Actions', 'mobility-trailblazers'); ?>
         </button>
-        <button id="mt-export-btn" class="button">
+        <button id="mt-export-btn" class="button" data-test="export-btn">
             <span class="dashicons dashicons-download"></span>
             <?php _e('Export', 'mobility-trailblazers'); ?>
         </button>
         <?php if (current_user_can('manage_options')) : ?>
-        <button id="mt-clear-all-btn" class="button button-link-delete">
+        <button id="mt-clear-all-btn" class="button button-link-delete" data-test="clear-all-btn">
             <span class="dashicons dashicons-trash"></span>
             <?php _e('Clear All', 'mobility-trailblazers'); ?>
         </button>

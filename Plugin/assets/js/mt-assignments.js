@@ -75,10 +75,14 @@
     var removeXhr = null;
 
     function openAutoAssignModal() {
-        $('#mt-auto-assign-modal').css('display', 'flex').hide().fadeIn(300);
+        var $modal = $('#mt-auto-assign-modal');
+        $modal.css('display', 'flex').hide().fadeIn(300);
+        try { trapFocus($modal); } catch(e) {}
     }
     function openManualAssignModal() {
-        $('#mt-manual-assign-modal').css('display', 'flex').hide().fadeIn(300);
+        var $modal = $('#mt-manual-assign-modal');
+        $modal.css('display', 'flex').hide().fadeIn(300);
+        try { trapFocus($modal); } catch(e) {}
     }
     function closeModal($modal) {
         $modal.fadeOut(300);
@@ -90,6 +94,35 @@
         if (id === 'mt-manual-assign-modal' && manualAssignXhr && manualAssignXhr.readyState !== 4) {
             try { manualAssignXhr.abort(); } catch(e) {}
         }
+        try { releaseFocus($modal); } catch(e) {}
+    }
+    // Basic focus trap for accessibility inside modals
+    var previousFocus = null;
+    function trapFocus($modal) {
+        var $content = $modal.find('.mt-modal-content').attr('tabindex', '-1');
+        previousFocus = document.activeElement;
+        var focusable = $content.find('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])')
+            .filter(':visible');
+        var first = focusable.get(0);
+        var last = focusable.get(focusable.length - 1);
+        if (first) { first.focus(); }
+        $modal.on('keydown.mtAssignFocus', function(e) {
+            if (e.key === 'Escape') { e.preventDefault(); closeModal($modal); }
+            if (e.key !== 'Tab') return;
+            if (focusable.length === 0) return;
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault(); last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault(); first.focus();
+            }
+        });
+    }
+    function releaseFocus($modal) {
+        $modal.off('keydown.mtAssignFocus');
+        if (previousFocus && typeof previousFocus.focus === 'function') {
+            try { previousFocus.focus(); } catch(e) {}
+        }
+        previousFocus = null;
     }
     function submitAutoAssignment() {
         var method = $('#assignment_method').val();
