@@ -161,7 +161,8 @@ playwright-report/
 /.internal/
 /node_modules/
 /screenshots/
-/tests/
+# Allow test sources to be tracked (artifacts still ignored above)
+# /tests/
 nul
 
 # ===== Auto-generated minified files =====
