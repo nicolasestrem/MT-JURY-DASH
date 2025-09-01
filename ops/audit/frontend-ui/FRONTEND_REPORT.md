@@ -60,6 +60,7 @@ Localization
 - Templates: Most frontend/admin templates correctly wrap UI strings with the `mobility-trailblazers` text domain (e.g., winners display and single templates). Good coverage.
 - JavaScript: Some hardcoded fallback strings exist (e.g., `Plugin/assets/js/frontend.js` uses English fallbacks like “An error occurred. Please try again.” when `mt_ajax.i18n` keys are missing). While acceptable as a safeguard, these are not translatable. Prefer always sourcing strings from localized objects and ensure keys are provided server-side.
 - Admin debug content: `Plugin/templates/admin/assignments.php` includes debug UI texts gated by `WP_DEBUG`. Keep gated to non-production; ensure any visible strings in production remain localized.
+ - Hardcoded strings in JS: `Plugin/assets/js/mt-jury-filters.js` uses a German message for no results ("Keine Kandidaten entsprechen Ihren Suchkriterien.") hardcoded in markup. This should be localized via `wp_localize_script` and consumed by the script.
 
 File-by-File Appendix (path:line → issue → impact → suggestion)
 
@@ -77,6 +78,8 @@ File-by-File Appendix (path:line → issue → impact → suggestion)
  - Plugin/assets/css/mt-candidate-grid.css:1–200,200–500 → Extensive use of `!important` across layout/spacing/hover and elementor overrides → Cascade brittleness and heavy specificity → Scope under a plugin root, reduce `!important`, replace inline style attribute matchers with component classes.
  - Plugin/assets/js/frontend.js:~680–980 → Uses localized messages but includes English fallbacks in code paths → Non-localized UX fallback → Ensure all keys are provided server-side and drop hardcoded fallbacks where feasible.
  - Plugin/templates/admin/assignments.php:~450–465 → Enqueues `mt-assignments.js` and `mt-modal-debug.js` from template → Risk of debug script inclusion outside strict debug contexts → Wrap debug script enqueue in `WP_DEBUG` and allow `MT_DEBUG` flag to control console output.
+ - Plugin/assets/js/mt-event-manager.js:~40–80 → `trackEvents()` contains an incomplete debug log statement → Potential runtime error if `MT_DEBUG` enabled → Fix debug log to include memory usage conditionally or remove.
+ - Plugin/includes/public/renderers/class-mt-shortcode-renderer.php:~200–360 → Legacy CSS refs to `assets/css/v3/*` used when v4 disabled; v3 assets folder not present in Plugin/assets/css → Risk of 404s if v4 disabled → Either ship v3 assets or remove legacy path and rely on v4 only.
 
 Suggested Remediations (prioritized)
 
