@@ -977,6 +977,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_bulk_evaluation_action',
                     bulk_action: action,
@@ -1006,8 +1007,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                 },
                 error: function(xhr, status, error) {
                     // Show detailed error message
-                    const errorMsg = mt_admin.i18n.error_occurred || 'An error occurred. Please try again.';
-                    mtShowNotification(errorMsg + ' (' + error + ')', 'error');
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred || 'An error occurred. Please try again.');
                     // Remove processing state from rows
                     $('input[name="evaluation[]"]:checked').closest('tr').removeClass('processing').css('opacity', '1');
                 },
