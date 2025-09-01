@@ -161,7 +161,8 @@ playwright-report/
 /.internal/
 /node_modules/
 /screenshots/
-/tests/
+# Keep test sources tracked; ignore only artifacts and secrets
+# tests/
 nul
 
 # ===== Auto-generated minified files =====
