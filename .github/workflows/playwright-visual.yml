@@ -2,7 +2,7 @@ name: Playwright Visual Regression
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ develop, staging ]
   workflow_dispatch:
 
 concurrency:
@@ -74,4 +74,3 @@ jobs:
         with:
           name: playwright-report-admin
           path: tests/reports/playwright-report
-
