@@ -15,6 +15,8 @@ Console Logs
   - Suggestion: Remove or guard with debug flag.
 - `Plugin/assets/js/frontend.js`: One `console.log` at ~711 (“Evaluation submission already in progress”).
   - Suggestion: Switch to a UI notice or remove.
+ - `Plugin/templates/admin/assignments.php`: Inline fallback JS logs/alerts; plus enqueues `mt-modal-debug.js` unconditionally.
+   - Suggestion: Remove inline fallback in favor of centralized `mt-assignments.js`; guard debug assets behind `WP_DEBUG` and `window.MT_DEBUG`.
 
 Event Binding & Potential Leaks
 
@@ -25,6 +27,7 @@ Event Binding & Potential Leaks
   - Fix: Namespace events (e.g., `.on('click.mt-assign', ...)`) and ensure only one script binds on the assignments page (feature flag or page guard). Prefer one owner module.
 - Intervals: `Plugin/assets/js/frontend.js` stores intervals on `window.mtIntervals` and clears previous intervals; good practice to minimize leaks.
 - Global handlers: Several `$(document).ready(...)` blocks across files; prefer single init per screen/module to avoid re-inits after partial DOM updates.
+ - Mixed native + jQuery in modal scripts (`mt-modal-force.js` uses `DOMContentLoaded` and jQuery ready in same file), increasing the chance of duplicate binds. Prefer one pattern and idempotent initializers.
 
 Async/UX Notes
 

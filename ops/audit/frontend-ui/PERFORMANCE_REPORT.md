@@ -19,6 +19,10 @@ Opportunities
 - JS loading:
   - Most scripts load in footer; continue ensuring per-screen enqueues (e.g., only load `mt-assignments.js` on the assignments admin screen).
   - Split large admin bundles if possible; avoid binding handlers for screens that are not active.
+ - Remove debug-only assets in production:
+   - `mt-modal-debug.js` should not load on production; wrap in `WP_DEBUG` check and guard logs.
+ - Remove unused/duplicate CSS:
+   - Investigate `Plugin/assets/css/frontend.css` and `Plugin/assets/css/frontend/frontend.css` which appear minimal and possibly superseded by `frontend-new.css`.
 
 Quick Wins Checklist
 
@@ -26,3 +30,4 @@ Quick Wins Checklist
 - Switch to minified CSS/JS in production and ensure sourcemaps are not shipped.
 - Audit hotfix CSS files (e.g., `mt-jury-filter-hotfix.css`) and narrow their scope to specific routes.
 - Defer animations or non-critical enhancements until after first content is visible; avoid forced reflows.
+ - Consolidate candidate grid and responsive styles to reduce duplication across `frontend/_responsive.css` and `mt-candidate-grid.css`.

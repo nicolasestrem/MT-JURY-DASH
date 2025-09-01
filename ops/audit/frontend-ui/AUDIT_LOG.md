@@ -6,3 +6,4 @@ Base: develop
 Branch: audit_codex_01092025
 Hour 1: scanned Plugin assets/enqueues, v4 vs legacy conflicts, JS handlers, responsive CSS
 Hour 2: deepened appendix, added localization findings; pushing
+Hour 3: assignments template + grid CSS review; updated JS/perf notes

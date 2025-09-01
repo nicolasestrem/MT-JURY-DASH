@@ -41,11 +41,13 @@ JavaScript (events, AJAX, console)
 - Double-binding risk: Both `admin.js` and `mt-assignments.js` bind the same selectors (auto/manual assign, clear all, remove assignment). One uses delegated `$(document).on(...)`, the other uses direct `.off().on(...)` — together they can still result in two handlers firing.
 - Console logs: `mt-modal-debug.js` and `mt-jury-filters.js` log extensively. `mt-modal-debug.js` is referenced from an admin template; ensure it is only included behind an explicit dev/debug flag.
 - AJAX hygiene: Most calls include `nonce` and use `mt_admin`/`mt_ajax` objects. Error handlers exist but are inconsistent in messaging and status handling across files.
+ - Inline fallback in assignments template: `Plugin/templates/admin/assignments.php` injects inline JS with console logs and English alerts, plus enqueues `mt-modal-debug.js`. This bypasses centralized admin handlers and localization.
 
 Responsive
 
 - Breakpoints used: 1400, 1200, 992, 900, 768, 480. They’re repeated across multiple CSS files under `Plugin/assets/css/frontend/`.
 - Grid responsiveness for candidates is solid; however, fixed pixel sizes for images and min-heights can create jumpiness. Consider `aspect-ratio`, `object-fit`, and `clamp()` for typography.
+ - Candidate grid relies on many `!important` rules in `mt-candidate-grid.css` to fight theme styles; prefer scoping inside a root container (e.g., `.mt-root`) and reduce `!important` where possible.
 
 Assets (enqueue order, duplication)
 
@@ -71,6 +73,8 @@ File-by-File Appendix (path:line → issue → impact → suggestion)
 - Plugin/assets/js/mt-assignments.js:18–64, 49, 54, 59, 64 → Direct handlers on same selectors → Potential double-fire with admin.js → Feature-flag per page or ensure admin.js detects and skips if `#mt-auto-assign-btn` is bound; or keep all logic in `mt-assignments.js` and remove overlaps from admin bundle on that screen.
 - Plugin/assets/js/mt-modal-debug.js:5,38,45,79–88,96,130,147–148 → Console logs → Debug noise in admin → Guard behind `if (window.MT_DEBUG) { ... }` or strip in production.
 - Plugin/assets/js/mt-jury-filters.js:10–113 → Console logs around filter actions → Production noise → Remove or guard with a debug flag.
+ - Plugin/templates/admin/assignments.php:452–560,560–840 → Enqueues `mt-assignments.js`, then `mt-modal-debug.js`, adds inline fallback handlers and English alerts → Double-bind risk, non-localized UX, console noise → Only enqueue `mt-assignments.js` on this page, drop debug script in production, and move fallback logic into the main module with i18n.
+ - Plugin/assets/css/mt-candidate-grid.css:1–200,200–500 → Extensive use of `!important` across layout/spacing/hover and elementor overrides → Cascade brittleness and heavy specificity → Scope under a plugin root, reduce `!important`, replace inline style attribute matchers with component classes.
  - Plugin/assets/js/frontend.js:~680–980 → Uses localized messages but includes English fallbacks in code paths → Non-localized UX fallback → Ensure all keys are provided server-side and drop hardcoded fallbacks where feasible.
  - Plugin/templates/admin/assignments.php:~450–465 → Enqueues `mt-assignments.js` and `mt-modal-debug.js` from template → Risk of debug script inclusion outside strict debug contexts → Wrap debug script enqueue in `WP_DEBUG` and allow `MT_DEBUG` flag to control console output.
 
