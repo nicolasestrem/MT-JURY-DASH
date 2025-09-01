@@ -173,3 +173,6 @@ nul
 #assets/js/*.min.js
 august-2025-daily-activities.xlsx
 /Production Files
+
+.gemini/
+gha-creds-*.json
