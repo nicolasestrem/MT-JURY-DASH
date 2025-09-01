@@ -248,7 +248,7 @@ function testAjax() {
     
     <!-- Bulk Actions Dropdown (Hidden by default) -->
     <div id="mt-bulk-actions-container" class="mt-bulk-actions" style="display: none;">
-        <select id="mt-bulk-action-select">
+        <select id="mt-bulk-action-select" data-test="bulk-action-select">
             <option value=""><?php _e('Select Bulk Action', 'mobility-trailblazers'); ?></option>
             <option value="remove"><?php _e('Remove Selected Assignments', 'mobility-trailblazers'); ?></option>
             <option value="reassign"><?php _e('Reassign to Another Jury Member', 'mobility-trailblazers'); ?></option>
@@ -417,7 +417,7 @@ include __DIR__ . '/assignments-modals.php';
         <form id="mt-manual-assignment-form" data-test="manual-assign-form">
             <div class="mt-form-group">
                 <label for="manual_jury_member"><?php _e('Jury Member', 'mobility-trailblazers'); ?></label>
-                <select name="jury_member_id" id="manual_jury_member" class="widefat" required>
+                <select name="jury_member_id" id="manual_jury_member" class="widefat" required data-test="manual-jury-select">
                     <option value=""><?php _e('Select Jury Member', 'mobility-trailblazers'); ?></option>
                     <?php foreach ($jury_members as $jury) : ?>
                     <option value="<?php echo esc_attr($jury->ID); ?>">
@@ -431,7 +431,7 @@ include __DIR__ . '/assignments-modals.php';
                 <label for="manual_candidates"><?php _e('Select Candidates', 'mobility-trailblazers'); ?></label>
                 <div class="mt-candidates-checklist">
                     <?php foreach ($candidates as $candidate) : ?>
-                    <label class="mt-candidate-checkbox">
+                    <label class="mt-candidate-checkbox" data-test="manual-candidate-checkbox">
                         <input type="checkbox" name="candidate_ids[]" value="<?php echo esc_attr($candidate->ID); ?>">
                         <?php echo esc_html($candidate->post_title); ?>
                     </label>

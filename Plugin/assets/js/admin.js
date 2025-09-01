@@ -835,6 +835,26 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                         this.closeModal($modal);
                     }
                 });
+                // Simple focus trap inside modal content
+                let prevFocus = null;
+                const focusTrapHandler = (e) => {
+                    if (!$modal.is(':visible')) return;
+                    const $content = $modal.find('.mt-modal-content').attr('tabindex', '-1');
+                    const focusable = $content.find('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])').filter(':visible');
+                    if (!prevFocus) { prevFocus = document.activeElement; }
+                    const first = focusable.get(0);
+                    const last = focusable.get(focusable.length - 1);
+                    if (e.key === 'Tab' && focusable.length) {
+                        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                    }
+                };
+                $modal.on('keydown.mtEvalFocus', focusTrapHandler);
+                $modal.on('mt:releaseFocus', () => {
+                    $modal.off('keydown.mtEvalFocus');
+                    if (prevFocus && typeof prevFocus.focus === 'function') { try { prevFocus.focus(); } catch(e) {} }
+                    prevFocus = null;
+                });
             }
             return $modal;
         },
@@ -845,6 +865,7 @@ function initMediaUpload() { /* ... media upload logic ... */ }
                     $modal.data('trigger').focus();
                 }
             });
+            $modal.trigger('mt:releaseFocus');
             if (this._detailsXhr && this._detailsXhr.readyState !== 4) { try { this._detailsXhr.abort(); } catch(e) {} }
         },
         renderEvaluationDetails: function(data) {

@@ -106,6 +106,10 @@
         var first = focusable.get(0);
         var last = focusable.get(focusable.length - 1);
         if (first) { first.focus(); }
+        // Close on overlay click
+        $modal.off('click.mtAssignClose').on('click.mtAssignClose', function(e) {
+            if ($(e.target).hasClass('mt-modal')) { closeModal($modal); }
+        });
         $modal.on('keydown.mtAssignFocus', function(e) {
             if (e.key === 'Escape') { e.preventDefault(); closeModal($modal); }
             if (e.key !== 'Tab') return;
@@ -118,7 +122,7 @@
         });
     }
     function releaseFocus($modal) {
-        $modal.off('keydown.mtAssignFocus');
+        $modal.off('keydown.mtAssignFocus click.mtAssignClose');
         if (previousFocus && typeof previousFocus.focus === 'function') {
             try { previousFocus.focus(); } catch(e) {}
         }
@@ -360,46 +364,11 @@
         }
     }
     function showNotification(message, type) {
+        if (typeof window.mtShowNotification === 'function') {
+            return window.mtShowNotification(message, type);
+        }
+        // Fallback lightweight notice if global helper is unavailable
         type = type || 'info';
-        // Remove any existing notifications
-        $('.mt-notification').remove();
-        // Map types to WordPress notice classes
-        var typeMap = {
-            'success': 'notice-success',
-            'error': 'notice-error',
-            'warning': 'notice-warning',
-            'info': 'notice-info'
-        };
-        var noticeClass = typeMap[type] || 'notice-info';
-        // Create notification HTML
-        var notificationHtml = 
-            '<div class="mt-notification notice ' + noticeClass + ' is-dismissible">' +
-                '<p>' + message + '</p>' +
-                '<button type="button" class="notice-dismiss">' +
-                    '<span class="screen-reader-text">Dismiss this notice.</span>' +
-                '</button>' +
-            '</div>';
-        // Add notification after the page title
-        var $target = $('.wrap h1').first();
-        if ($target.length) {
-            $(notificationHtml).insertAfter($target);
-        } else {
-            // Fallback: add to beginning of .wrap
-            $('.wrap').prepend(notificationHtml);
-        }
-        // Auto-dismiss after 5 seconds for success messages
-        if (type === 'success') {
-            setTimeout(function() {
-                $('.mt-notification').fadeOut(400, function() {
-                    $(this).remove();
-                });
-            }, 5000);
-        }
-        // Handle dismiss button
-        $('.mt-notification .notice-dismiss').on('click', function() {
-            $(this).closest('.mt-notification').fadeOut(400, function() {
-                $(this).remove();
-            });
-        });
+        alert((type ? '[' + type.toUpperCase() + '] ' : '') + message);
     }
 })(jQuery);
