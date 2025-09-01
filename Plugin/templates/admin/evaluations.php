@@ -60,12 +60,12 @@ $candidates = get_posts([
             <input type="hidden" name="page" value="mt-evaluations">
             
             <div class="alignleft actions">
-                <select name="status" id="filter-status">
+                <select name="status" id="filter-status" data-test="eval-filter-status">
                     <option value=""><?php _e('All Statuses', 'mobility-trailblazers'); ?></option>
                     <option value="completed" <?php selected($filter_status, 'completed'); ?>><?php _e('Completed', 'mobility-trailblazers'); ?></option>
                 </select>
                 
-                <select name="jury_member" id="filter-jury">
+                <select name="jury_member" id="filter-jury" data-test="eval-filter-jury">
                     <option value=""><?php _e('All Jury Members', 'mobility-trailblazers'); ?></option>
                     <?php foreach ($jury_members as $jury) : ?>
                         <option value="<?php echo esc_attr($jury->ID); ?>" <?php selected($filter_jury, $jury->ID); ?>>
@@ -74,7 +74,7 @@ $candidates = get_posts([
                     <?php endforeach; ?>
                 </select>
                 
-                <select name="candidate" id="filter-candidate">
+                <select name="candidate" id="filter-candidate" data-test="eval-filter-candidate">
                     <option value=""><?php _e('All Candidates', 'mobility-trailblazers'); ?></option>
                     <?php foreach ($candidates as $candidate) : ?>
                         <option value="<?php echo esc_attr($candidate->ID); ?>" <?php selected($filter_candidate, $candidate->ID); ?>>
@@ -89,13 +89,13 @@ $candidates = get_posts([
         
         <div class="alignleft actions bulkactions">
             <label for="bulk-action-selector-top" class="screen-reader-text"><?php _e('Select bulk action', 'mobility-trailblazers'); ?></label>
-            <select name="action" id="bulk-action-selector-top">
+            <select name="action" id="bulk-action-selector-top" data-test="eval-bulk-select-top">
                 <option value="-1"><?php _e('Bulk Actions', 'mobility-trailblazers'); ?></option>
                 <option value="approve"><?php _e('Approve', 'mobility-trailblazers'); ?></option>
                 <option value="reject"><?php _e('Reject', 'mobility-trailblazers'); ?></option>
                 <option value="delete"><?php _e('Delete', 'mobility-trailblazers'); ?></option>
             </select>
-            <input type="button" id="doaction" class="button action" value="<?php esc_attr_e('Apply', 'mobility-trailblazers'); ?>">
+            <input type="button" id="doaction" class="button action" data-test="eval-bulk-apply-top" value="<?php esc_attr_e('Apply', 'mobility-trailblazers'); ?>">
         </div>
     </div>
     
@@ -104,7 +104,7 @@ $candidates = get_posts([
             <tr>
                 <td id="cb" class="manage-column column-cb check-column">
                     <label class="screen-reader-text" for="cb-select-all-1"><?php _e('Select All', 'mobility-trailblazers'); ?></label>
-                    <input id="cb-select-all-1" type="checkbox">
+                    <input id="cb-select-all-1" type="checkbox" data-test="eval-select-all-top">
                 </td>
                 <th><?php _e('ID', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Jury Member', 'mobility-trailblazers'); ?></th>
@@ -126,7 +126,7 @@ $candidates = get_posts([
                             <label class="screen-reader-text" for="cb-select-<?php echo esc_attr($evaluation->id); ?>">
                                 <?php printf(__('Select evaluation %s', 'mobility-trailblazers'), $evaluation->id); ?>
                             </label>
-                            <input id="cb-select-<?php echo esc_attr($evaluation->id); ?>" type="checkbox" name="evaluation[]" value="<?php echo esc_attr($evaluation->id); ?>">
+                            <input id="cb-select-<?php echo esc_attr($evaluation->id); ?>" type="checkbox" name="evaluation[]" value="<?php echo esc_attr($evaluation->id); ?>" data-test="eval-row-checkbox">
                         </th>
                         <td><?php echo esc_html($evaluation->id); ?></td>
                         <td>
@@ -157,7 +157,7 @@ $candidates = get_posts([
                         </td>
                         <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($evaluation->updated_at))); ?></td>
                         <td>
-                            <button class="button view-details" data-evaluation-id="<?php echo esc_attr($evaluation->id); ?>">
+                            <button class="button view-details" data-evaluation-id="<?php echo esc_attr($evaluation->id); ?>" data-test="eval-view-details">
                                 <?php _e('View Details', 'mobility-trailblazers'); ?>
                             </button>
                         </td>
@@ -173,7 +173,7 @@ $candidates = get_posts([
             <tr>
                 <td class="manage-column column-cb check-column">
                     <label class="screen-reader-text" for="cb-select-all-2"><?php _e('Select All', 'mobility-trailblazers'); ?></label>
-                    <input id="cb-select-all-2" type="checkbox">
+                    <input id="cb-select-all-2" type="checkbox" data-test="eval-select-all-bottom">
                 </td>
                 <th><?php _e('ID', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Jury Member', 'mobility-trailblazers'); ?></th>
@@ -189,13 +189,13 @@ $candidates = get_posts([
     <div class="tablenav bottom">
         <div class="alignleft actions bulkactions">
             <label for="bulk-action-selector-bottom" class="screen-reader-text"><?php _e('Select bulk action', 'mobility-trailblazers'); ?></label>
-            <select name="action2" id="bulk-action-selector-bottom">
+            <select name="action2" id="bulk-action-selector-bottom" data-test="eval-bulk-select-bottom">
                 <option value="-1"><?php _e('Bulk Actions', 'mobility-trailblazers'); ?></option>
                 <option value="approve"><?php _e('Approve', 'mobility-trailblazers'); ?></option>
                 <option value="reject"><?php _e('Reject', 'mobility-trailblazers'); ?></option>
                 <option value="delete"><?php _e('Delete', 'mobility-trailblazers'); ?></option>
             </select>
-            <input type="button" id="doaction2" class="button action" value="<?php esc_attr_e('Apply', 'mobility-trailblazers'); ?>">
+            <input type="button" id="doaction2" class="button action" data-test="eval-bulk-apply-bottom" value="<?php esc_attr_e('Apply', 'mobility-trailblazers'); ?>">
         </div>
     </div>
 </div>
