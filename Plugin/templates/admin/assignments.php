@@ -202,24 +202,24 @@ function testAjax() {
     
     <!-- Action Buttons -->
     <div class="mt-action-bar">
-        <button id="mt-auto-assign-btn" class="button button-primary">
+        <button id="mt-auto-assign-btn" class="button button-primary" data-test="auto-assign-btn">
             <span class="dashicons dashicons-randomize"></span>
             <?php _e('Auto-Assign', 'mobility-trailblazers'); ?>
         </button>
-        <button id="mt-manual-assign-btn" class="button">
+        <button id="mt-manual-assign-btn" class="button" data-test="manual-assign-btn">
             <span class="dashicons dashicons-plus-alt"></span>
             <?php _e('Manual Assignment', 'mobility-trailblazers'); ?>
         </button>
-        <button id="mt-bulk-actions-btn" class="button">
+        <button id="mt-bulk-actions-btn" class="button" data-test="bulk-actions-btn">
             <span class="dashicons dashicons-admin-generic"></span>
             <?php _e('Bulk Actions', 'mobility-trailblazers'); ?>
         </button>
-        <button id="mt-export-btn" class="button">
+        <button id="mt-export-btn" class="button" data-test="export-btn">
             <span class="dashicons dashicons-download"></span>
             <?php _e('Export', 'mobility-trailblazers'); ?>
         </button>
         <?php if (current_user_can('manage_options')) : ?>
-        <button id="mt-clear-all-btn" class="button button-link-delete">
+        <button id="mt-clear-all-btn" class="button button-link-delete" data-test="clear-all-btn">
             <span class="dashicons dashicons-trash"></span>
             <?php _e('Clear All', 'mobility-trailblazers'); ?>
         </button>
@@ -248,7 +248,7 @@ function testAjax() {
     
     <!-- Bulk Actions Dropdown (Hidden by default) -->
     <div id="mt-bulk-actions-container" class="mt-bulk-actions" style="display: none;">
-        <select id="mt-bulk-action-select">
+        <select id="mt-bulk-action-select" data-test="bulk-action-select">
             <option value=""><?php _e('Select Bulk Action', 'mobility-trailblazers'); ?></option>
             <option value="remove"><?php _e('Remove Selected Assignments', 'mobility-trailblazers'); ?></option>
             <option value="reassign"><?php _e('Reassign to Another Jury Member', 'mobility-trailblazers'); ?></option>
@@ -410,14 +410,14 @@ include __DIR__ . '/assignments-modals.php';
 </div>
 
 <!-- Manual Assignment Modal -->
-<div id="mt-manual-assign-modal" class="mt-modal">
-    <div class="mt-modal-content">
-        <button type="button" class="mt-modal-close">&times;</button>
-        <h2><?php _e('Manual Assignment', 'mobility-trailblazers'); ?></h2>
-        <form id="mt-manual-assignment-form">
+<div id="mt-manual-assign-modal" class="mt-modal" role="dialog" aria-modal="true" aria-labelledby="mt-manual-assign-title" data-test="manual-assign-modal">
+    <div class="mt-modal-content" tabindex="-1">
+        <button type="button" class="mt-modal-close" aria-label="Close dialog">&times;</button>
+        <h2 id="mt-manual-assign-title"><?php _e('Manual Assignment', 'mobility-trailblazers'); ?></h2>
+        <form id="mt-manual-assignment-form" data-test="manual-assign-form">
             <div class="mt-form-group">
                 <label for="manual_jury_member"><?php _e('Jury Member', 'mobility-trailblazers'); ?></label>
-                <select name="jury_member_id" id="manual_jury_member" class="widefat" required>
+                <select name="jury_member_id" id="manual_jury_member" class="widefat" required data-test="manual-jury-select">
                     <option value=""><?php _e('Select Jury Member', 'mobility-trailblazers'); ?></option>
                     <?php foreach ($jury_members as $jury) : ?>
                     <option value="<?php echo esc_attr($jury->ID); ?>">
@@ -431,7 +431,7 @@ include __DIR__ . '/assignments-modals.php';
                 <label for="manual_candidates"><?php _e('Select Candidates', 'mobility-trailblazers'); ?></label>
                 <div class="mt-candidates-checklist">
                     <?php foreach ($candidates as $candidate) : ?>
-                    <label class="mt-candidate-checkbox">
+                    <label class="mt-candidate-checkbox" data-test="manual-candidate-checkbox">
                         <input type="checkbox" name="candidate_ids[]" value="<?php echo esc_attr($candidate->ID); ?>">
                         <?php echo esc_html($candidate->post_title); ?>
                     </label>
@@ -457,14 +457,16 @@ wp_enqueue_script(
     true
 );
 
-// Enqueue modal debug script - load it last to override everything
-wp_enqueue_script(
-    'mt-modal-debug',
-    MT_PLUGIN_URL . 'assets/js/mt-modal-debug.js',
-    ['jquery'],
-    MT_VERSION . '.2',
-    true
-);
+// Enqueue modal debug script only in development
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    wp_enqueue_script(
+        'mt-modal-debug',
+        MT_PLUGIN_URL . 'assets/js/mt-modal-debug.js',
+        ['jquery'],
+        MT_VERSION . '.2',
+        true
+    );
+}
 
 // Enqueue modal fix CSS
 wp_enqueue_style(
@@ -477,7 +479,7 @@ wp_enqueue_style(
 
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-    console.log('MT Assignments: Inline fallback script loaded');
+    // Inline fallback removed — assignments handled by mt-assignments.js or admin.js
     
     // Check if main admin.js loaded correctly
     if (typeof mt_admin !== 'undefined') {
@@ -517,25 +519,25 @@ jQuery(document).ready(function($) {
     }
     
     // Check if MTAssignmentManager initialized
-    if (typeof MTAssignmentManager === 'undefined') {
-        console.log('MT Assignments: MTAssignmentManager not found, using fallback handlers');
+    if (false && typeof MTAssignmentManager === 'undefined') {
+        // Fallback removed to avoid double bindings
         
         // Fallback handlers for modal functionality
         $('#mt-auto-assign-btn').on('click', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Opening auto-assign modal');
+            
             forceShowModal('mt-auto-assign-modal');
         });
         
         $('#mt-manual-assign-btn').on('click', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Opening manual assign modal');
+            
             forceShowModal('mt-manual-assign-modal');
         });
         
         $('.mt-modal-close').on('click', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Closing modal');
+            
             var modalId = $(this).closest('.mt-modal').attr('id');
             hideModal(modalId);
         });
@@ -550,7 +552,7 @@ jQuery(document).ready(function($) {
         // Handle auto-assign form submission
         $('#mt-auto-assign-modal form').on('submit', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Submitting auto-assignment');
+            
             
             var $form = $(this);
             var $submitBtn = $form.find('button[type="submit"]');
@@ -570,7 +572,7 @@ jQuery(document).ready(function($) {
                     $submitBtn.prop('disabled', true).text('Processing...');
                 },
                 success: function(response) {
-                    console.log('MT Assignments: Auto-assign response', response);
+                    
                     if (response.success) {
                         alert(response.data.message || 'Auto-assignment completed successfully!');
                         location.reload();
@@ -579,7 +581,7 @@ jQuery(document).ready(function($) {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('MT Assignments: Auto-assign error', error);
+                    
                     alert('Error: ' + error);
                 },
                 complete: function() {
@@ -591,7 +593,7 @@ jQuery(document).ready(function($) {
         // Handle manual assignment form submission
         $('#mt-manual-assignment-form').on('submit', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Submitting manual assignment');
+            
             
             var $form = $(this);
             var $submitBtn = $form.find('button[type="submit"]');
@@ -620,7 +622,7 @@ jQuery(document).ready(function($) {
                     $submitBtn.prop('disabled', true).text('Processing...');
                 },
                 success: function(response) {
-                    console.log('MT Assignments: Manual assign response', response);
+                    
                     if (response.success) {
                         alert(response.data.message || 'Assignments created successfully!');
                         location.reload();
@@ -629,7 +631,7 @@ jQuery(document).ready(function($) {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('MT Assignments: Manual assign error', error);
+                    
                     alert('Error: ' + error);
                 },
                 complete: function() {

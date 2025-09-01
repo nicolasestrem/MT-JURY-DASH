@@ -708,7 +708,7 @@
             
             // Prevent double submission
             if (this.isSubmittingEvaluation) {
-                console.log('Evaluation submission already in progress');
+                if (window.MT_DEBUG) { console.log('Evaluation submission already in progress'); }
                 return false;
             }
             
@@ -992,9 +992,9 @@
                 const currentValue = parseFloat($input.val()) || 0;
                 let newValue = currentValue;
                 if (action === 'increase' && currentValue < 10) {
-                    newValue = Math.min(10, currentValue + 0.5);
+                    newValue = Math.min(10, currentValue + 1);
                 } else if (action === 'decrease' && currentValue > 0) {
-                    newValue = Math.max(0, currentValue - 0.5);
+                    newValue = Math.max(0, currentValue - 1);
                 }
                 $input.val(newValue).trigger('change');
             });

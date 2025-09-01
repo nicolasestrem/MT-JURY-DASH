@@ -82,7 +82,23 @@ if (typeof mt_admin.i18n === 'undefined') {
     function initModals() { /* ... modal logic ... */ }
     function initConfirmations() { /* ... confirmation logic ... */ }
     function initAjaxForms() { /* ... ajax form logic ... */ }
-    function initMediaUpload() { /* ... media upload logic ... */ }
+function initMediaUpload() { /* ... media upload logic ... */ }
+    /**
+     * Standard AJAX error handler
+     * @param {jqXHR} xhr
+     * @param {string} fallback - default message if none available
+     */
+    window.mtHandleAjaxError = function(xhr, fallback) {
+        let msg = fallback || (mt_admin && mt_admin.i18n && mt_admin.i18n.error_occurred ? mt_admin.i18n.error_occurred : 'An error occurred. Please try again.');
+        try {
+            if (xhr && xhr.statusText === 'timeout') {
+                msg = (mt_admin && mt_admin.i18n && mt_admin.i18n.request_timeout) || 'Request timed out. Please try again.';
+            } else if (xhr && xhr.responseJSON && xhr.responseJSON.data) {
+                msg = xhr.responseJSON.data.message || xhr.responseJSON.data;
+            }
+        } catch(e) {}
+        window.mtShowNotification(msg, 'error');
+    };
     /**
      * Show notification message to user
      * @param {string} message - The message to display
@@ -183,6 +199,7 @@ if (typeof mt_admin.i18n === 'undefined') {
         $.ajax({
             url: mt_admin.ajax_url,
             type: 'POST',
+            timeout: 15000,
             data: {
                 action: 'mt_refresh_widget',
                 widget: widgetId,
@@ -200,7 +217,8 @@ if (typeof mt_admin.i18n === 'undefined') {
                     if (callback) callback(false);
                 }
             },
-            error: function() {
+            error: function(xhr) {
+                window.mtHandleAjaxError(xhr);
                 if (callback) callback(false);
             },
             complete: function() {
@@ -282,10 +300,15 @@ if (typeof mt_admin.i18n === 'undefined') {
             $(document).on('change', '#mt-filter-jury, #mt-filter-status', () => {
                 this.applyFilters();
             });
-            // Search handler
+            // Search handler (debounced)
+            let mtAssignSearchTimer;
             $(document).on('keyup', '#mt-assignment-search', function() {
-                const searchTerm = $(this).val();
-                MTAssignmentManager.filterAssignments(searchTerm);
+                const $self = $(this);
+                clearTimeout(mtAssignSearchTimer);
+                mtAssignSearchTimer = setTimeout(function() {
+                    const searchTerm = $self.val();
+                    MTAssignmentManager.filterAssignments(searchTerm);
+                }, 250);
             });
         },
         initBulkActions: function() {
@@ -317,6 +340,7 @@ if (typeof mt_admin.i18n === 'undefined') {
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_auto_assign',
                     nonce: mt_admin.nonce,
@@ -339,8 +363,8 @@ if (typeof mt_admin.i18n === 'undefined') {
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $('#mt-auto-assign-modal button[type="submit"]').prop('disabled', false).text('Run Auto-Assignment');
@@ -360,6 +384,7 @@ if (typeof mt_admin.i18n === 'undefined') {
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_manual_assign',
                     nonce: mt_admin.nonce,
@@ -380,8 +405,8 @@ if (typeof mt_admin.i18n === 'undefined') {
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $('#mt-manual-assignment-form button[type="submit"]').prop('disabled', false).text(mt_admin.i18n.assign_selected);
@@ -398,6 +423,7 @@ if (typeof mt_admin.i18n === 'undefined') {
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_remove_assignment',
                     nonce: mt_admin.nonce,
@@ -420,8 +446,8 @@ if (typeof mt_admin.i18n === 'undefined') {
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $button.prop('disabled', false).text(mt_admin && mt_admin.i18n && mt_admin.i18n.remove ? mt_admin.i18n.remove : 'Entfernen');
@@ -438,6 +464,7 @@ if (typeof mt_admin.i18n === 'undefined') {
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_clear_all_assignments',
                     nonce: mt_admin.nonce
@@ -453,8 +480,8 @@ if (typeof mt_admin.i18n === 'undefined') {
                         mtShowNotification(response.data || mt_admin.i18n.error_occurred, 'error');
                     }
                 },
-                error: () => {
-                    mtShowNotification(mt_admin.i18n.error_occurred, 'error');
+                error: (xhr) => {
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred);
                 },
                 complete: () => {
                     $('#mt-clear-all-btn').prop('disabled', false).html('<span class="dashicons dashicons-trash"></span> ' + mt_admin.i18n.clear_all);
@@ -748,10 +775,12 @@ if (typeof mt_admin.i18n === 'undefined') {
                 // Focus on modal body for screen readers
                 $modal.find('.mt-modal-body').focus();
             });
-            // Fetch evaluation details via AJAX
-            $.ajax({
+            // Fetch evaluation details via AJAX (abort previous if present)
+            if (this._detailsXhr && this._detailsXhr.readyState !== 4) { try { this._detailsXhr.abort(); } catch(e) {} }
+            this._detailsXhr = $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_get_evaluation_details',
                     nonce: mt_admin.nonce,
@@ -769,10 +798,11 @@ if (typeof mt_admin.i18n === 'undefined') {
                         );
                     }
                 },
-                error: () => {
+                error: (xhr) => {
                     $modal.find('.mt-modal-body').html(
-                        '<div class="notice notice-error"><p>An error occurred while loading evaluation details</p></div>'
+                        '<div class="notice notice-error"><p>' + ((mt_admin && mt_admin.i18n && mt_admin.i18n.load_error) || 'An error occurred while loading evaluation details') + '</p></div>'
                     );
+                    window.mtHandleAjaxError(xhr);
                 }
             });
         },
@@ -782,14 +812,14 @@ if (typeof mt_admin.i18n === 'undefined') {
             if ($modal.length === 0) {
                 // Create modal HTML with accessibility attributes
                 const modalHtml = `
-                    <div id="mt-evaluation-modal" class="mt-modal" role="dialog" aria-modal="true" aria-labelledby="mt-modal-title" style="display:none;">
+                    <div id="mt-evaluation-modal" class="mt-modal" role="dialog" aria-modal="true" aria-labelledby="mt-modal-title" style="display:none;" data-test="evaluation-modal">
                         <div class="mt-modal-overlay" aria-hidden="true"></div>
-                        <div class="mt-modal-content">
+                        <div class="mt-modal-content" tabindex="-1" data-test="evaluation-modal-content">
                             <div class="mt-modal-header">
                                 <h2 id="mt-modal-title">Evaluation Details</h2>
-                                <button class="mt-modal-close" aria-label="Close dialog" type="button">&times;</button>
+                                <button class="mt-modal-close" aria-label="Close dialog" type="button" data-test="evaluation-modal-close">&times;</button>
                             </div>
-                            <div class="mt-modal-body" tabindex="0"></div>
+                            <div class="mt-modal-body" tabindex="0" data-test="evaluation-modal-body"></div>
                         </div>
                     </div>
                 `;
@@ -805,6 +835,26 @@ if (typeof mt_admin.i18n === 'undefined') {
                         this.closeModal($modal);
                     }
                 });
+                // Simple focus trap inside modal content
+                let prevFocus = null;
+                const focusTrapHandler = (e) => {
+                    if (!$modal.is(':visible')) return;
+                    const $content = $modal.find('.mt-modal-content').attr('tabindex', '-1');
+                    const focusable = $content.find('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])').filter(':visible');
+                    if (!prevFocus) { prevFocus = document.activeElement; }
+                    const first = focusable.get(0);
+                    const last = focusable.get(focusable.length - 1);
+                    if (e.key === 'Tab' && focusable.length) {
+                        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                    }
+                };
+                $modal.on('keydown.mtEvalFocus', focusTrapHandler);
+                $modal.on('mt:releaseFocus', () => {
+                    $modal.off('keydown.mtEvalFocus');
+                    if (prevFocus && typeof prevFocus.focus === 'function') { try { prevFocus.focus(); } catch(e) {} }
+                    prevFocus = null;
+                });
             }
             return $modal;
         },
@@ -815,6 +865,8 @@ if (typeof mt_admin.i18n === 'undefined') {
                     $modal.data('trigger').focus();
                 }
             });
+            $modal.trigger('mt:releaseFocus');
+            if (this._detailsXhr && this._detailsXhr.readyState !== 4) { try { this._detailsXhr.abort(); } catch(e) {} }
         },
         renderEvaluationDetails: function(data) {
             let scoresHtml = '';
@@ -925,6 +977,7 @@ if (typeof mt_admin.i18n === 'undefined') {
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_bulk_evaluation_action',
                     bulk_action: action,
@@ -954,8 +1007,7 @@ if (typeof mt_admin.i18n === 'undefined') {
                 },
                 error: function(xhr, status, error) {
                     // Show detailed error message
-                    const errorMsg = mt_admin.i18n.error_occurred || 'An error occurred. Please try again.';
-                    mtShowNotification(errorMsg + ' (' + error + ')', 'error');
+                    window.mtHandleAjaxError(xhr, mt_admin.i18n.error_occurred || 'An error occurred. Please try again.');
                     // Remove processing state from rows
                     $('input[name="evaluation[]"]:checked').closest('tr').removeClass('processing').css('opacity', '1');
                 },
@@ -991,7 +1043,7 @@ if (typeof mt_admin.i18n === 'undefined') {
         }
         // --- Conditional Initialization for Page-Specific Managers ---
         // Check for the Assignment Management page
-        if ($('#mt-auto-assign-btn').length > 0 || $('.mt-assignments-table').length > 0) {
+        if (!window.MT_ASSIGNMENTS_OWNED && ($('#mt-auto-assign-btn').length > 0 || $('.mt-assignments-table').length > 0)) {
             MTAssignmentManager.init();
         }
         // Check for the Evaluations page using body class (more reliable than checking page title)
