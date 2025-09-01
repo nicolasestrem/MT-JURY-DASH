@@ -82,7 +82,23 @@ if (typeof mt_admin.i18n === 'undefined') {
     function initModals() { /* ... modal logic ... */ }
     function initConfirmations() { /* ... confirmation logic ... */ }
     function initAjaxForms() { /* ... ajax form logic ... */ }
-    function initMediaUpload() { /* ... media upload logic ... */ }
+function initMediaUpload() { /* ... media upload logic ... */ }
+    /**
+     * Standard AJAX error handler
+     * @param {jqXHR} xhr
+     * @param {string} fallback - default message if none available
+     */
+    window.mtHandleAjaxError = function(xhr, fallback) {
+        let msg = fallback || (mt_admin && mt_admin.i18n && mt_admin.i18n.error_occurred ? mt_admin.i18n.error_occurred : 'An error occurred. Please try again.');
+        try {
+            if (xhr && xhr.statusText === 'timeout') {
+                msg = (mt_admin && mt_admin.i18n && mt_admin.i18n.request_timeout) || 'Request timed out. Please try again.';
+            } else if (xhr && xhr.responseJSON && xhr.responseJSON.data) {
+                msg = xhr.responseJSON.data.message || xhr.responseJSON.data;
+            }
+        } catch(e) {}
+        window.mtShowNotification(msg, 'error');
+    };
     /**
      * Show notification message to user
      * @param {string} message - The message to display
@@ -757,6 +773,7 @@ if (typeof mt_admin.i18n === 'undefined') {
             $.ajax({
                 url: mt_admin.ajax_url,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'mt_get_evaluation_details',
                     nonce: mt_admin.nonce,
@@ -774,10 +791,11 @@ if (typeof mt_admin.i18n === 'undefined') {
                         );
                     }
                 },
-                error: () => {
+                error: (xhr) => {
                     $modal.find('.mt-modal-body').html(
-                        '<div class="notice notice-error"><p>An error occurred while loading evaluation details</p></div>'
+                        '<div class="notice notice-error"><p>' + ((mt_admin && mt_admin.i18n && mt_admin.i18n.load_error) || 'An error occurred while loading evaluation details') + '</p></div>'
                     );
+                    window.mtHandleAjaxError(xhr);
                 }
             });
         },

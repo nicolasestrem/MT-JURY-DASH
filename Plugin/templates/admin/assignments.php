@@ -410,11 +410,11 @@ include __DIR__ . '/assignments-modals.php';
 </div>
 
 <!-- Manual Assignment Modal -->
-<div id="mt-manual-assign-modal" class="mt-modal">
-    <div class="mt-modal-content">
-        <button type="button" class="mt-modal-close">&times;</button>
-        <h2><?php _e('Manual Assignment', 'mobility-trailblazers'); ?></h2>
-        <form id="mt-manual-assignment-form">
+<div id="mt-manual-assign-modal" class="mt-modal" role="dialog" aria-modal="true" aria-labelledby="mt-manual-assign-title" data-test="manual-assign-modal">
+    <div class="mt-modal-content" tabindex="-1">
+        <button type="button" class="mt-modal-close" aria-label="Close dialog">&times;</button>
+        <h2 id="mt-manual-assign-title"><?php _e('Manual Assignment', 'mobility-trailblazers'); ?></h2>
+        <form id="mt-manual-assignment-form" data-test="manual-assign-form">
             <div class="mt-form-group">
                 <label for="manual_jury_member"><?php _e('Jury Member', 'mobility-trailblazers'); ?></label>
                 <select name="jury_member_id" id="manual_jury_member" class="widefat" required>
