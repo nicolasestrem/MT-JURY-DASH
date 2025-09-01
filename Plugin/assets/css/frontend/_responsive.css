@@ -1,0 +1,408 @@
+
+/* ===================================
+   CONSOLIDATED RESPONSIVE GRID DESIGN
+   =================================== */
+
+@media (max-width: 1200px) {
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+    
+    .mt-candidates-grid.columns-4 {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+    
+    .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+        grid-template-columns: repeat(auto-fill, minmax(250px,1fr)) !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .mt-candidates-grid.columns-3,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    
+    .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+        grid-template-columns: repeat(auto-fill, minmax(200px,1fr)) !important;
+    }
+    
+    .mt-jury-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .mt-candidates-grid.columns-3,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .mt-candidates-grid:not(.columns-3):not(.columns-4):not(.columns-5) {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .mt-candidates-grid {
+        gap: 15px !important;
+    }
+    
+    .mt-candidate-grid-item,
+    .mt-candidate-card {
+        min-height: 250px !important;
+    }
+    
+    .mt-candidate-image {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    .mt-candidate-info h3 {
+        font-size: 16px !important;
+        min-height: 40px !important;
+    }
+    
+    .mt-container {
+        padding: 20px;
+    }
+    
+    .mt-evaluation-form,
+    .mt-jury-dashboard {
+        padding: 20px;
+    }
+    
+    .mt-score-selector {
+        flex-wrap: wrap;
+    }
+    
+    .mt-score-option {
+        min-width: calc(33.333% - 10px);
+    }
+}
+
+@media (max-width: 480px) {
+    .mt-candidates-grid.columns-3,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-5,
+    .mt-candidates-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .mt-candidate-grid-item,
+    .mt-candidate-card {
+        min-height: auto !important;
+        padding: 15px !important;
+    }
+    
+    .mt-jury-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .mt-winner-card {
+        padding: 20px;
+    }
+    
+    .mt-winner-rank {
+        font-size: 36px;
+    }
+    
+    .mt-winner-name {
+        font-size: 24px;
+    }
+    
+    .mt-progress-step {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+        margin: 0 5px;
+    }
+    
+    .mt-progress-step::after {
+        width: 40px;
+    }
+}
+
+/* Mobile Language Switcher Styles */
+@media (max-width: 768px) {
+    .mt-language-switcher-dropdown {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .mt-language-switcher.active .mt-language-switcher-dropdown {
+        transform: translateY(0);
+    }
+    
+    .mt-language-switcher-option {
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body .mt-candidate-showcase {
+        padding: 25px !important;
+    }
+    
+    body .mt-candidate-showcase .mt-candidate-profile {
+        flex-direction: column !important;
+        gap: 25px !important;
+    }
+    
+    body .mt-candidate-showcase.mt-layout-side-by-side .mt-candidate-profile {
+        align-items: center !important;
+        text-align: center !important;
+    }
+    
+    body .mt-candidate-showcase.mt-layout-side-by-side .mt-candidate-meta {
+        justify-content: center !important;
+    }
+    
+    body .mt-candidate-showcase .mt-candidate-photo {
+        width: 150px !important;
+        height: 150px !important;
+    }
+    
+    body .mt-candidate-showcase .mt-candidate-name {
+        font-size: 26px !important;
+    }
+    
+    body .mt-candidate-showcase .mt-candidate-meta {
+        gap: 10px !important;
+    }
+    
+    body .mt-candidate-showcase .mt-meta-item {
+        font-size: 13px !important;
+        padding: 6px 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body .mt-candidate-showcase {
+        padding: 20px !important;
+        margin: 20px -10px !important;
+        border-radius: 0 !important;
+    }
+    
+    body .mt-candidate-showcase .mt-candidate-name {
+        font-size: 22px !important;
+    }
+    
+    body .mt-candidate-showcase .mt-innovation-summary {
+        padding: 15px !important;
+    }
+    
+    body .mt-candidate-showcase .mt-bio-content {
+        font-size: 15px !important;
+    }
+}
+
+/* Responsive Design for Evaluation Page */
+@media (max-width: 768px) {
+    body .mt-evaluation-header {
+        flex-direction: column !important;
+        gap: 15px !important;
+        text-align: center !important;
+    }
+    
+    body .mt-evaluation-header .mt-back-link {
+        align-self: flex-start !important;
+    }
+    
+    body .mt-scoring-section,
+    body .mt-comments-section {
+        padding: 25px !important;
+    }
+    
+    body .mt-section-title {
+        flex-direction: column !important;
+        gap: 10px !important;
+        text-align: center !important;
+    }
+    
+    body .mt-criterion-header {
+        flex-direction: column !important;
+        text-align: center !important;
+        padding-left: 0 !important;
+        border-left: none !important;
+        border-top: 4px solid !important;
+        padding-top: 15px !important;
+    }
+    
+    body .mt-scoring-control {
+        flex-direction: column !important;
+    }
+    
+    body .mt-form-actions {
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+    
+    body .mt-form-actions .mt-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .mt-rankings-list .mt-ranking-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 8px 6px;
+    }
+    .mt-rankings-list .mt-inline-evaluation-controls {
+        margin-left: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    body .mt-jury-dashboard .mt-rankings-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    body .mt-jury-dashboard .mt-criteria-grid-inline {
+        grid-template-columns: repeat(auto-fit, minmax(70px,1fr)) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body .mt-jury-dashboard .mt-rankings-section {
+        padding: 20px !important;
+    }
+    
+    body .mt-jury-dashboard .mt-rankings-header {
+        margin: -20px -20px 20px -20px !important;
+        padding: 20px !important;
+    }
+    
+    body .mt-jury-dashboard .mt-criterion-inline {
+        padding: 8px 3px !important;
+    }
+    
+    body .mt-jury-dashboard .mt-score-input {
+        width: 40px !important;
+    }
+}
+
+/* Responsive fixes for main dashboard */
+@media (max-width: 768px) {
+    body .mt-jury-dashboard {
+        padding: 20px !important;
+    }
+    
+    body .mt-jury-dashboard .mt-candidates-list {
+        grid-template-columns: repeat(auto-fit, minmax(200px,1fr)) !important;
+    }
+    
+    body .mt-jury-dashboard .mt-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body .mt-jury-dashboard .mt-candidates-list {
+        grid-template-columns: 1fr !important;
+    }
+    
+    body .mt-jury-dashboard .mt-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Responsive Design - Maintain aspect ratio */
+@media (max-width: 1400px) {
+    .mt-candidates-grid.columns-5 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .mt-candidates-grid.columns-5,
+    .mt-candidates-grid.columns-4 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .mt-candidates-grid.columns-5,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    
+    .mt-candidate-grid-item {
+        min-height: 280px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .mt-candidates-grid.columns-5,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    
+    .mt-candidate-grid-item {
+        min-height: 260px !important;
+        padding: 15px !important;
+    }
+    
+    .mt-candidate-image {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    .mt-candidate-info h3 {
+        font-size: 15px !important;
+        min-height: 38px !important;
+    }
+    
+    .mt-candidate-meta {
+        font-size: 12px !important;
+        min-height: 44px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .mt-candidates-grid.columns-5,
+    .mt-candidates-grid.columns-4,
+    .mt-candidates-grid.columns-3 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .mt-candidate-grid-item {
+        min-height: auto !important;
+        padding: 15px !important;
+    }
+}
+
+/* Responsive adjustments for evaluation page meta items */
+@media (max-width: 768px) {
+    .mt-evaluation-page .mt-candidate-showcase .mt-candidate-meta {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    
+    .mt-evaluation-page .mt-candidate-showcase .mt-meta-item {
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .mt-evaluation-page .mt-candidate-showcase .mt-meta-item {
+        min-width: 220px !important;
+        max-width: 300px !important;
+    }
+}
