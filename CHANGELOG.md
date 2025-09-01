@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.5.42] - 2025-08-31
 
+## [Unreleased]
+
+### Added
+- Admin (Assignments): data-test hooks for buttons (auto-assign, manual-assign, bulk-actions, export, clear-all), bulk apply/cancel, bulk select; manual-assign modal/form inputs.
+- Admin (Evaluations): data-test hooks for filters, bulk selectors/buttons, row checkboxes, and view-details buttons.
+- Admin: standardized AJAX error handler `window.mtHandleAjaxError` (timeouts, JSON error parsing) used across assignments, evaluations, and widget refresh.
+- Admin/Evaluations modal: focus trap and inflight request abort; data-test hooks for modal elements.
+- Notifications: ARIA attributes (role="alert", aria-live="polite", aria-atomic) to improve announcements.
+
+### Changed
+- Jury Dashboard: increment/decrement now adjust scores by 1 (was 0.5); rankings table step unified to whole numbers.
+- Assignments: modals support ESC and overlay click to close; cancelling closes and aborts any in‑flight requests; search input debounced by 250ms.
+- Assignments JS now defers notifications to `mtShowNotification` with alert fallback; no CSS changes.
+
+### Fixed
+- Prevent duplicate submissions by aborting previous AJAX requests when a new one starts or when closing modals.
+
+
 ### Security
 - **CRITICAL**: Fixed SQL injection vulnerability in export function (CVE pending)
 - **CRITICAL**: Fixed SQL injection vulnerability in audit log ORDER BY clause
