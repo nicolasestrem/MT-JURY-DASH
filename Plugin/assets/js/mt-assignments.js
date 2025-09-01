@@ -68,6 +68,12 @@
             toggleBulkActions();
         });
     }
+    // Track in-flight requests to prevent duplicates and allow cancellation
+    var autoAssignXhr = null;
+    var manualAssignXhr = null;
+    var clearAllXhr = null;
+    var removeXhr = null;
+
     function openAutoAssignModal() {
         $('#mt-auto-assign-modal').css('display', 'flex').hide().fadeIn(300);
     }
@@ -76,6 +82,14 @@
     }
     function closeModal($modal) {
         $modal.fadeOut(300);
+        // Cancel any in-flight request related to the modal being closed
+        var id = $modal && $modal.attr('id');
+        if (id === 'mt-auto-assign-modal' && autoAssignXhr && autoAssignXhr.readyState !== 4) {
+            try { autoAssignXhr.abort(); } catch(e) {}
+        }
+        if (id === 'mt-manual-assign-modal' && manualAssignXhr && manualAssignXhr.readyState !== 4) {
+            try { manualAssignXhr.abort(); } catch(e) {}
+        }
     }
     function submitAutoAssignment() {
         var method = $('#assignment_method').val();
@@ -87,9 +101,11 @@
         var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
             ? mt_admin.nonce 
             : $('#mt_admin_nonce').val();
-        $.ajax({
+        if (autoAssignXhr && autoAssignXhr.readyState !== 4) { try { autoAssignXhr.abort(); } catch(e) {} }
+        autoAssignXhr = $.ajax({
             url: ajaxUrl,
             type: 'POST',
+            timeout: 15000,
             data: {
                 action: 'mt_auto_assign',
                 nonce: nonce,
@@ -139,9 +155,11 @@
         var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
             ? mt_admin.nonce 
             : $('#mt_admin_nonce').val();
-        $.ajax({
+        if (manualAssignXhr && manualAssignXhr.readyState !== 4) { try { manualAssignXhr.abort(); } catch(e) {} }
+        manualAssignXhr = $.ajax({
             url: ajaxUrl,
             type: 'POST',
+            timeout: 15000,
             data: {
                 action: 'mt_manual_assign',
                 nonce: nonce,
@@ -187,9 +205,11 @@
         var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
             ? mt_admin.nonce 
             : $('#mt_admin_nonce').val();
-        $.ajax({
+        if (removeXhr && removeXhr.readyState !== 4) { try { removeXhr.abort(); } catch(e) {} }
+        removeXhr = $.ajax({
             url: ajaxUrl,
             type: 'POST',
+            timeout: 15000,
             data: {
                 action: 'mt_remove_assignment',
                 nonce: nonce,
@@ -235,9 +255,11 @@
         var nonce = (typeof mt_admin !== 'undefined' && mt_admin.nonce) 
             ? mt_admin.nonce 
             : $('#mt_admin_nonce').val();
-        $.ajax({
+        if (clearAllXhr && clearAllXhr.readyState !== 4) { try { clearAllXhr.abort(); } catch(e) {} }
+        clearAllXhr = $.ajax({
             url: ajaxUrl,
             type: 'POST',
+            timeout: 15000,
             data: {
                 action: 'mt_clear_all_assignments',
                 nonce: nonce

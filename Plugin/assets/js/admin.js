@@ -282,10 +282,15 @@ if (typeof mt_admin.i18n === 'undefined') {
             $(document).on('change', '#mt-filter-jury, #mt-filter-status', () => {
                 this.applyFilters();
             });
-            // Search handler
+            // Search handler (debounced)
+            let mtAssignSearchTimer;
             $(document).on('keyup', '#mt-assignment-search', function() {
-                const searchTerm = $(this).val();
-                MTAssignmentManager.filterAssignments(searchTerm);
+                const $self = $(this);
+                clearTimeout(mtAssignSearchTimer);
+                mtAssignSearchTimer = setTimeout(function() {
+                    const searchTerm = $self.val();
+                    MTAssignmentManager.filterAssignments(searchTerm);
+                }, 250);
             });
         },
         initBulkActions: function() {
