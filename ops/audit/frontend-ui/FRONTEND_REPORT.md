@@ -53,9 +53,16 @@ Assets (enqueue order, duplication)
 - Legacy CSS is enqueued even when v4 is enabled. This defeats the purpose of v4 isolation and introduces specificity battles.
 - Suggestion: When v4 is enabled on a route, do not enqueue legacy bundles; and consider dequeuing known legacy handles returned by `MT_Public_Assets::get_legacy_css_handles()`.
 
+Localization
+
+- Templates: Most frontend/admin templates correctly wrap UI strings with the `mobility-trailblazers` text domain (e.g., winners display and single templates). Good coverage.
+- JavaScript: Some hardcoded fallback strings exist (e.g., `Plugin/assets/js/frontend.js` uses English fallbacks like “An error occurred. Please try again.” when `mt_ajax.i18n` keys are missing). While acceptable as a safeguard, these are not translatable. Prefer always sourcing strings from localized objects and ensure keys are provided server-side.
+- Admin debug content: `Plugin/templates/admin/assignments.php` includes debug UI texts gated by `WP_DEBUG`. Keep gated to non-production; ensure any visible strings in production remain localized.
+
 File-by-File Appendix (path:line → issue → impact → suggestion)
 
 - Plugin/includes/core/class-mt-plugin.php:386–540 (approx) → Enqueues v4 CSS unconditionally; subsequently enqueues legacy CSS bundles → v4/legacy conflicts and bloat → Gate legacy enqueues when `apply_filters('mt_enable_css_v4', true)` and plugin route is active; or fully delegate v4 to `MT_Public_Assets` only.
+- Plugin/includes/core/class-mt-plugin.php:~360–520; 520–720 → v4 framework enqueued (tokens/reset/base/components/pages) then legacy stacks like `mt-frontend`, `mt-evaluation-forms`, `mt-jury-dashboard-enhanced`, plus hotfixes → Payload + specificity conflicts with MT_Public_Assets v4 → Centralize v4 in MT_Public_Assets and conditionally load modules based on route.
 - Plugin/includes/public/class-mt-public-assets.php:200–220 → Enqueues v4 (tokens/reset/base/components/pages) on plugin routes → Can duplicate with core enqueues → Centralize v4 loading here; remove v4 enqueues from `class-mt-plugin.php`.
 - Plugin/includes/public/class-mt-public-assets.php:312–335 → Elementor neutralization uses `all: unset` on `.elementor-widget-container` within `.mt-root` → Risk of over-resetting embedded widgets → Narrow selectors to plugin-owned containers/components; prefer targeted property resets.
 - Plugin/assets/css/mt_candidate_rollback.css:[25–100, 110–124, 300–338, etc.] → Heavy `!important` usage → Specificity inflation; hard to maintain; conflicts with v4 → Replace with scoped selectors inside `.mt-root`/component blocks; leverage v4 variables and remove `!important` where possible.
@@ -64,6 +71,8 @@ File-by-File Appendix (path:line → issue → impact → suggestion)
 - Plugin/assets/js/mt-assignments.js:18–64, 49, 54, 59, 64 → Direct handlers on same selectors → Potential double-fire with admin.js → Feature-flag per page or ensure admin.js detects and skips if `#mt-auto-assign-btn` is bound; or keep all logic in `mt-assignments.js` and remove overlaps from admin bundle on that screen.
 - Plugin/assets/js/mt-modal-debug.js:5,38,45,79–88,96,130,147–148 → Console logs → Debug noise in admin → Guard behind `if (window.MT_DEBUG) { ... }` or strip in production.
 - Plugin/assets/js/mt-jury-filters.js:10–113 → Console logs around filter actions → Production noise → Remove or guard with a debug flag.
+ - Plugin/assets/js/frontend.js:~680–980 → Uses localized messages but includes English fallbacks in code paths → Non-localized UX fallback → Ensure all keys are provided server-side and drop hardcoded fallbacks where feasible.
+ - Plugin/templates/admin/assignments.php:~450–465 → Enqueues `mt-assignments.js` and `mt-modal-debug.js` from template → Risk of debug script inclusion outside strict debug contexts → Wrap debug script enqueue in `WP_DEBUG` and allow `MT_DEBUG` flag to control console output.
 
 Suggested Remediations (prioritized)
 
