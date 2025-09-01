@@ -64,10 +64,13 @@
         
         // Show no results message
         function showNoResults() {
+            const i18n = (window.mt_jury_filters_i18n && window.mt_jury_filters_i18n.no_results)
+                || (window.mt_frontend && window.mt_frontend.i18n && window.mt_frontend.i18n.no_results)
+                || 'No candidates match your filters.';
             if (!$('.mt-no-results-message').length) {
                 $('.mt-candidates-list').append(
                     '<div class="mt-no-results-message mt-notice">' +
-                    '<p>Keine Kandidaten entsprechen Ihren Suchkriterien.</p>' +
+                    '<p>' + i18n + '</p>' +
                     '</div>'
                 );
             }
@@ -110,7 +113,7 @@
             window.location.href = '?evaluate=' + candidateId;
         });
         
-        console.log('MT Jury Filters - Event handlers attached');
+        if (window.MT_DEBUG) { console.log('MT Jury Filters - Event handlers attached'); }
     });
     
 })(jQuery);

@@ -89,9 +89,12 @@
         trackEvents: function() {
             if (window.MT_DEBUG) {
                 setInterval(function() {
-                    if (performance && performance.memory) {
-                         + 'MB');
-                    }
+                    try {
+                        if (performance && performance.memory && typeof performance.memory.usedJSHeapSize === 'number') {
+                            var mb = (performance.memory.usedJSHeapSize / 1048576).toFixed(1);
+                            console.log('[MT][debug] memory', mb + 'MB');
+                        }
+                    } catch (e) {}
                 }, 30000); // Log every 30 seconds
             }
         },

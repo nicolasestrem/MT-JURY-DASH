@@ -457,14 +457,16 @@ wp_enqueue_script(
     true
 );
 
-// Enqueue modal debug script - load it last to override everything
-wp_enqueue_script(
-    'mt-modal-debug',
-    MT_PLUGIN_URL . 'assets/js/mt-modal-debug.js',
-    ['jquery'],
-    MT_VERSION . '.2',
-    true
-);
+// Enqueue modal debug script only in development
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    wp_enqueue_script(
+        'mt-modal-debug',
+        MT_PLUGIN_URL . 'assets/js/mt-modal-debug.js',
+        ['jquery'],
+        MT_VERSION . '.2',
+        true
+    );
+}
 
 // Enqueue modal fix CSS
 wp_enqueue_style(
@@ -477,7 +479,7 @@ wp_enqueue_style(
 
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-    console.log('MT Assignments: Inline fallback script loaded');
+    // Inline fallback removed — assignments handled by mt-assignments.js or admin.js
     
     // Check if main admin.js loaded correctly
     if (typeof mt_admin !== 'undefined') {
@@ -517,25 +519,25 @@ jQuery(document).ready(function($) {
     }
     
     // Check if MTAssignmentManager initialized
-    if (typeof MTAssignmentManager === 'undefined') {
-        console.log('MT Assignments: MTAssignmentManager not found, using fallback handlers');
+    if (false && typeof MTAssignmentManager === 'undefined') {
+        // Fallback removed to avoid double bindings
         
         // Fallback handlers for modal functionality
         $('#mt-auto-assign-btn').on('click', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Opening auto-assign modal');
+            
             forceShowModal('mt-auto-assign-modal');
         });
         
         $('#mt-manual-assign-btn').on('click', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Opening manual assign modal');
+            
             forceShowModal('mt-manual-assign-modal');
         });
         
         $('.mt-modal-close').on('click', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Closing modal');
+            
             var modalId = $(this).closest('.mt-modal').attr('id');
             hideModal(modalId);
         });
@@ -550,7 +552,7 @@ jQuery(document).ready(function($) {
         // Handle auto-assign form submission
         $('#mt-auto-assign-modal form').on('submit', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Submitting auto-assignment');
+            
             
             var $form = $(this);
             var $submitBtn = $form.find('button[type="submit"]');
@@ -570,7 +572,7 @@ jQuery(document).ready(function($) {
                     $submitBtn.prop('disabled', true).text('Processing...');
                 },
                 success: function(response) {
-                    console.log('MT Assignments: Auto-assign response', response);
+                    
                     if (response.success) {
                         alert(response.data.message || 'Auto-assignment completed successfully!');
                         location.reload();
@@ -579,7 +581,7 @@ jQuery(document).ready(function($) {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('MT Assignments: Auto-assign error', error);
+                    
                     alert('Error: ' + error);
                 },
                 complete: function() {
@@ -591,7 +593,7 @@ jQuery(document).ready(function($) {
         // Handle manual assignment form submission
         $('#mt-manual-assignment-form').on('submit', function(e) {
             e.preventDefault();
-            console.log('MT Assignments: Submitting manual assignment');
+            
             
             var $form = $(this);
             var $submitBtn = $form.find('button[type="submit"]');
@@ -620,7 +622,7 @@ jQuery(document).ready(function($) {
                     $submitBtn.prop('disabled', true).text('Processing...');
                 },
                 success: function(response) {
-                    console.log('MT Assignments: Manual assign response', response);
+                    
                     if (response.success) {
                         alert(response.data.message || 'Assignments created successfully!');
                         location.reload();
@@ -629,7 +631,7 @@ jQuery(document).ready(function($) {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('MT Assignments: Manual assign error', error);
+                    
                     alert('Error: ' + error);
                 },
                 complete: function() {
