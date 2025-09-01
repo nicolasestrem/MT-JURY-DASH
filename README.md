@@ -12,6 +12,8 @@ A comprehensive WordPress plugin for managing the prestigious "25 Mobility Trail
 
 The Mobility Trailblazers Award System is an enterprise-grade WordPress plugin that provides complete digital infrastructure for managing a multi-stage award selection process. Built with modern PHP practices and designed for scalability, it handles everything from candidate nominations through jury evaluations to public announcements.
 
+**⚠️ CSS Notice:** CSS development is currently de-prioritized. Previous attempts to fix CSS have resulted in visual regressions. CSS framework v4 rollout is on hold. Use JavaScript-based solutions for critical UI issues.
+
 ### Mission
 To create a transparent, efficient, and engaging platform that identifies and celebrates the 25 most impactful mobility innovators who are shaping the future of transportation and urban mobility in the DACH region.
 

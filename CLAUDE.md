@@ -6,6 +6,16 @@
 **Dates:** Launch Aug 18, 2025 | Ceremony Oct 30, 2025  
 **Migration:** New voting platform at https://github.com/nicolasestrem/mobility-voting-app (PocketBase + SvelteKit)
 
+## CSS Notice - Not a Priority
+
+**⚠️ CSS development is currently de-prioritized due to visual regression issues.**
+- Previous attempts to fix CSS resulted in significant visual regressions
+- CSS framework v4 rollout is on hold
+- Editing CSS files is allowed but not recommended
+- Use JavaScript-based solutions for critical UI issues
+- StyleLint rules changed to warnings (not errors)
+- CSS quality workflow removed from CI/CD
+
 ## Critical Security Rules
 
 ### NEVER Commit (Must be in .gitignore)
@@ -101,7 +111,7 @@ git push origin feature/name
 |----------|-------------|
 | **PHP** | WPCS via PHPCS, Type hints, PHPDoc, Prepared statements |
 | **JavaScript** | ES6+, JSDoc, No jQuery, Error boundaries |
-| **CSS** | BEM methodology, CSS v4 tokens, Mobile-first, No !important |
+| **CSS** | *Not a priority* - Editing allowed but CSS v4 rollout on hold due to visual regression issues |
 
 ## Performance Targets
 - Page Load: <2s | Memory: <64MB | Queries: <50/page
@@ -135,7 +145,7 @@ var_dump($data); console.log(data);
 | **Assignments broken** | `wp rewrite flush && wp post-type list` |
 | **Rankings page 404** | Known issue - check route/controller wiring in `includes/routes/` |
 | **WP-CLI not working** | Known production issue - check registration in `includes/cli/` |
-| **CSS not loading** | Ensure v4 framework is registered: `assets/css/framework/` |
+| **CSS not loading** | CSS fixes not prioritized - use JavaScript workarounds if critical |
 | **AJAX failing** | Check nonce: `wp_create_nonce('mt_admin_ajax')` |
 
 ## Architecture
@@ -158,7 +168,7 @@ var_dump($data); console.log(data);
 - `includes/admin/` - Admin interfaces and columns
 - `includes/widgets/` - Dashboard widgets
 - `includes/legacy/` - Backward compatibility layer
-- `assets/css/` - CSS framework v4 (USE THIS - BEM methodology)
+- `assets/css/` - CSS files (v4 rollout on hold - editing allowed but not prioritized)
 - `templates/` - PHP templates (admin/, frontend/)
 - `tests/` - Consolidated test files (8 files, was 23)
 
@@ -195,7 +205,7 @@ wp cache flush
 - `includes/core/class-mt-plugin.php` - Main plugin class
 - `includes/repositories/class-mt-evaluation-repository.php` - Core evaluation data
 - `includes/services/class-mt-evaluation-service.php` - Evaluation business logic
-- `assets/css/framework/mobility-trailblazers-framework-v4.css` - Main CSS framework
+- `assets/css/framework/mobility-trailblazers-framework-v4.css` - CSS framework (v4 rollout on hold)
 
 ### Database Tables
 - `wp_mt_evaluations` - 5-criteria scores (0-10, 0.5 increments)

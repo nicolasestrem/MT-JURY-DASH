@@ -16,7 +16,7 @@
       "severity": "warning"
     }],
     "selector-max-id": [0, {
-      "severity": "error"
+      "severity": "warning"
     }],
     "max-nesting-depth": [3, {
       "severity": "warning"

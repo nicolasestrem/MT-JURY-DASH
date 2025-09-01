@@ -5,6 +5,18 @@ All notable changes to the Mobility Trailblazers WordPress Plugin will be docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.43] - 2025-09-01
+
+### Changed
+- **CSS De-prioritized**: CSS development is now on hold due to visual regression issues
+- **Removed CSS Quality Workflow**: Deleted strict CSS enforcement from CI/CD pipeline
+- **StyleLint Rules Relaxed**: Changed all CSS linting rules from errors to warnings
+- **CSS Framework v4**: Rollout postponed indefinitely
+
+### Removed
+- Removed `.github/workflows/css-quality.yml` workflow that blocked CSS with !important
+- Removed strict CSS quality checks from pre-commit requirements
+
 ## [2.5.42] - 2025-08-31
 
 ### Security
