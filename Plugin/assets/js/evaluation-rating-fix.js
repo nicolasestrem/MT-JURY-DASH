@@ -57,7 +57,6 @@
                 var sliderName = $slider.attr('name');
                 // Ensure unique name attribute
                 if (!sliderName) {
-                    // Error logging removed for production
                     return;
                 }
                 // Remove any conflicting event handlers with our namespace
@@ -72,7 +71,6 @@
                     // Update visual feedback for this slider only
                     var percentage = (value / 10) * 100;
                     $(this).css('background', 'linear-gradient(to right, #667eea 0%, #667eea ' + percentage + '%, #e5e7eb ' + percentage + '%, #e5e7eb 100%)');
-                    // Log for debugging
                     // Update total score
                     updateOverallScore();
                 });
@@ -149,10 +147,6 @@
                     alert('Please rate at least one criterion before submitting.');
                     return false;
                 }
-                // Log submission data for debugging
-                $('.mt-score-slider').each(function() {
-                    console.log($(this).attr('name') + ': ' + $(this).val());
-                });
             });
         }
         // Fix 5: Ensure sliders work after AJAX loads
@@ -218,14 +212,9 @@
                 initializeAllFixes();
             }
         });
-        // Expose functions globally for debugging
+        // Expose functions globally for maintenance
         window.MTEvaluationFix = {
-            reinitialize: initializeAllFixes,
-            checkValues: function() {
-                $('.mt-score-slider').each(function() {
-                    console.log($(this).attr('name') + ': ' + $(this).val());
-                });
-            }
+            reinitialize: initializeAllFixes
         };
     });
 })(jQuery);

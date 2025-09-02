@@ -7,10 +7,7 @@
 (function($) {
     'use strict';
     
-    console.log('MT Jury Filters Script Loaded');
-    
     $(document).ready(function() {
-        console.log('MT Jury Filters - jQuery Ready');
         
         // Filter candidates based on search, status, and category
         function filterDashboardCandidates() {
@@ -19,8 +16,6 @@
             var categoryFilter = $('#mt-category-filter').val() || 'all';
             var visibleCount = 0;
             var totalCandidates = $('.mt-candidate-card').length;
-            
-            console.log('Filter called - Search:', searchTerm, 'Status:', statusFilter, 'Category:', categoryFilter, 'Total cards:', totalCandidates);
             
             $('.mt-candidate-card').each(function() {
                 var $card = $(this);
@@ -52,8 +47,6 @@
                 }
             });
             
-            console.log('Filter complete - Visible:', visibleCount);
-            
             // Show/hide no results message
             if (visibleCount === 0 && (searchTerm !== '' || statusFilter !== '' || categoryFilter !== 'all')) {
                 showNoResults();
@@ -67,7 +60,7 @@
             if (!$('.mt-no-results-message').length) {
                 $('.mt-candidates-list').append(
                     '<div class="mt-no-results-message mt-notice">' +
-                    '<p>Keine Kandidaten entsprechen Ihren Suchkriterien.</p>' +
+                    '<p>' + (window.getI18nText ? window.getI18nText('no_candidates_match', 'No candidates match your search criteria.') : 'No candidates match your search criteria.') + '</p>' +
                     '</div>'
                 );
             }
@@ -81,8 +74,7 @@
         
         // Search functionality with debounce
         let searchTimer;
-        $('#mt-candidate-search').on('input', function() {
-            console.log('Search input changed:', $(this).val());
+        $('#mt-candidate-search').off('input.mtfilters').on('input.mtfilters', function() {
             clearTimeout(searchTimer);
             searchTimer = setTimeout(function() {
                 filterDashboardCandidates();
@@ -90,27 +82,23 @@
         });
         
         // Status filter
-        $('#mt-status-filter').on('change', function(e) {
+        $('#mt-status-filter').off('change.mtfilters').on('change.mtfilters', function(e) {
             e.preventDefault();
-            console.log('Status filter changed to:', $(this).val());
             filterDashboardCandidates();
         });
         
         // Category filter dropdown
-        $('#mt-category-filter').on('change', function(e) {
+        $('#mt-category-filter').off('change.mtfilters').on('change.mtfilters', function(e) {
             e.preventDefault();
-            console.log('Category filter changed to:', $(this).val());
             filterDashboardCandidates();
         });
         
         // Evaluation button click
-        $('.mt-evaluate-btn').on('click', function(e) {
+        $('.mt-evaluate-btn').off('click.mtfilters').on('click.mtfilters', function(e) {
             e.preventDefault();
             var candidateId = $(this).data('candidate-id');
             window.location.href = '?evaluate=' + candidateId;
         });
-        
-        console.log('MT Jury Filters - Event handlers attached');
     });
     
 })(jQuery);

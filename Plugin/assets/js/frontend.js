@@ -708,7 +708,6 @@
             
             // Prevent double submission
             if (this.isSubmittingEvaluation) {
-                console.log('Evaluation submission already in progress');
                 return false;
             }
             
