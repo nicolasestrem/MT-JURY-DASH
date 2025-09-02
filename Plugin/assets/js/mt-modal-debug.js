@@ -1,54 +1,57 @@
 /**
  * Debug script to force modal visibility
+ * Fixed: XSS vulnerability with safe DOM creation
  */
 jQuery(document).ready(function($) {
-    if (window.MT_DEBUG) {
-        console.log('MT Modal Debug: Script loaded');
-    }
     
-    // Create a simple test modal function
+    // Create a simple test modal function using safe DOM creation
     window.showTestModal = function() {
         // Remove any existing test modal
         $('#test-modal').remove();
         
-        // Create a new modal from scratch
-        var modalHtml = '<div id="test-modal" style="' +
-            'position: fixed !important;' +
-            'top: 0 !important;' +
-            'left: 0 !important;' +
-            'width: 100% !important;' +
-            'height: 100% !important;' +
-            'background: rgba(0,0,0,0.8) !important;' +
-            'z-index: 9999999 !important;' +
-            'display: flex !important;' +
-            'align-items: center !important;' +
-            'justify-content: center !important;' +
-            '">' +
-            '<div style="' +
-            'background: white !important;' +
-            'padding: 30px !important;' +
-            'border-radius: 8px !important;' +
-            'max-width: 500px !important;' +
-            '">' +
-            '<h2>Test Modal</h2>' +
-            '<p>If you can see this, modals can work!</p>' +
-            '<button onclick="jQuery(\'#test-modal\').remove()">Close</button>' +
-            '</div>' +
-            '</div>';
+        // Create modal elements safely using jQuery
+        var $modal = $('<div>', {
+            id: 'test-modal',
+            css: {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                background: 'rgba(0,0,0,0.8)',
+                zIndex: '9999999',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }
+        });
         
-        $('body').append(modalHtml);
-        if (window.MT_DEBUG) {
-            console.log('Test modal should be visible now');
-        }
+        var $content = $('<div>', {
+            css: {
+                background: 'white',
+                padding: '30px',
+                borderRadius: '8px',
+                maxWidth: '500px'
+            }
+        });
+        
+        // Add content safely
+        $content.append(
+            $('<h2>').text('Test Modal'),
+            $('<p>').text('If you can see this, modals can work!'),
+            $('<button>').text('Close').on('click', function() {
+                $('#test-modal').remove();
+            })
+        );
+        
+        $modal.append($content);
+        $('body').append($modal);
     };
     
     // Override the button clicks to use our existing modals differently
     $('#mt-auto-assign-btn').off('click').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        if (window.MT_DEBUG) {
-            console.log('Debug: Auto-assign button clicked');
-        }
         
         var $modal = $('#mt-auto-assign-modal');
         var $content = $modal.find('.mt-modal-content');
@@ -56,46 +59,31 @@ jQuery(document).ready(function($) {
         // Remove the modal from its current position and add to body
         $modal.detach().appendTo('body');
         
-        // Apply inline styles directly
-        $modal.attr('style', 
-            'position: fixed !important;' +
-            'top: 0 !important;' +
-            'left: 0 !important;' +
-            'width: 100% !important;' +
-            'height: 100% !important;' +
-            'background: rgba(0,0,0,0.8) !important;' +
-            'z-index: 9999999 !important;' +
-            'display: flex !important;' +
-            'align-items: center !important;' +
-            'justify-content: center !important;'
-        );
+        // Apply styles using jQuery css method (safer than attr)
+        $modal.css({
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0,0,0,0.8)',
+            zIndex: '9999999',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
         
-        $content.attr('style',
-            'background: white !important;' +
-            'padding: 30px !important;' +
-            'border-radius: 8px !important;' +
-            'max-width: 600px !important;' +
-            'width: 90% !important;' +
-            'max-height: 90vh !important;' +
-            'overflow-y: auto !important;' +
-            'position: relative !important;' +
-            'z-index: 10000000 !important;'
-        );
-        
-        if (window.MT_DEBUG) {
-            console.log('Modal styles applied. Modal should be visible.');
-            console.log('Modal display:', $modal.css('display'));
-            console.log('Modal position:', $modal.css('position'));
-            console.log('Modal z-index:', $modal.css('z-index'));
-        }
-        
-        // Check if modal is actually visible
-        var isVisible = $modal.is(':visible');
-        var rect = $modal[0].getBoundingClientRect();
-        if (window.MT_DEBUG) {
-            console.log('Modal visible?', isVisible);
-            console.log('Modal dimensions:', rect);
-        }
+        $content.css({
+            background: 'white',
+            padding: '30px',
+            borderRadius: '8px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            position: 'relative',
+            zIndex: '10000000'
+        });
         
         return false;
     });
@@ -103,9 +91,6 @@ jQuery(document).ready(function($) {
     $('#mt-manual-assign-btn').off('click').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        if (window.MT_DEBUG) {
-            console.log('Debug: Manual assign button clicked');
-        }
         
         var $modal = $('#mt-manual-assign-modal');
         var $content = $modal.find('.mt-modal-content');
@@ -113,35 +98,32 @@ jQuery(document).ready(function($) {
         // Remove the modal from its current position and add to body
         $modal.detach().appendTo('body');
         
-        // Apply inline styles directly
-        $modal.attr('style', 
-            'position: fixed !important;' +
-            'top: 0 !important;' +
-            'left: 0 !important;' +
-            'width: 100% !important;' +
-            'height: 100% !important;' +
-            'background: rgba(0,0,0,0.8) !important;' +
-            'z-index: 9999999 !important;' +
-            'display: flex !important;' +
-            'align-items: center !important;' +
-            'justify-content: center !important;'
-        );
+        // Apply styles using jQuery css method (safer than attr)
+        $modal.css({
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0,0,0,0.8)',
+            zIndex: '9999999',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
         
-        $content.attr('style',
-            'background: white !important;' +
-            'padding: 30px !important;' +
-            'border-radius: 8px !important;' +
-            'max-width: 600px !important;' +
-            'width: 90% !important;' +
-            'max-height: 90vh !important;' +
-            'overflow-y: auto !important;' +
-            'position: relative !important;' +
-            'z-index: 10000000 !important;'
-        );
+        $content.css({
+            background: 'white',
+            padding: '30px',
+            borderRadius: '8px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            position: 'relative',
+            zIndex: '10000000'
+        });
         
-        if (window.MT_DEBUG) {
-            console.log('Manual modal styles applied');
-        }
         return false;
     });
     
@@ -157,9 +139,4 @@ jQuery(document).ready(function($) {
             $(this).hide();
         }
     });
-    
-    if (window.MT_DEBUG) {
-        console.log('MT Modal Debug: Handlers attached');
-        console.log('To test if modals can work at all, run: showTestModal()');
-    }
 });

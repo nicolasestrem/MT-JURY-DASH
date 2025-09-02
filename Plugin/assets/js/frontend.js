@@ -708,9 +708,6 @@
             
             // Prevent double submission
             if (this.isSubmittingEvaluation) {
-                if (window.MT_DEBUG) {
-                    console.log('Evaluation submission already in progress');
-                }
                 return false;
             }
             

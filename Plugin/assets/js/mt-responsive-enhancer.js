@@ -21,6 +21,15 @@
         // Current viewport state
         currentViewport: null,
         
+        // Track parallax state
+        parallaxEnabled: false,
+        
+        // Track if component is destroyed
+        isDestroyed: false,
+        
+        // Store timer references for cleanup
+        resizeTimer: null,
+        
         // Initialize responsive enhancements
         init: function() {
             this.updateViewport();
@@ -39,11 +48,12 @@
                 }, 250);
             } else {
                 // Fallback with manual debounce
-                var resizeTimer;
                 $(window).on('resize.mtresponsive', function() {
-                    clearTimeout(resizeTimer);
-                    resizeTimer = setTimeout(function() {
-                        self.handleResize();
+                    clearTimeout(self.resizeTimer);
+                    self.resizeTimer = setTimeout(function() {
+                        if (!self.isDestroyed) {
+                            self.handleResize();
+                        }
                     }, 250);
                 });
             }
@@ -96,6 +106,7 @@
             // Mobile optimizations
             if (viewport === 'mobile') {
                 this.applyMobileOptimizations();
+                this.disableParallaxEffects(); // Ensure parallax is disabled on mobile
             } else {
                 this.removeMobileOptimizations();
             }
@@ -103,11 +114,15 @@
             // Tablet adjustments
             if (viewport === 'tablet') {
                 this.applyTabletAdjustments();
+                this.disableParallaxEffects(); // Ensure parallax is disabled on tablet
             }
             
             // Desktop enhancements
             if (viewport === 'desktop' || viewport === 'wide') {
                 this.applyDesktopEnhancements();
+            } else {
+                // Disable desktop features when not in desktop viewport
+                this.disableParallaxEffects();
             }
         },
         
@@ -261,16 +276,32 @@
         
         // Enable parallax effects on desktop
         enableParallaxEffects: function() {
-            if (this.reducedMotion()) return;
+            if (this.reducedMotion() || this.isDestroyed) return;
             
             var self = this;
             var $parallaxElements = $('[data-parallax]');
             
-            if ($parallaxElements.length) {
+            // First, always clean up any existing handler to prevent duplicates
+            $(window).off('scroll.parallax');
+            
+            if ($parallaxElements.length && (this.currentViewport === 'desktop' || this.currentViewport === 'wide')) {
+                this.parallaxEnabled = true;
                 $(window).on('scroll.parallax', function() {
-                    self.updateParallax($parallaxElements);
+                    // Only process if still enabled and in correct viewport
+                    if (self.parallaxEnabled && !self.isDestroyed && 
+                        (self.currentViewport === 'desktop' || self.currentViewport === 'wide')) {
+                        self.updateParallax($parallaxElements);
+                    }
                 });
             }
+        },
+        
+        // Disable parallax effects
+        disableParallaxEffects: function() {
+            this.parallaxEnabled = false;
+            $(window).off('scroll.parallax');
+            // Reset any parallax transforms
+            $('[data-parallax]').css('transform', '');
         },
         
         // Update parallax positions
@@ -310,6 +341,42 @@
         // Public API: Check if touch device
         isTouchDevice: function() {
             return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        },
+        
+        // Public API: Destroy and cleanup
+        destroy: function() {
+            this.isDestroyed = true;
+            
+            // Clear all timers
+            clearTimeout(this.resizeTimer);
+            
+            // Remove all event handlers
+            $(window).off('.mtresponsive');
+            $(window).off('.parallax');
+            $(document).off('.mtresponsive');
+            
+            // Remove viewport attributes
+            document.documentElement.removeAttribute('data-mt-viewport');
+            $('body').removeAttribute('data-orientation');
+            
+            // Reset parallax transforms
+            $('[data-parallax]').css('transform', '');
+            
+            // Remove mobile optimizations
+            $('.mt-table-scroll-wrapper').contents().unwrap();
+            $('.mt-mobile-card-view').removeClass('mt-mobile-card-view');
+            
+            // Clear references
+            this.parallaxEnabled = false;
+            this.currentViewport = null;
+        },
+        
+        // Public API: Reinitialize after destroy
+        reinit: function() {
+            this.isDestroyed = false;
+            this.parallaxEnabled = false;
+            this.currentViewport = null;
+            this.init();
         }
     };
     
