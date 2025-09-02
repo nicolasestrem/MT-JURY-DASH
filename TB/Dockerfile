@@ -1,60 +1,39 @@
-FROM wordpress:php8.2-apache
+FROM wordpress:6.4-php8.2-apache
 
-# Install Git and other development tools
+# Install additional PHP extensions and tools
 RUN apt-get update && apt-get install -y \
-    git \
-    vim \
-    nano \
-    curl \
-    wget \
+    libzip-dev \
     zip \
     unzip \
-    mariadb-client \
+    && docker-php-ext-install zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install additional PHP extensions that might be needed
-RUN docker-php-ext-install opcache pdo_mysql mysqli
+# Configure Apache
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+    && a2enmod rewrite headers
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Set proper DocumentRoot permissions and DirectoryIndex
+RUN echo '<Directory /var/www/html/>\n\
+    Options FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+    DirectoryIndex index.php index.html\n\
+</Directory>' > /etc/apache2/conf-available/wordpress.conf \
+    && a2enconf wordpress
 
-# Install Node.js and npm (for frontend development)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
+# Ensure the entrypoint script runs to install WordPress
+RUN set -eux; \
+    chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Install WP-CLI
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-    && chmod +x wp-cli.phar \
-    && mv wp-cli.phar /usr/local/bin/wp
+# Create wp-content directories with proper permissions
+RUN mkdir -p /var/www/html/wp-content/uploads \
+    && mkdir -p /var/www/html/wp-content/plugins \
+    && mkdir -p /var/www/html/wp-content/themes \
+    && chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/html
 
-# Set working directory
-WORKDIR /var/www/html
+EXPOSE 80
 
-# Enable Apache modules for WordPress
-RUN a2enmod rewrite headers expires
-
-# Create uploads directories with proper permissions
-RUN mkdir -p /var/www/html/wp-content/uploads/tmp \
-    && chown -R www-data:www-data /var/www/html/wp-content \
-    && chmod -R 755 /var/www/html/wp-content
-
-# Add Git safe directory configuration to avoid ownership issues
-RUN git config --global --add safe.directory /var/www/html/wp-content/plugins/mobility-trailblazers
-
-# Set proper permissions for the web server
-RUN chown -R www-data:www-data /var/www/html \
-    && find /var/www/html -type d -exec chmod 755 {} \; \
-    && find /var/www/html -type f -exec chmod 644 {} \;
-
-# Add a script to fix permissions after container starts
-RUN echo '#!/bin/bash\n\
-chown -R www-data:www-data /var/www/html/wp-content/uploads\n\
-chmod -R 755 /var/www/html/wp-content/uploads\n\
-chown -R www-data:www-data /var/www/html/wp-content/plugins/mobility-trailblazers\n\
-chmod -R 755 /var/www/html/wp-content/plugins/mobility-trailblazers\n\
-exec docker-entrypoint.sh apache2-foreground' > /usr/local/bin/custom-entrypoint.sh \
-    && chmod +x /usr/local/bin/custom-entrypoint.sh
-
-# Use custom entrypoint to ensure permissions are set
-ENTRYPOINT ["/usr/local/bin/custom-entrypoint.sh"]
+# Use the original WordPress entrypoint to ensure WordPress gets installed
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"]
