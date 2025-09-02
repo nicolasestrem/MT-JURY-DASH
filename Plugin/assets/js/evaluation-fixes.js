@@ -107,7 +107,9 @@ jQuery(document).ready(function($) {
             
             // Prevent double submission
             if (isSubmitting) {
-                console.log('Form submission already in progress');
+                if (window.MT_DEBUG) {
+                    console.log('Form submission already in progress');
+                }
                 return false;
             }
             
