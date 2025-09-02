@@ -33,7 +33,7 @@ services:
         define('WP_MEMORY_LIMIT', '256M');
     volumes:
       - wordpress_data:/var/www/html
-      - ./Plugin:/var/www/html/wp-content/plugins/mobility-trailblazers
+      - ../Plugin:/var/www/html/wp-content/plugins/mobility-trailblazers
       - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
     depends_on:
       - db
