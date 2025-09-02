@@ -174,5 +174,19 @@ nul
 august-2025-daily-activities.xlsx
 /Production Files
 
+
 .gemini/
 gha-creds-*.json
+
+# All themes
+#
+# Note: If you wish to whitelist themes,
+# uncomment the next line
+#/wp-content/themes
+/node_modules
+/tests
+/Production Source Code
+/node_modules
+/playwright-report
+TB/.env
+
