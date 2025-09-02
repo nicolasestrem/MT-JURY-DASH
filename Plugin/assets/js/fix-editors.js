@@ -16,7 +16,7 @@
         
         // Wait for TinyMCE to be available
         if (typeof tinymce === 'undefined' || typeof wp === 'undefined' || !wp.editor) {
-    // console.log('Editor libraries not ready, retrying...');
+            console.log('Editor libraries not ready, retrying...');
             setTimeout(fixBrokenEditors, 500);
             return;
         }
@@ -40,7 +40,7 @@
             
             // If editor doesn't exist or is not properly initialized
             if (!editor || !editor.initialized || $('#' + editorId + '_ifr').length === 0) {
-    // console.log('Fixing broken editor: ' + editorId);
+                console.log('Fixing broken editor: ' + editorId);
                 
                 // Remove any existing broken instance
                 if (editor) {
