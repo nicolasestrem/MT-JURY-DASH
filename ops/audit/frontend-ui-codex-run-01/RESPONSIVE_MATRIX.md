@@ -2,6 +2,9 @@ Responsive Matrix (Read‑Only)
 
 Scope: Not exhaustive; highlights primary breakpoints and components observed in CSS.
 
+Constraints Acknowledged
+- No CSS changes. Use existing CSS utilities and adjust templates/JS only.
+
 Breakpoints Observed
 - 480px: Fine-grained phone tweaks in legacy candidate/profile CSS.
 - 576px: Declared in legacy variables as `--mt-breakpoint-sm`.
@@ -17,9 +20,10 @@ Key Components
 - Tables: Rankings/table enhancements apply min-widths that may cause horizontal scroll at ≤768px.
 
 Risks
-- Mixed systems: v4 + legacy breakpoints lead to uneven tablet experiences (992px breakpoints from legacy vs 768px v4).
-- Fixed max-widths: Repeated `max-width: 1200px` can fight v4 container sizing and cause wrapping issues inside page builders.
+- Mixed systems: v4 + legacy breakpoints lead to uneven tablet experiences (992px breakpoints from legacy vs 768px v4). No CSS change recommended; mitigate via template structure and JS gating.
+- Fixed max-widths: Repeated `max-width: 1200px` can cause wrapping issues. Avoid nested containers in templates.
 
-Recommendations
-- Standardize on v4 breakpoints for public routes; replace legacy 992px blocks with 768/1200 tokens.
-- Move fixed max-widths to container utilities; delegate component width via percentage/flex rules.
+Recommendations (no CSS edits)
+- Avoid nested constrained wrappers in templates to reduce double-constraining at tablet widths.
+- Prefer adding existing utility classes in markup (e.g., `.mt-img-cover`) for better image behavior.
+- Use JS `matchMedia('(max-width: 768px)')` to conditionally reduce heavy behaviors on small screens.

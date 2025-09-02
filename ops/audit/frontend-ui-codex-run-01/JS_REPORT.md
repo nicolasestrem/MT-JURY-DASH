@@ -2,6 +2,9 @@ Mobility Trailblazers — JavaScript Audit (Read‑Only)
 
 Scope: Admin + frontend JS under `Plugin/assets/js` and related localization/enqueues in PHP.
 
+Constraints Acknowledged
+- No CSS edits or refactors. Responsiveness improvements should be accomplished via JS behavior, markup usage of existing classes, and conditional enqueues only.
+
 Summary
 - Error handling: Frontend central `MTErrorHandler` present with `handleAjaxError` helpers; many calls use i18n fallbacks via `getI18nText`. Good baseline.
 - Event lifecycle: `mt-event-manager.js` implements namespaced bindings and cleanup, reducing leak risk. Many modules still bind directly with `on()`; off/on patterns applied in some admin scripts.
@@ -15,6 +18,13 @@ Findings
 - Global state cleanup: `frontend.js` tracks intervals/timeouts/listeners and cleans on `beforeunload` and `visibilitychange`. Good practice. Some direct jQuery animations remain; they are stopped in cleanup.
 - Error surfaces: Default fallbacks (e.g., “An error occurred”) appear often; ensure i18n keys exist in `class-mt-i18n-handler.php` for parity.
 
+Responsive JS Opportunities (no CSS changes)
+- Debounced resize: Use `MTEventManager.debounce('resize', window, ...)` or a small wrapper to toggle lightweight state in the DOM (e.g., add/remove `data-mt-viewport="mobile|tablet|desktop"` on `.mt-root`) for progressive enhancements where needed.
+- MatchMedia guards: Prefer `window.matchMedia('(max-width: 768px)')` to gate heavy UI logic (animations, DOM hydration) on small screens without altering CSS.
+- Conditional behaviors: Skip non-critical animations on small screens; you already stop animations in cleanup. Extend to avoid starting them when `document.hidden` or on narrow viewports.
+- Image hydration: Where templates render candidate cards, use JS to set `loading=lazy` if missing and to attach `sizes` hints based on container width. This improves mobile responsiveness and CLS without CSS changes.
+- Event scopes: Ensure `.off().on()` or MTEventManager `.on()` is used for scroll/resize to prevent double bindings during admin page updates.
+
 AJAX Patterns
 - URL/Nonce: `mt_ajax.ajax_url` and `mt_ajax.nonce` set via `wp_localize_script`. Some modules defensively fallback to `ajaxurl` and hidden nonce inputs.
 - Error handling: `error:` handlers often call `showNotification` with localized fallback; `frontend.js`’s `handleAjaxError` improves consistency on public routes.
@@ -25,8 +35,8 @@ Enqueue/Localization
 - Duplication: Both `Plugin/includes/...` and root `includes/...` define localizations and enqueues for similar handles. Risk of divergence and duplicate localize calls if both paths run.
 
 Recommendations (Read‑Only)
-- Remove or gate debug logs: Delete `console.log` from `mt-jury-filters.js` or wrap with `if (window.MT_DEBUG) { … }`. Keep file if not enqueued but mark deprecated to avoid future use.
-- Centralize event binding: Prefer `MTEventManager.on()` across modules; replace direct `on()` where views can re-render.
-- Standardize AJAX error/timeout: Use a shared wrapper with default timeout and message surfaces; align keys with `i18n-handler`.
-- Audit localization coverage: Ensure all UI strings in JS reference `mt_frontend_i18n`/module i18n, avoiding hardcoded fallbacks. Keep fallbacks as a last resort only.
-- Reduce surface area: Remove unreferenced JS modules or move to a `legacy/` folder to avoid accidental enqueues.
+ - Remove or gate debug logs: Delete `console.log` from `mt-jury-filters.js` or wrap with `if (window.MT_DEBUG) { … }`. Keep file if not enqueued but mark deprecated to avoid future use.
+ - Centralize event binding: Prefer `MTEventManager.on()` across modules; replace direct `on()` where views can re-render.
+ - Standardize AJAX error/timeout: Use a shared wrapper with default timeout and message surfaces; align keys with `i18n-handler`.
+ - Audit localization coverage: Ensure all UI strings in JS reference `mt_frontend_i18n`/module i18n, avoiding hardcoded fallbacks. Keep fallbacks as a last resort only.
+ - Responsiveness in JS only: Use `matchMedia` and debounced resize for behavior, not styling; add/remove existing utility classes in markup if needed, without modifying CSS files.
