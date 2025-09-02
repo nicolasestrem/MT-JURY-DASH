@@ -28,9 +28,9 @@ services:
         define('WP_DEBUG', true);
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', false);
-        define('SCRIPT_DEBUG', true);
-        define('MT_DEBUG', true);
-        define('SAVEQUERIES', true);
+        define('SCRIPT_DEBUG', false);
+        define('MT_DEBUG', false);
+        define('SAVEQUERIES', false);
         
         /* File Upload Settings */
         define('WP_TEMP_DIR', '/var/www/html/wp-content/uploads/tmp');
