@@ -1,33 +1,36 @@
-version: '3.8'
-
 services:
+  db:
+    image: mysql:8.0
+    container_name: mt_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
   wordpress:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: mobility_wordpress_dev
-    restart: unless-stopped
+    build: .
+    container_name: mt_wordpress
+    restart: always
     ports:
       - "${WORDPRESS_PORT:-8080}:80"
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
-          memory: 256M
     environment:
-      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST:-db}
+      WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
-      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-true}
+      WORDPRESS_DEBUG: 1
       WORDPRESS_CONFIG_EXTRA: |
-        /* Development Settings */
+        define('FS_METHOD', 'direct');
         define('WP_DEBUG', true);
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', false);
+
         define('SCRIPT_DEBUG', false);
         define('MT_DEBUG', false);
         define('SAVEQUERIES', false);
@@ -37,134 +40,27 @@ services:
         define('UPLOADS', 'wp-content/uploads');
         
         /* Memory Limits */
+
         define('WP_MEMORY_LIMIT', '256M');
-        define('WP_MAX_MEMORY_LIMIT', '512M');
-        
-        /* File Permissions */
-        define('FS_METHOD', 'direct');
-        define('FS_CHMOD_DIR', (0755 & ~ umask()));
-        define('FS_CHMOD_FILE', (0644 & ~ umask()));
     volumes:
-      # Mount the plugin directory from the host to WordPress plugins directory
-      - ../Plugin:/var/www/html/wp-content/plugins/mobility-trailblazers:rw
-      
-      # Persist WordPress core files, themes, and other plugins
       - wordpress_data:/var/www/html
-      
-      # Persist uploads directory separately for better management
-      - uploads_data:/var/www/html/wp-content/uploads
-      
-      # Temporary directory for file uploads
-      - tmp_data:/var/www/html/wp-content/uploads/tmp
-      
-      # Mount custom PHP configuration
-      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      - ../Plugin:/var/www/html/wp-content/plugins/mobility-trailblazers
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
     depends_on:
       - db
-    networks:
-      - mobility_network
-
-  wpcli:
-    image: wordpress:cli-php8.2
-    container_name: mobility_wpcli_dev
-    user: "33:33"  # www-data user
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
-    depends_on:
-      - db
-      - wordpress
-    environment:
-      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST:-db}
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
-    volumes:
-      # Mount the plugin directory
-      - ../Plugin:/var/www/html/wp-content/plugins/mobility-trailblazers:rw
-      
-      # Share WordPress data with main container
-      - wordpress_data:/var/www/html
-      - uploads_data:/var/www/html/wp-content/uploads
-    command: tail -f /dev/null
-    networks:
-      - mobility_network
-
-  db:
-    image: mariadb:11
-    container_name: mobility_mariadb_dev
-    restart: unless-stopped
-    # Database port removed - only accessible within Docker network
-    # ports:
-    #   - "${MYSQL_PORT:-3306}:3306"
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-    environment:
-      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${MYSQL_DATABASE}
-      MARIADB_USER: ${MYSQL_USER}
-      MARIADB_PASSWORD: ${MYSQL_PASSWORD}
-      MARIADB_CHARACTER_SET: utf8mb4
-      MARIADB_COLLATION: utf8mb4_unicode_ci
-    volumes:
-      - db_data:/var/lib/mysql
-      # Optional: Mount custom MySQL configuration
-      # - ./mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
-    networks:
-      - mobility_network
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: mobility_phpmyadmin_dev
-    restart: unless-stopped
+    image: phpmyadmin
+    container_name: mt_phpmyadmin
+    restart: always
     ports:
       - "${PHPMYADMIN_PORT:-8081}:80"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     environment:
       PMA_HOST: db
-      PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      PMA_ARBITRARY: 1
-      HIDE_PHP_VERSION: 1
-      UPLOAD_LIMIT: 100M
     depends_on:
       - db
-    networks:
-      - mobility_network
 
 volumes:
-  wordpress_data:
-    driver: local
   db_data:
-    driver: local
-  uploads_data:
-    driver: local
-  tmp_data:
-    driver: local
-
-networks:
-  mobility_network:
-    driver: bridge
+  wordpress_data:
