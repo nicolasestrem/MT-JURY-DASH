@@ -40,6 +40,7 @@ services:
         define('UPLOADS', 'wp-content/uploads');
         
         /* Memory Limits */
+        c8337500c88b4bbedc942dd1d4a2dc0548d6b887
 
         define('WP_MEMORY_LIMIT', '256M');
     volumes:
