@@ -230,3 +230,4 @@ wp cache flush
 - 🔍 CLAUDE CODE - 8 HOUR DEEP AUDIT MISSION
 
 - Never bypass pre commit hooks without approval
+- Plugin Folders at root level are mistakes and all the active plugin files should be in /plugin/ such as /includes/ /languages/ /templates/ /assets/

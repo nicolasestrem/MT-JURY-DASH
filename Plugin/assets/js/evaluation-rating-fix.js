@@ -150,9 +150,11 @@
                     return false;
                 }
                 // Log submission data for debugging
-                $('.mt-score-slider').each(function() {
-                    console.log($(this).attr('name') + ': ' + $(this).val());
-                });
+                if (window.MT_DEBUG) {
+                    $('.mt-score-slider').each(function() {
+                        console.log($(this).attr('name') + ': ' + $(this).val());
+                    });
+                }
             });
         }
         // Fix 5: Ensure sliders work after AJAX loads
@@ -222,9 +224,11 @@
         window.MTEvaluationFix = {
             reinitialize: initializeAllFixes,
             checkValues: function() {
-                $('.mt-score-slider').each(function() {
-                    console.log($(this).attr('name') + ': ' + $(this).val());
-                });
+                if (window.MT_DEBUG) {
+                    $('.mt-score-slider').each(function() {
+                        console.log($(this).attr('name') + ': ' + $(this).val());
+                    });
+                }
             }
         };
     });

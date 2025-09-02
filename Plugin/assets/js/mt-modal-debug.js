@@ -2,7 +2,9 @@
  * Debug script to force modal visibility
  */
 jQuery(document).ready(function($) {
-    console.log('MT Modal Debug: Script loaded');
+    if (window.MT_DEBUG) {
+        console.log('MT Modal Debug: Script loaded');
+    }
     
     // Create a simple test modal function
     window.showTestModal = function() {
@@ -35,14 +37,18 @@ jQuery(document).ready(function($) {
             '</div>';
         
         $('body').append(modalHtml);
-        console.log('Test modal should be visible now');
+        if (window.MT_DEBUG) {
+            console.log('Test modal should be visible now');
+        }
     };
     
     // Override the button clicks to use our existing modals differently
     $('#mt-auto-assign-btn').off('click').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Debug: Auto-assign button clicked');
+        if (window.MT_DEBUG) {
+            console.log('Debug: Auto-assign button clicked');
+        }
         
         var $modal = $('#mt-auto-assign-modal');
         var $content = $modal.find('.mt-modal-content');
@@ -76,16 +82,20 @@ jQuery(document).ready(function($) {
             'z-index: 10000000 !important;'
         );
         
-        console.log('Modal styles applied. Modal should be visible.');
-        console.log('Modal display:', $modal.css('display'));
-        console.log('Modal position:', $modal.css('position'));
-        console.log('Modal z-index:', $modal.css('z-index'));
+        if (window.MT_DEBUG) {
+            console.log('Modal styles applied. Modal should be visible.');
+            console.log('Modal display:', $modal.css('display'));
+            console.log('Modal position:', $modal.css('position'));
+            console.log('Modal z-index:', $modal.css('z-index'));
+        }
         
         // Check if modal is actually visible
         var isVisible = $modal.is(':visible');
         var rect = $modal[0].getBoundingClientRect();
-        console.log('Modal visible?', isVisible);
-        console.log('Modal dimensions:', rect);
+        if (window.MT_DEBUG) {
+            console.log('Modal visible?', isVisible);
+            console.log('Modal dimensions:', rect);
+        }
         
         return false;
     });
@@ -93,7 +103,9 @@ jQuery(document).ready(function($) {
     $('#mt-manual-assign-btn').off('click').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Debug: Manual assign button clicked');
+        if (window.MT_DEBUG) {
+            console.log('Debug: Manual assign button clicked');
+        }
         
         var $modal = $('#mt-manual-assign-modal');
         var $content = $modal.find('.mt-modal-content');
@@ -127,7 +139,9 @@ jQuery(document).ready(function($) {
             'z-index: 10000000 !important;'
         );
         
-        console.log('Manual modal styles applied');
+        if (window.MT_DEBUG) {
+            console.log('Manual modal styles applied');
+        }
         return false;
     });
     
@@ -144,6 +158,8 @@ jQuery(document).ready(function($) {
         }
     });
     
-    console.log('MT Modal Debug: Handlers attached');
-    console.log('To test if modals can work at all, run: showTestModal()');
+    if (window.MT_DEBUG) {
+        console.log('MT Modal Debug: Handlers attached');
+        console.log('To test if modals can work at all, run: showTestModal()');
+    }
 });
