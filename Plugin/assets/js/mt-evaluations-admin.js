@@ -24,9 +24,6 @@
         init: function() {
             this.bindEvents();
             this.setupBulkActions();
-            if (window.MT_DEBUG) {
-                console.log('MT Evaluations Admin initialized');
-            }
         },
         
         /**
