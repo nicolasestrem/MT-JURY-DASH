@@ -346,6 +346,54 @@ abstract class MT_Base_Ajax {
     }
     
     /**
+     * Check rate limiting for current user
+     * 
+     * SECURITY ENHANCEMENT: Prevent brute force and abuse
+     * 
+     * @param string $action Action identifier for rate limiting
+     * @param int $max_attempts Maximum attempts allowed
+     * @param int $window_seconds Time window in seconds
+     * @return bool True if within rate limit, false if exceeded
+     * @since 2.5.42
+     */
+    protected function check_rate_limit($action = 'ajax_action', $max_attempts = 10, $window_seconds = 60) {
+        $user_id = get_current_user_id();
+        
+        // Create unique transient key for this user and action
+        $transient_key = 'mt_rate_limit_' . $action . '_' . $user_id . '_' . get_current_blog_id();
+        
+        // Get current attempt count
+        $attempts = get_transient($transient_key);
+        
+        if ($attempts === false) {
+            // First attempt in this window
+            set_transient($transient_key, 1, $window_seconds);
+            return true;
+        }
+        
+        if ($attempts >= $max_attempts) {
+            // Rate limit exceeded
+            MT_Logger::security_event('Rate limit exceeded', [
+                'action' => $action,
+                'user_id' => $user_id,
+                'attempts' => $attempts,
+                'max_attempts' => $max_attempts,
+                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+            ]);
+            
+            $this->error(sprintf(
+                __('Too many requests. Please wait %d seconds and try again.', 'mobility-trailblazers'),
+                $window_seconds
+            ));
+            return false;
+        }
+        
+        // Increment attempt count
+        set_transient($transient_key, $attempts + 1, $window_seconds);
+        return true;
+    }
+    
+    /**
      * Ensure container is properly initialized
      * Call this in AJAX handlers that rely on the container
      *

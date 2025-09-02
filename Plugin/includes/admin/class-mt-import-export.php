@@ -495,6 +495,8 @@ class MT_Import_Export {
      * Export candidates to CSV
      */
     public static function export_candidates() {
+        global $wpdb; // CRITICAL FIX: Add missing global declaration
+        
         // Verify nonce
         if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'mt_export_candidates')) {
             wp_die(__('Security check failed', 'mobility-trailblazers'));
@@ -540,17 +542,35 @@ class MT_Import_Export {
         // Optimize meta data fetching - get all meta at once
         $candidate_ids = wp_list_pluck($candidates, 'ID');
         if (!empty($candidate_ids)) {
-            // Create placeholders for prepared statement
-            $placeholders = implode(',', array_fill(0, count($candidate_ids), '%d'));
+            // SECURITY FIX: Properly handle IN clause to prevent SQL injection
+            // Ensure all IDs are integers
+            $candidate_ids = array_map('intval', $candidate_ids);
             
-            $meta_query = $wpdb->prepare(
-                "SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta} 
-                 WHERE post_id IN ($placeholders) 
-                 AND meta_key IN ('_mt_candidate_name', '_mt_organization', '_mt_category_type', 
-                                  '_mt_description_full', '_mt_innovation', '_mt_website_url', 
-                                  '_mt_linkedin_url', '_mt_email')",
-                ...$candidate_ids
+            // Build the query with proper placeholders
+            $placeholders = array_fill(0, count($candidate_ids), '%d');
+            $in_placeholders = implode(',', $placeholders);
+            
+            // Build the complete query with all parameters
+            $query = "SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta} 
+                     WHERE post_id IN ({$in_placeholders}) 
+                     AND meta_key IN (%s, %s, %s, %s, %s, %s, %s, %s)";
+            
+            // Merge all parameters for prepare
+            $query_params = array_merge(
+                $candidate_ids,
+                [
+                    '_mt_candidate_name',
+                    '_mt_organization', 
+                    '_mt_category_type',
+                    '_mt_description_full',
+                    '_mt_innovation',
+                    '_mt_website_url',
+                    '_mt_linkedin_url',
+                    '_mt_email'
+                ]
             );
+            
+            $meta_query = $wpdb->prepare($query, $query_params);
             $all_meta = $wpdb->get_results($meta_query);
             
             // Organize meta by post ID

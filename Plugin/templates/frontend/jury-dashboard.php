@@ -82,7 +82,6 @@ $progress_class = 'mt-progress-bar mt-progress-' . (isset($dashboard_settings['p
 $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? $dashboard_settings['card_layout'] : 'grid');
 ?>
 
-<div id="mt-plugin-wrapper">
 <div class="mt-root">
 <div class="mt-jury-dashboard mt-dashboard-v3">
     <?php if ($progress['completion_rate'] == 100) : ?>
@@ -441,6 +440,5 @@ jQuery(document).ready(function($) {
 });
 </script>
 </div><!-- .mt-root -->
-</div>
 
  

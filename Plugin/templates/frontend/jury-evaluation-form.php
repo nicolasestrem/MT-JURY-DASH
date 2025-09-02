@@ -105,7 +105,6 @@ $criteria = [
 ];
 ?>
 
-<div id="mt-plugin-wrapper">
 <div class="mt-evaluation-page">
     <!-- Header -->
     <div class="mt-evaluation-header">
@@ -432,4 +431,4 @@ $criteria = [
             </ul>
         </div>
     </form>
-</div> </div> 
+</div> 

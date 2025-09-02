@@ -137,6 +137,12 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             return;
         }
         
+        // SECURITY ENHANCEMENT: Check rate limiting
+        // Allow 10 evaluation submissions per minute per user
+        if (!$this->check_rate_limit('evaluation_submission', 10, 60)) {
+            return; // Rate limit exceeded, error already sent
+        }
+        
         // Ensure container is properly initialized
         if (!$this->ensure_container()) {
             return;
@@ -435,10 +441,10 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
      * Get ranked candidates for jury dashboard
      */
     public function get_jury_rankings() {
-        // Verify nonce with proper termination
-        if (!check_ajax_referer('mt_ajax_nonce', 'nonce', false)) {
-            $this->error(__('Security check failed', 'mobility-trailblazers'));
-            wp_die(); // Ensure execution stops
+        // SECURITY FIX: Use standardized nonce verification from base class
+        if (!$this->verify_nonce('mt_ajax_nonce')) {
+            $this->error(__('Security check failed. Please refresh the page and try again.', 'mobility-trailblazers'));
+            return;
         }
         
         // Check permissions
@@ -732,6 +738,12 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             }
             $this->error(__('Security check failed', 'mobility-trailblazers'));
             return;
+        }
+        
+        // SECURITY ENHANCEMENT: Check rate limiting for inline saves
+        // Allow 20 inline saves per minute (more than regular submissions since they're smaller)
+        if (!$this->check_rate_limit('inline_evaluation_save', 20, 60)) {
+            return; // Rate limit exceeded, error already sent
         }
         
         // Check permissions

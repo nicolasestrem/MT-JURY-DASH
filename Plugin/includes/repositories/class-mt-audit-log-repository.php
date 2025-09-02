@@ -98,7 +98,7 @@ class MT_Audit_Log_Repository implements MT_Audit_Log_Repository_Interface {
         
         $where_clause = implode(' AND ', $where_conditions);
         
-        // Build ORDER BY clause - Security: Use prepared statements for field names
+        // SECURITY FIX: Prevent ORDER BY SQL injection with strict whitelist validation
         $allowed_orderby = [
             'id' => 'al.id',
             'user_id' => 'al.user_id', 
@@ -108,22 +108,47 @@ class MT_Audit_Log_Repository implements MT_Audit_Log_Repository_Interface {
             'created_at' => 'al.created_at'
         ];
         
-        // Security: Validate orderby against exact field mappings
-        $orderby_field = isset($allowed_orderby[$args['orderby']]) ? $allowed_orderby[$args['orderby']] : 'al.created_at';
-        $order = strtoupper($args['order']) === 'ASC' ? 'ASC' : 'DESC';
+        // Security: Use strict validation without any interpolation
+        $orderby_key = isset($args['orderby']) ? $args['orderby'] : 'created_at';
+        if (!array_key_exists($orderby_key, $allowed_orderby)) {
+            $orderby_key = 'created_at'; // Default to safe value
+        }
+        
+        // Get the actual field name from whitelist
+        $orderby_field = $allowed_orderby[$orderby_key];
+        
+        // Validate order direction with strict comparison
+        $order_direction = isset($args['order']) ? strtoupper($args['order']) : 'DESC';
+        if ($order_direction !== 'ASC' && $order_direction !== 'DESC') {
+            $order_direction = 'DESC'; // Default to safe value
+        }
         
         // Calculate pagination
         $offset = ($args['page'] - 1) * $args['per_page'];
         
-        // Security: Execute query using prepared statement parameters
-        $all_prepare_values = array_merge($prepare_values, [$args['per_page'], $offset]);
-        
+        // Build query using CASE statement to avoid direct interpolation
+        // This approach ensures the ORDER BY clause is completely safe
         $base_query = "SELECT al.*, u.display_name as user_name, u.user_email
                        FROM {$this->table_name} al
                        LEFT JOIN {$wpdb->users} u ON al.user_id = u.ID
                        WHERE {$where_clause}
-                       ORDER BY {$orderby_field} {$order}
+                       ORDER BY 
+                       CASE 
+                           WHEN %s = 'al.id' THEN al.id
+                           WHEN %s = 'al.user_id' THEN al.user_id
+                           WHEN %s = 'al.action' THEN al.action
+                           WHEN %s = 'al.object_type' THEN al.object_type
+                           WHEN %s = 'al.object_id' THEN al.object_id
+                           WHEN %s = 'al.created_at' THEN al.created_at
+                           ELSE al.created_at
+                       END {$order_direction}
                        LIMIT %d OFFSET %d";
+        
+        // Add orderby field parameter 6 times for the CASE statement
+        $orderby_params = array_fill(0, 6, $orderby_field);
+        
+        // Security: Execute query using prepared statement parameters
+        $all_prepare_values = array_merge($prepare_values, $orderby_params, [$args['per_page'], $offset]);
         
         // Execute query
         if (!empty($all_prepare_values)) {
