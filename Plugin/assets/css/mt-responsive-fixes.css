@@ -1,0 +1,264 @@
+/**
+ * Mobile-First Responsive Fixes for Mobility Trailblazers
+ * Consolidated responsive design patterns and touch-friendly interfaces
+ * Mobile: 320px - 767px | Tablet: 768px - 1023px | Desktop: 1024px+
+ */
+
+/* Mobile-first base styles */
+.mt-container {
+    max-width: 100%;
+    padding: 0 16px;
+}
+
+.mt-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+}
+
+/* Touch-friendly interactive elements - minimum 44x44px */
+.mt-button,
+.mt-card .mt-button,
+button[class*="mt-"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Fix for candidate cards on mobile */
+.mt-candidate-card,
+.mt-candidates-grid .mt-card {
+    min-height: 320px;
+    padding: 16px;
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mt-candidate-card:hover,
+.mt-candidate-card:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Candidate image responsive fixes */
+.mt-candidate-image {
+    height: 200px;
+    max-height: 200px;
+    min-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Fix jury dashboard mobile layout */
+.mt-jury-dashboard {
+    padding: 16px;
+}
+
+.mt-jury-dashboard .mt-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+/* Evaluation form mobile fixes */
+.mt-evaluation-form {
+    padding: 16px;
+}
+
+.mt-evaluation-form .mt-form-row {
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mt-rating-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.mt-rating-button {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 50%;
+    font-weight: 600;
+    touch-action: manipulation;
+}
+
+/* Modal mobile improvements */
+.mt-modal .mt-modal-content {
+    width: 95%;
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+/* Fix table rankings for mobile */
+.mt-rankings-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mt-rankings-table table {
+    min-width: 600px;
+}
+
+/* Ensure text is readable on mobile */
+.mt-description,
+.mt-card-description {
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Fix navigation elements */
+.mt-nav {
+    padding: 8px 16px;
+}
+
+.mt-nav-item {
+    min-height: 44px;
+    padding: 10px 16px;
+}
+
+/* Tablet breakpoint: 768px - 1023px */
+@media (min-width: 768px) {
+    .mt-container {
+        padding: 0 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .mt-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .mt-candidates-grid .mt-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mt-candidate-image {
+        height: 250px;
+        max-height: 250px;
+        min-height: 250px;
+    }
+    
+    .mt-jury-dashboard .mt-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .mt-evaluation-form .mt-form-row {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .mt-modal .mt-modal-content {
+        width: 90%;
+        max-width: 600px;
+        padding: 30px;
+    }
+}
+
+/* Desktop breakpoint: 1024px+ */
+@media (min-width: 1024px) {
+    .mt-container {
+        padding: 0 32px;
+    }
+    
+    .mt-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+    
+    .mt-candidates-grid .mt-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .mt-candidate-card {
+        min-height: 360px;
+        padding: 20px;
+    }
+    
+    .mt-candidate-image {
+        height: 300px;
+        max-height: 300px;
+        min-height: 300px;
+    }
+    
+    .mt-jury-dashboard .mt-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    
+    .mt-button:hover,
+    .mt-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Large desktop: 1200px+ */
+@media (min-width: 1200px) {
+    .mt-grid.mt-large-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .mt-candidates-grid .mt-grid.mt-large-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* High DPI / Retina display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .mt-candidate-image,
+    .mt-logo img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Dark mode support (if enabled) */
+@media (prefers-color-scheme: dark) {
+    .mt-card {
+        background-color: #1a1a1a;
+        border-color: #333;
+        color: #fff;
+    }
+    
+    .mt-modal .mt-modal-content {
+        background-color: #1a1a1a;
+        color: #fff;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .mt-candidate-card,
+    .mt-button,
+    .mt-modal {
+        transition: none;
+    }
+}
+
+/* Print styles */
+@media print {
+    .mt-modal,
+    .mt-button,
+    .mt-nav {
+        display: none !important;
+    }
+    
+    .mt-candidate-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}

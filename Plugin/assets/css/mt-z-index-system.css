@@ -1,0 +1,100 @@
+/**
+ * Z-Index System for Mobility Trailblazers
+ * Consolidated z-index values to prevent conflicts
+ * 
+ * Layer System:
+ * Base (0-99): Normal content, images, backgrounds
+ * Content (100-199): Cards, sections, overlays
+ * Navigation (200-299): Menus, dropdowns
+ * Tooltips (300-399): Tooltips, popovers
+ * Modals (400-499): Modal overlays and content
+ * Toast/Alerts (500-599): Notifications, alerts
+ * Debug/Admin (600-699): Debug overlays, admin bars
+ */
+
+:root {
+    /* Base Layer (0-99) */
+    --mt-z-base: 0;
+    --mt-z-background: 1;
+    --mt-z-content-bg: 2;
+    --mt-z-sticky: 10;
+    
+    /* Content Layer (100-199) */
+    --mt-z-card: 100;
+    --mt-z-card-hover: 101;
+    --mt-z-dropdown: 150;
+    --mt-z-overlay: 180;
+    
+    /* Navigation Layer (200-299) */
+    --mt-z-nav: 200;
+    --mt-z-nav-dropdown: 210;
+    
+    /* Tooltips Layer (300-399) */
+    --mt-z-tooltip: 300;
+    --mt-z-popover: 310;
+    
+    /* Modal Layer (400-499) */
+    --mt-z-modal-backdrop: 400;
+    --mt-z-modal: 410;
+    --mt-z-modal-content: 420;
+    
+    /* Toast/Alerts Layer (500-599) */
+    --mt-z-toast: 500;
+    --mt-z-alert: 510;
+    
+    /* Debug/Admin Layer (600-699) */
+    --mt-z-debug: 600;
+    --mt-z-admin-bar: 610;
+    --mt-z-admin-overlay: 620;
+}
+
+/* Apply z-index system to key components */
+.mt-modal {
+    z-index: var(--mt-z-modal-backdrop);
+}
+
+.mt-modal .mt-modal-content {
+    z-index: var(--mt-z-modal-content);
+}
+
+.mt-sticky {
+    z-index: var(--mt-z-sticky);
+}
+
+.mt-card {
+    z-index: var(--mt-z-card);
+}
+
+.mt-card:hover {
+    z-index: var(--mt-z-card-hover);
+}
+
+.mt-dropdown {
+    z-index: var(--mt-z-dropdown);
+}
+
+.mt-tooltip {
+    z-index: var(--mt-z-tooltip);
+}
+
+.mt-toast {
+    z-index: var(--mt-z-toast);
+}
+
+/* WordPress admin compatibility */
+.wp-admin .mt-modal {
+    z-index: var(--mt-z-modal-backdrop);
+}
+
+.wp-admin .mt-modal-content {
+    z-index: var(--mt-z-modal-content);
+}
+
+/* Ensure proper layering for Elementor compatibility */
+.elementor-widget .mt-card {
+    z-index: var(--mt-z-card);
+}
+
+.elementor-widget .mt-modal {
+    z-index: var(--mt-z-modal-backdrop);
+}

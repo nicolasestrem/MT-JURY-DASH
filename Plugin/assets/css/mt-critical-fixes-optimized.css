@@ -1,0 +1,227 @@
+/**
+ * OPTIMIZED CRITICAL FIXES
+ * Refactored to remove excessive !important declarations
+ * Uses proper CSS specificity and cascading
+ * Mobile-first responsive approach
+ */
+
+/* ===================================
+   HERO SECTION HEIGHT CONTROL
+   =================================== */
+
+/* Hero sections with proper specificity */
+.mt-hero-pattern,
+.elementor-section.mt-hero-pattern,
+.elementor-section.elementor-top-section.mt-hero-pattern {
+    max-height: 300px;
+    height: 300px;
+    min-height: 300px;
+    overflow: hidden;
+}
+
+/* Responsive hero heights */
+@media (max-width: 767px) {
+    .mt-hero-pattern,
+    .elementor-section.mt-hero-pattern {
+        max-height: 200px;
+        height: 200px;
+        min-height: 200px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .mt-hero-pattern,
+    .elementor-section.mt-hero-pattern {
+        max-height: 250px;
+        height: 250px;
+        min-height: 250px;
+    }
+}
+
+/* ===================================
+   CANDIDATE GRID LAYOUT FIXES
+   =================================== */
+
+/* Grid container with progressive enhancement */
+.mt-candidates-grid,
+.elementor-widget-shortcode .mt-candidates-container,
+.mt-widget-candidates-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* Individual candidate cards */
+.mt-candidates-grid .mt-candidate-card,
+.mt-candidates-container .candidate-card {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    min-height: 320px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.mt-candidates-grid .mt-candidate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-color: #004C5F;
+}
+
+/* Candidate image styling */
+.mt-candidate-card .mt-candidate-image,
+.candidate-card .candidate-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* Candidate description visibility */
+.mt-candidate-card .mt-description,
+.candidate-card .description {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 5px;
+    line-height: 1.5;
+    font-weight: normal;
+    overflow: visible;
+    height: auto;
+    max-height: none;
+    white-space: normal;
+    text-overflow: visible;
+}
+
+/* Grid responsive breakpoints */
+@media (min-width: 768px) {
+    .mt-candidates-grid,
+    .mt-candidates-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .mt-candidate-card {
+        min-height: 260px;
+        padding: 15px;
+    }
+    
+    .mt-candidate-card .mt-candidate-image {
+        height: 250px;
+        max-height: 250px;
+        min-height: 250px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .mt-candidates-grid,
+    .mt-candidates-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    .mt-candidate-card .mt-candidate-image {
+        height: 300px;
+        max-height: 300px;
+        min-height: 300px;
+    }
+}
+
+/* ===================================
+   Z-INDEX LAYER MANAGEMENT
+   =================================== */
+
+/* Use CSS custom properties for consistent layering */
+.mt-background-layer {
+    z-index: var(--mt-z-background, 1);
+    position: relative;
+}
+
+.mt-content-layer {
+    z-index: var(--mt-z-card, 100);
+    position: relative;
+}
+
+.mt-overlay-layer {
+    z-index: var(--mt-z-overlay, 180);
+    position: relative;
+}
+
+/* ===================================
+   TOUCH OPTIMIZATION
+   =================================== */
+
+/* Touch-friendly button sizing */
+.mt-button,
+.mt-candidate-card .button,
+button[class*="mt-"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 767px) {
+    .mt-button,
+    button[class*="mt-"] {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px 20px;
+    }
+}
+
+/* ===================================
+   BROWSER COMPATIBILITY FIXES
+   =================================== */
+
+/* Grid fallback for older browsers */
+@supports not (display: grid) {
+    .mt-candidates-grid,
+    .mt-candidates-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .mt-candidate-card {
+        flex: 0 1 280px;
+    }
+}
+
+/* IE 10-11 specific grid support */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    .mt-candidates-grid {
+        display: -ms-grid;
+        -ms-grid-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+/* ===================================
+   PERFORMANCE OPTIMIZATIONS
+   =================================== */
+
+/* Optimize animations and transitions */
+.mt-candidate-card {
+    will-change: transform;
+}
+
+.mt-candidate-card:hover {
+    will-change: transform, box-shadow;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .mt-candidate-card,
+    .mt-button,
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
