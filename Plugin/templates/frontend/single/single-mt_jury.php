@@ -489,7 +489,7 @@ while (have_posts()) : the_post();
                 
                 <div class="mt-stat-card">
                     <div class="mt-stat-icon">⭐</div>
-                    <div class="mt-stat-value"><?php echo $stats->avg_score ? number_format($stats->avg_score, 1) : '—'; ?></div>
+                    <div class="mt-stat-value"><?php echo esc_html($stats->avg_score ? number_format($stats->avg_score, 1) : '—'); ?></div>
                     <div class="mt-stat-label"><?php _e('Average Score', 'mobility-trailblazers'); ?></div>
                 </div>
             </div>

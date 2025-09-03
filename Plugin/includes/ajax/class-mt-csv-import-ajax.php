@@ -61,8 +61,8 @@ class MT_CSV_Import_Ajax extends MT_Base_Ajax {
                 return;
             }
             
-            // Step 3: Validate import type
-            $import_type = isset($_POST['import_type']) ? sanitize_text_field($_POST['import_type']) : '';
+            // SECURITY FIX: Use base class method for parameter sanitization
+            $import_type = $this->get_text_param('import_type', '');
             if (!in_array($import_type, ['candidates', 'jury_members'])) {
                 $this->error(__('Invalid import type selected.', 'mobility-trailblazers'));
                 return;
@@ -130,8 +130,8 @@ class MT_CSV_Import_Ajax extends MT_Base_Ajax {
                 // Don't completely block, but log the warning
             }
             
-            // Step 8: Prepare import options
-            $update_existing = isset($_POST['update_existing']) && $_POST['update_existing'] === 'true';
+            // SECURITY FIX: Use base class method for parameter sanitization
+            $update_existing = ($this->get_text_param('update_existing', 'false') === 'true');
             
             // Log import attempt
             MT_Logger::info('Starting CSV import via AJAX', [

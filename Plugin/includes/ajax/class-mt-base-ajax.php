@@ -30,7 +30,8 @@ abstract class MT_Base_Ajax {
      */
     protected function verify_nonce($nonce_name = 'mt_ajax_nonce') {
         try {
-            $nonce = isset($_REQUEST['nonce']) ? $_REQUEST['nonce'] : '';
+            // SECURITY FIX: Sanitize nonce before verification
+            $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field($_REQUEST['nonce']) : '';
             $result = wp_verify_nonce($nonce, $nonce_name);
 
             if (!$result) {
@@ -204,7 +205,50 @@ abstract class MT_Base_Ajax {
         }
 
         $value = $_REQUEST[$key];
-        return is_array($value) ? $value : $default;
+        if (!is_array($value)) {
+            return $default;
+        }
+
+        // SECURITY FIX: Sanitize array elements based on context
+        $sanitized = [];
+        foreach ($value as $item) {
+            if (is_numeric($item)) {
+                $sanitized[] = intval($item);
+            } else {
+                $sanitized[] = sanitize_text_field($item);
+            }
+        }
+        
+        return $sanitized;
+    }
+
+    /**
+     * Get integer array parameter (for IDs)
+     *
+     * @param string $key Parameter key
+     * @param array $default Default value
+     * @return array Array of integers
+     */
+    protected function get_int_array_param($key, $default = []) {
+        if (!isset($_REQUEST[$key])) {
+            return $default;
+        }
+
+        $value = $_REQUEST[$key];
+        if (!is_array($value)) {
+            return $default;
+        }
+
+        // SECURITY FIX: Ensure all elements are positive integers
+        $sanitized = [];
+        foreach ($value as $item) {
+            $int_val = intval($item);
+            if ($int_val > 0) {  // Only allow positive integers for IDs
+                $sanitized[] = $int_val;
+            }
+        }
+        
+        return $sanitized;
     }
 
     /**

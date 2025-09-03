@@ -240,10 +240,9 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
         // Check permissions
         $this->check_permission('mt_manage_assignments');
         
-        $jury_member_id = isset($_POST['jury_member_id']) ? intval($_POST['jury_member_id']) : 0;
-        $candidate_ids = isset($_POST['candidate_ids']) && is_array($_POST['candidate_ids']) 
-            ? array_map('intval', $_POST['candidate_ids']) 
-            : array();
+        // SECURITY FIX: Use base class methods for parameter sanitization
+        $jury_member_id = $this->get_int_param('jury_member_id', 0);
+        $candidate_ids = $this->get_int_array_param('candidate_ids', []);
         
         MT_Logger::debug('Assignment parameters', [
             'jury_member_id' => $jury_member_id,
@@ -331,10 +330,8 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
         }
         
         $jury_member_id = $this->get_int_param('jury_member_id');
-        // Get the raw array from $_POST to avoid sanitization issues
-        $candidate_ids = isset($_POST['candidate_ids']) && is_array($_POST['candidate_ids']) 
-            ? array_map('intval', $_POST['candidate_ids']) 
-            : array();
+        // SECURITY FIX: Use base class method for proper sanitization
+        $candidate_ids = $this->get_int_array_param('candidate_ids', []);
         
         MT_Logger::debug('Assignment parameters', [
             'jury_member_id' => $jury_member_id,
@@ -459,9 +456,19 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
         // Check permissions
         $this->check_permission('mt_manage_assignments');
         
-        // Get parameters
-        $method = isset($_POST['method']) ? sanitize_text_field($_POST['method']) : 'balanced';
-        $candidates_per_jury = isset($_POST['candidates_per_jury']) ? intval($_POST['candidates_per_jury']) : 5;
+        // SECURITY FIX: Use base class methods and validate parameters
+        $method = $this->get_text_param('method', 'balanced');
+        $candidates_per_jury = $this->get_int_param('candidates_per_jury', 5);
+        
+        // SECURITY FIX: Validate method parameter against allowed values
+        if (!in_array($method, ['balanced', 'random'])) {
+            $method = 'balanced';
+        }
+        
+        // SECURITY FIX: Validate candidates_per_jury range to prevent abuse
+        if ($candidates_per_jury < 1 || $candidates_per_jury > 50) {
+            $candidates_per_jury = 5;
+        }
         
         // Log for debugging
         MT_Logger::info('Starting auto-assignment', [
@@ -502,8 +509,9 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
         // Initialize repository
         $assignment_repo = $this->get_assignment_repository();
         
-        // Clear existing assignments if requested
-        if (isset($_POST['clear_existing']) && $_POST['clear_existing'] === 'true') {
+        // SECURITY FIX: Sanitize boolean parameter
+        $clear_existing = $this->get_text_param('clear_existing', 'false');
+        if ($clear_existing === 'true') {
             // Clear assignments and evaluations with proper cache clearing
             $clear_result = $assignment_repo->clear_all(true); // true = cascade delete evaluations
             if ($clear_result) {
@@ -556,7 +564,7 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
             
             // Track existing assignments if we're not clearing them
             $existing_assignments_by_jury = [];
-            if (!isset($_POST['clear_existing']) || $_POST['clear_existing'] !== 'true') {
+            if ($clear_existing !== 'true') {
                 // Get all existing assignments
                 $existing_assignments = $assignment_repo->find_all();
                 foreach ($existing_assignments as $assignment) {
@@ -780,10 +788,8 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        // Get assignment IDs
-        $assignment_ids = isset($_POST['assignment_ids']) && is_array($_POST['assignment_ids']) 
-            ? array_map('intval', $_POST['assignment_ids']) 
-            : array();
+        // SECURITY FIX: Use base class method for parameter sanitization
+        $assignment_ids = $this->get_int_array_param('assignment_ids', []);
         
         if (empty($assignment_ids)) {
             $this->error(__('No assignments selected', 'mobility-trailblazers'));
@@ -844,11 +850,9 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        // Get parameters
-        $assignment_ids = isset($_POST['assignment_ids']) && is_array($_POST['assignment_ids']) 
-            ? array_map('intval', $_POST['assignment_ids']) 
-            : array();
-        $new_jury_member_id = isset($_POST['new_jury_member_id']) ? intval($_POST['new_jury_member_id']) : 0;
+        // SECURITY FIX: Use base class methods for parameter sanitization
+        $assignment_ids = $this->get_int_array_param('assignment_ids', []);
+        $new_jury_member_id = $this->get_int_param('new_jury_member_id', 0);
         
         if (empty($assignment_ids) || !$new_jury_member_id) {
             $this->error(__('Invalid parameters', 'mobility-trailblazers'));
@@ -961,10 +965,8 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
         // Check permissions
         $this->check_permission('mt_export_data');
         
-        // Get assignment IDs
-        $assignment_ids = isset($_POST['assignment_ids']) && is_array($_POST['assignment_ids']) 
-            ? array_map('intval', $_POST['assignment_ids']) 
-            : array();
+        // SECURITY FIX: Use base class method for parameter sanitization
+        $assignment_ids = $this->get_int_array_param('assignment_ids', []);
         
         if (empty($assignment_ids)) {
             wp_die(__('No assignments selected for export.', 'mobility-trailblazers'));

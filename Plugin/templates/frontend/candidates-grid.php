@@ -74,7 +74,7 @@ if ($show_category && !empty($candidate_ids)) {
             $image_style = 'style="object-position: center 20% !important; object-fit: cover !important;"';
         }
     ?>
-        <div class="mt-candidate-grid-item" data-candidate-id="<?php echo $candidate_id; ?>">
+        <div class="mt-candidate-grid-item" data-candidate-id="<?php echo esc_attr($candidate_id); ?>">
             <a href="<?php the_permalink(); ?>" class="mt-candidate-link">
                 <?php if (has_post_thumbnail()) : ?>
                     <div class="mt-candidate-image">

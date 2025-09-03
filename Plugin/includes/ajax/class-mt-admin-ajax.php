@@ -122,8 +122,9 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
      * Export candidates - Direct download version
      */
     public function export_candidates_download() {
-        // Verify nonce
-        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'mt_admin_nonce')) {
+        // SECURITY FIX: Sanitize GET nonce before verification
+        $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field($_GET['_wpnonce']) : '';
+        if (!wp_verify_nonce($nonce, 'mt_admin_nonce')) {
             wp_die(__('Security check failed', 'mobility-trailblazers'));
         }
         
@@ -242,8 +243,9 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
      * Export evaluations - Direct download version
      */
     public function export_evaluations_download() {
-        // Verify nonce
-        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'mt_admin_nonce')) {
+        // SECURITY FIX: Sanitize GET nonce before verification
+        $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field($_GET['_wpnonce']) : '';
+        if (!wp_verify_nonce($nonce, 'mt_admin_nonce')) {
             wp_die(__('Security check failed', 'mobility-trailblazers'));
         }
         
@@ -349,8 +351,9 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
      * Export assignments - Direct download version
      */
     public function export_assignments_download() {
-        // Verify nonce
-        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'mt_admin_nonce')) {
+        // SECURITY FIX: Sanitize GET nonce before verification
+        $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field($_GET['_wpnonce']) : '';
+        if (!wp_verify_nonce($nonce, 'mt_admin_nonce')) {
             wp_die(__('Security check failed', 'mobility-trailblazers'));
         }
         
@@ -477,10 +480,11 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         
         $file = $_FILES['import_file'];
         
-        // Validate file type
-        $allowed_types = ['text/csv', 'application/csv', 'text/plain'];
-        if (!in_array($file['type'], $allowed_types)) {
-            $this->error(__('Invalid file type. Please upload a CSV file.', 'mobility-trailblazers'));
+        // SECURITY FIX: Use comprehensive file validation from base class
+        $validation_result = $this->validate_upload($file, ['csv'], 5 * MB_IN_BYTES);
+        if ($validation_result !== true) {
+            $this->error($validation_result);
+            return;
         }
         
         // Handle upload
@@ -606,11 +610,9 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        // Get parameters
-        $action = isset($_POST['bulk_action']) ? sanitize_text_field($_POST['bulk_action']) : '';
-        $candidate_ids = isset($_POST['candidate_ids']) && is_array($_POST['candidate_ids']) 
-            ? array_map('intval', $_POST['candidate_ids']) 
-            : array();
+        // SECURITY FIX: Use base class methods for parameter sanitization
+        $action = $this->get_text_param('bulk_action', '');
+        $candidate_ids = $this->get_int_array_param('candidate_ids', []);
         
         if (empty($action) || empty($candidate_ids)) {
             $this->error(__('Invalid parameters', 'mobility-trailblazers'));
@@ -665,7 +667,8 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
                     break;
                     
                 case 'add_category':
-                    $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
+                    // SECURITY FIX: Use base class method for parameter sanitization
+                    $category = $this->get_text_param('category', '');
                     if ($category) {
                         $result = wp_set_object_terms($candidate_id, $category, 'mt_award_category', true);
                         $result = !is_wp_error($result);
@@ -673,7 +676,8 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
                     break;
                     
                 case 'remove_category':
-                    $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
+                    // SECURITY FIX: Use base class method for parameter sanitization
+                    $category = $this->get_text_param('category', '');
                     if ($category) {
                         $current_terms = wp_get_object_terms($candidate_id, 'mt_award_category', ['fields' => 'slugs']);
                         if (!is_wp_error($current_terms)) {

@@ -460,7 +460,12 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
         }
         
         $evaluation_repo = $this->get_evaluation_repository();
-        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 10;
+        // SECURITY FIX: Use base class method and validate limit bounds
+        $limit = $this->get_int_param('limit', 10);
+        // SECURITY FIX: Enforce reasonable limits to prevent DoS
+        if ($limit < 1 || $limit > 100) {
+            $limit = 10;
+        }
         
         $rankings = $evaluation_repo->get_ranked_candidates_for_jury($jury_member->ID, $limit);
         
@@ -574,11 +579,9 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        // Get parameters
-        $action = isset($_POST['bulk_action']) ? sanitize_text_field($_POST['bulk_action']) : '';
-        $evaluation_ids = isset($_POST['evaluation_ids']) && is_array($_POST['evaluation_ids']) 
-            ? array_map('intval', $_POST['evaluation_ids']) 
-            : array();
+        // SECURITY FIX: Use base class methods for parameter sanitization
+        $action = $this->get_text_param('bulk_action', '');
+        $evaluation_ids = $this->get_int_array_param('evaluation_ids', []);
         
         if (empty($action) || empty($evaluation_ids)) {
             $this->error(__('Invalid parameters', 'mobility-trailblazers'));
@@ -760,13 +763,29 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        $candidate_id = isset($_POST['candidate_id']) ? intval($_POST['candidate_id']) : 0;
+        // SECURITY FIX: Use base class methods for parameter sanitization
+        $candidate_id = $this->get_int_param('candidate_id', 0);
         if (!$candidate_id) {
             $this->error(__('Invalid candidate ID', 'mobility-trailblazers'));
             return;
         }
         
-        $scores = isset($_POST['scores']) ? $_POST['scores'] : [];
+        // SECURITY FIX: Sanitize scores array properly
+        $scores = $this->get_array_param('scores', []);
+        
+        // SECURITY FIX: Validate scores array structure
+        $valid_score_fields = ['courage', 'innovation', 'implementation', 'relevance', 'visibility', 'courage_score', 'innovation_score', 'implementation_score', 'relevance_score', 'visibility_score'];
+        $sanitized_scores = [];
+        foreach ($scores as $key => $value) {
+            if (in_array($key, $valid_score_fields) && is_numeric($value)) {
+                $score_val = floatval($value);
+                // SECURITY FIX: Validate score ranges (0-10)
+                if ($score_val >= 0 && $score_val <= 10) {
+                    $sanitized_scores[$key] = $score_val;
+                }
+            }
+        }
+        $scores = $sanitized_scores;
         
         // Enhanced debugging for assignment verification
         MT_Logger::debug('Inline evaluation save debug info', [
@@ -799,8 +818,9 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             // Check if user has special permissions that allow evaluating any candidate
             $can_evaluate_all = current_user_can('administrator') || current_user_can('mt_manage_evaluations');
             
-            // For table views from admin or managers, allow evaluation without assignment
-            $is_table_view = isset($_POST['context']) && $_POST['context'] === 'table';
+            // SECURITY FIX: Sanitize context parameter
+            $context = $this->get_text_param('context', '');
+            $is_table_view = ($context === 'table');
             
             // Even administrators must have proper assignments for security
             if (!$assignment_exists) {
