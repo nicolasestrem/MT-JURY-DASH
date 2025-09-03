@@ -43,29 +43,43 @@ class MT_Import_Export {
             wp_die(__('Security check failed', 'mobility-trailblazers'));
         }
         
-        // Check permission
-        if (!current_user_can('edit_posts')) {
-            wp_die(__('Permission denied', 'mobility-trailblazers'));
+        // Check permission - use proper capability
+        if (!current_user_can('mt_export_data')) {
+            MT_Logger::security_event('Unauthorized export attempt - candidates', [
+                'user_id' => get_current_user_id(),
+                'user_login' => wp_get_current_user()->user_login,
+                'export_type' => 'candidates'
+            ]);
+            wp_die(__('Permission denied. You need export data capability.', 'mobility-trailblazers'));
         }
         
-        // Get candidates
-        $candidates = get_posts([
-            'post_type' => 'mt_candidate',
-            'posts_per_page' => -1,
-            'orderby' => 'title',
-            'order' => 'ASC'
-        ]);
-        
-        // Set headers for download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=candidates-' . date('Y-m-d') . '.csv');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-        
-        // Remove BOM - causes parsing issues
-        
-        // Open output stream
-        $output = fopen('php://output', 'w');
+        try {
+            // Get candidates
+            $candidates = get_posts([
+                'post_type' => 'mt_candidate',
+                'posts_per_page' => -1,
+                'orderby' => 'title',
+                'order' => 'ASC'
+            ]);
+            
+            if (empty($candidates)) {
+                MT_Logger::warning('No candidates found for export');
+            }
+            
+            // Set headers for download
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename=candidates-' . date('Y-m-d') . '.csv');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+            
+            // Remove BOM - causes parsing issues
+            
+            // Open output stream with error checking
+            $output = fopen('php://output', 'w');
+            if ($output === false) {
+                MT_Logger::error('Failed to open output stream for candidates export');
+                wp_die(__('Export failed: Unable to create output file.', 'mobility-trailblazers'));
+            }
         
         // Write headers with consistent structure
         fputcsv($output, [
@@ -140,13 +154,27 @@ class MT_Import_Export {
                     isset($meta['_mt_linkedin_url']) ? $meta['_mt_linkedin_url'] : '',
                     isset($meta['_mt_email']) ? $meta['_mt_email'] : '',
                     $candidate->post_status,
-                    $candidate->post_date,
-                    $candidate->post_modified
+                    self::format_date_iso8601($candidate->post_date),
+                    self::format_date_iso8601($candidate->post_modified)
                 ]);
             }
         }
         
-        fclose($output);
+            fclose($output);
+            
+            MT_Logger::info('Candidates export completed successfully', [
+                'count' => count($candidates),
+                'user_id' => get_current_user_id()
+            ]);
+            
+        } catch (Exception $e) {
+            MT_Logger::error('Candidates export failed', [
+                'error' => $e->getMessage(),
+                'user_id' => get_current_user_id()
+            ]);
+            wp_die(__('Export failed: ', 'mobility-trailblazers') . $e->getMessage());
+        }
+        
         exit;
     }
     
@@ -161,35 +189,55 @@ class MT_Import_Export {
             wp_die(__('Security check failed', 'mobility-trailblazers'));
         }
         
-        // Check permission
-        if (!current_user_can('edit_posts')) {
-            wp_die(__('Permission denied', 'mobility-trailblazers'));
+        // Check permission - use proper capability
+        if (!current_user_can('mt_export_data')) {
+            MT_Logger::security_event('Unauthorized export attempt - evaluations', [
+                'user_id' => get_current_user_id(),
+                'user_login' => wp_get_current_user()->user_login,
+                'export_type' => 'evaluations'
+            ]);
+            wp_die(__('Permission denied. You need export data capability.', 'mobility-trailblazers'));
         }
         
-        // Get ALL evaluations with proper jury member data
-        $table_name = $wpdb->prefix . 'mt_evaluations';
-        $evaluations = $wpdb->get_results("
-            SELECT e.*, 
-                   c.post_title as candidate_name, 
-                   COALESCE(j.post_title, u.display_name, CONCAT('User #', e.jury_member_id)) as jury_member
-            FROM {$table_name} e
-            LEFT JOIN {$wpdb->posts} c ON e.candidate_id = c.ID AND c.post_type = 'mt_candidate'
-            LEFT JOIN {$wpdb->posts} j ON e.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
-            LEFT JOIN {$wpdb->users} u ON e.jury_member_id = u.ID
-            WHERE e.status IN ('completed', 'draft', 'in_progress')
-            ORDER BY e.jury_member_id, e.candidate_id, e.created_at DESC
-        ");
-        
-        // Set headers for download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=evaluations-' . date('Y-m-d') . '.csv');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-        
-        // Remove BOM - causes parsing issues
-        
-        // Open output stream
-        $output = fopen('php://output', 'w');
+        try {
+            // Get ALL evaluations with proper jury member data
+            $table_name = $wpdb->prefix . 'mt_evaluations';
+            $evaluations = $wpdb->get_results("
+                SELECT e.*, 
+                       c.post_title as candidate_name, 
+                       COALESCE(j.post_title, u.display_name, CONCAT('User #', e.jury_member_id)) as jury_member
+                FROM {$table_name} e
+                LEFT JOIN {$wpdb->posts} c ON e.candidate_id = c.ID AND c.post_type = 'mt_candidate'
+                LEFT JOIN {$wpdb->posts} j ON e.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
+                LEFT JOIN {$wpdb->users} u ON e.jury_member_id = u.ID
+                WHERE e.status IN ('completed', 'draft', 'in_progress')
+                ORDER BY e.jury_member_id, e.candidate_id, e.created_at DESC
+            ");
+            
+            // Check for database errors
+            if ($wpdb->last_error) {
+                MT_Logger::database_error('SELECT', 'mt_evaluations', $wpdb->last_error);
+                wp_die(__('Export failed: Database error occurred.', 'mobility-trailblazers'));
+            }
+            
+            if (empty($evaluations)) {
+                MT_Logger::warning('No evaluations found for export');
+            }
+            
+            // Set headers for download
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename=evaluations-' . date('Y-m-d') . '.csv');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+            
+            // Remove BOM - causes parsing issues
+            
+            // Open output stream with error checking
+            $output = fopen('php://output', 'w');
+            if ($output === false) {
+                MT_Logger::error('Failed to open output stream for evaluations export');
+                wp_die(__('Export failed: Unable to create output file.', 'mobility-trailblazers'));
+            }
         
         // Write headers
         fputcsv($output, [
@@ -217,11 +265,25 @@ class MT_Import_Export {
                 $evaluation->visibility_score,
                 $evaluation->comments,
                 $evaluation->status,
-                $evaluation->created_at
+                self::format_date_iso8601($evaluation->created_at)
             ]);
         }
         
-        fclose($output);
+            fclose($output);
+            
+            MT_Logger::info('Evaluations export completed successfully', [
+                'count' => count($evaluations),
+                'user_id' => get_current_user_id()
+            ]);
+            
+        } catch (Exception $e) {
+            MT_Logger::error('Evaluations export failed', [
+                'error' => $e->getMessage(),
+                'user_id' => get_current_user_id()
+            ]);
+            wp_die(__('Export failed: ', 'mobility-trailblazers') . $e->getMessage());
+        }
+        
         exit;
     }
     
@@ -236,37 +298,57 @@ class MT_Import_Export {
             wp_die(__('Security check failed', 'mobility-trailblazers'));
         }
         
-        // Check permission
-        if (!current_user_can('edit_posts')) {
-            wp_die(__('Permission denied', 'mobility-trailblazers'));
+        // Check permission - use proper capability
+        if (!current_user_can('mt_export_data')) {
+            MT_Logger::security_event('Unauthorized export attempt - assignments', [
+                'user_id' => get_current_user_id(),
+                'user_login' => wp_get_current_user()->user_login,
+                'export_type' => 'assignments'
+            ]);
+            wp_die(__('Permission denied. You need export data capability.', 'mobility-trailblazers'));
         }
         
-        // Get assignments with proper data
-        $table_name = $wpdb->prefix . 'mt_jury_assignments';
-        $assignments = $wpdb->get_results("
-            SELECT a.*, 
-                   c.post_title as candidate_name,
-                   COALESCE(j.post_title, u.display_name, CONCAT('User #', a.jury_member_id)) as jury_member,
-                   a.status,
-                   a.assigned_at,
-                   a.created_at
-            FROM {$table_name} a
-            LEFT JOIN {$wpdb->posts} c ON a.candidate_id = c.ID AND c.post_type = 'mt_candidate'
-            LEFT JOIN {$wpdb->posts} j ON a.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
-            LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID
-            ORDER BY a.jury_member_id, a.candidate_id, a.assigned_at DESC
-        ");
-        
-        // Set headers for download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=assignments-' . date('Y-m-d') . '.csv');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-        
-        // Remove BOM - causes parsing issues
-        
-        // Open output stream
-        $output = fopen('php://output', 'w');
+        try {
+            // Get assignments with proper data
+            $table_name = $wpdb->prefix . 'mt_jury_assignments';
+            $assignments = $wpdb->get_results("
+                SELECT a.*, 
+                       c.post_title as candidate_name,
+                       COALESCE(j.post_title, u.display_name, CONCAT('User #', a.jury_member_id)) as jury_member,
+                       a.status,
+                       a.assigned_at,
+                       a.created_at
+                FROM {$table_name} a
+                LEFT JOIN {$wpdb->posts} c ON a.candidate_id = c.ID AND c.post_type = 'mt_candidate'
+                LEFT JOIN {$wpdb->posts} j ON a.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
+                LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID
+                ORDER BY a.jury_member_id, a.candidate_id, a.assigned_at DESC
+            ");
+            
+            // Check for database errors
+            if ($wpdb->last_error) {
+                MT_Logger::database_error('SELECT', 'mt_jury_assignments', $wpdb->last_error);
+                wp_die(__('Export failed: Database error occurred.', 'mobility-trailblazers'));
+            }
+            
+            if (empty($assignments)) {
+                MT_Logger::warning('No assignments found for export');
+            }
+            
+            // Set headers for download
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename=assignments-' . date('Y-m-d') . '.csv');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+            
+            // Remove BOM - causes parsing issues
+            
+            // Open output stream with error checking
+            $output = fopen('php://output', 'w');
+            if ($output === false) {
+                MT_Logger::error('Failed to open output stream for assignments export');
+                wp_die(__('Export failed: Unable to create output file.', 'mobility-trailblazers'));
+            }
         
         // Write headers
         fputcsv($output, [
@@ -282,11 +364,25 @@ class MT_Import_Export {
                 $assignment->jury_member ?: 'Unknown',
                 $assignment->candidate_name ?: 'Unknown',
                 $assignment->status ?: 'pending',
-                $assignment->assigned_at ?: $assignment->created_at
+                self::format_date_iso8601($assignment->assigned_at ?: $assignment->created_at)
             ]);
         }
         
-        fclose($output);
+            fclose($output);
+            
+            MT_Logger::info('Assignments export completed successfully', [
+                'count' => count($assignments),
+                'user_id' => get_current_user_id()
+            ]);
+            
+        } catch (Exception $e) {
+            MT_Logger::error('Assignments export failed', [
+                'error' => $e->getMessage(),
+                'user_id' => get_current_user_id()
+            ]);
+            wp_die(__('Export failed: ', 'mobility-trailblazers') . $e->getMessage());
+        }
+        
         exit;
     }
     
@@ -479,6 +575,32 @@ class MT_Import_Export {
         
         fclose($output);
         exit;
+    }
+    
+    /**
+     * Format date to ISO 8601 standard (Y-m-d H:i:s)
+     * Handles null values and various input formats
+     *
+     * @param string|null $date Date to format
+     * @return string Formatted date or empty string
+     * @since 2.5.41
+     */
+    private static function format_date_iso8601($date) {
+        if (empty($date) || $date === '0000-00-00 00:00:00') {
+            return '';
+        }
+        
+        try {
+            // Convert to DateTime object and format consistently
+            $datetime = new DateTime($date);
+            return $datetime->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            MT_Logger::warning('Date formatting failed', [
+                'input_date' => $date,
+                'error' => $e->getMessage()
+            ]);
+            return $date; // Return original if formatting fails
+        }
     }
 }
 

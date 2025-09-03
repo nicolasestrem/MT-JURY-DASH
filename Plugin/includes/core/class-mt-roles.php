@@ -109,7 +109,8 @@ class MT_Roles {
             
             // Custom capabilities
             'mt_view_all_evaluations',
-            'mt_view_reports'
+            'mt_view_reports',
+            'mt_export_data'  // CRITICAL FIX: Add export capability for editors
         ];
         
         $editor_role = get_role('editor');
