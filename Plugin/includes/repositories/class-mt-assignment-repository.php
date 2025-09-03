@@ -73,45 +73,34 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         
         $args = wp_parse_args($args, $defaults);
         
-        // Check if assigned_at column exists, if not use id for ordering
-        $columns = $wpdb->get_col("SHOW COLUMNS FROM {$this->table_name}");
-        if ($args['orderby'] === 'assigned_at' && !in_array('assigned_at', $columns)) {
-            $args['orderby'] = 'id';
-        }
-        
-        // Build query
-        $where_clauses = ['1=1'];
-        $values = [];
-        
+        $sql = "SELECT * FROM {$this->table_name}";
+        $params = [];
+
+        $where = ['1=1'];
         if ($args['jury_member_id'] !== null) {
-            $where_clauses[] = 'jury_member_id = %d';
-            $values[] = $args['jury_member_id'];
+            $where[] = 'jury_member_id = %d';
+            $params[] = $args['jury_member_id'];
         }
-        
         if ($args['candidate_id'] !== null) {
-            $where_clauses[] = 'candidate_id = %d';
-            $values[] = $args['candidate_id'];
+            $where[] = 'candidate_id = %d';
+            $params[] = $args['candidate_id'];
         }
-        
-        $where = implode(' AND ', $where_clauses);
-        $orderby = sprintf('%s %s', 
-            esc_sql($args['orderby']), 
-            esc_sql($args['order'])
-        );
-        
-        $query = "SELECT * FROM {$this->table_name} WHERE {$where} ORDER BY {$orderby}";
-        
+
+        $sql .= " WHERE " . implode(' AND ', $where);
+
+        $allowed_orderby = ['id', 'jury_member_id', 'candidate_id', 'assigned_at'];
+        if (in_array($args['orderby'], $allowed_orderby, true)) {
+            $order = strtoupper($args['order']) === 'DESC' ? 'DESC' : 'ASC';
+            $sql .= " ORDER BY " . esc_sql($args['orderby']) . " {$order}";
+        }
+
         if ($args['limit'] > 0) {
-            $query .= " LIMIT %d OFFSET %d";
-            $values[] = $args['limit'];
-            $values[] = $args['offset'];
+            $sql .= " LIMIT %d OFFSET %d";
+            $params[] = $args['limit'];
+            $params[] = $args['offset'];
         }
-        
-        if (!empty($values)) {
-            $query = $wpdb->prepare($query, $values);
-        }
-        
-        return $wpdb->get_results($query);
+
+        return $wpdb->get_results($wpdb->prepare($sql, $params));
     }
     
     /**
@@ -460,29 +449,17 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         ];
         
         // Total assignments
-        $stats['total_assignments'] = $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->table_name}"
-        );
+        $stats['total_assignments'] = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}");
         
         // Unique assigned candidates
-        $stats['assigned_candidates'] = $wpdb->get_var(
-            "SELECT COUNT(DISTINCT candidate_id) FROM {$this->table_name}"
-        );
+        $stats['assigned_candidates'] = $wpdb->get_var("SELECT COUNT(DISTINCT candidate_id) FROM {$this->table_name}");
         
         // Unique assigned jury members
-        $stats['assigned_jury_members'] = $wpdb->get_var(
-            "SELECT COUNT(DISTINCT jury_member_id) FROM {$this->table_name}"
-        );
+        $stats['assigned_jury_members'] = $wpdb->get_var("SELECT COUNT(DISTINCT jury_member_id) FROM {$this->table_name}");
         
         // Assignments per jury member
         $per_jury = $wpdb->get_results(
-            "SELECT 
-                j.post_title as jury_member_name,
-                COUNT(a.id) as assignment_count
-             FROM {$this->table_name} a
-             INNER JOIN {$wpdb->posts} j ON a.jury_member_id = j.ID
-             GROUP BY a.jury_member_id
-             ORDER BY assignment_count DESC"
+            "SELECT j.post_title as jury_member_name, COUNT(a.id) as assignment_count FROM {$this->table_name} a INNER JOIN {$wpdb->posts} j ON a.jury_member_id = j.ID GROUP BY a.jury_member_id ORDER BY assignment_count DESC"
         );
         
         foreach ($per_jury as $jury) {
@@ -507,15 +484,10 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         global $wpdb;
         
         return $wpdb->get_results(
-            "SELECT ID, post_title 
-             FROM {$wpdb->posts} 
-             WHERE post_type = 'mt_candidate' 
-               AND post_status = 'publish'
-               AND ID NOT IN (
-                   SELECT DISTINCT candidate_id 
-                   FROM {$this->table_name}
-               )
-             ORDER BY post_title ASC"
+            $wpdb->prepare(
+                "SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND ID NOT IN (SELECT DISTINCT candidate_id FROM {$this->table_name}) ORDER BY post_title ASC",
+                'mt_candidate', 'publish'
+            )
         );
     }
     
@@ -539,7 +511,7 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         
         // Use TRUNCATE for better performance and to reset auto-increment
         // TRUNCATE is safe here as we're intentionally removing all data
-        $result = $wpdb->query("TRUNCATE TABLE {$this->table_name}");
+        $result = $wpdb->query("TRUNCATE TABLE `{$this->table_name}`");
         
         // TRUNCATE returns 0 on success, false on failure
         // DELETE returns number of rows affected or false on failure
@@ -549,9 +521,7 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
             $this->clear_all_assignment_caches();
             
             // Clear ALL transients that might contain assignment/evaluation data
-            $wpdb->query("DELETE FROM {$wpdb->options} 
-                         WHERE option_name LIKE '_transient_mt_%' 
-                         OR option_name LIKE '_transient_timeout_mt_%'");
+            $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", '\_transient\_mt\_%', '\_transient\_timeout\_mt\_%'));
             
             // Log the action
             MT_Logger::info('Cleared all assignments', [
@@ -590,10 +560,7 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         delete_transient('mt_assignment_statistics');
         
         // Clear all jury member caches
-        $query = "DELETE FROM {$wpdb->options} 
-                  WHERE option_name LIKE '_transient_mt_jury_assignments_%' 
-                  OR option_name LIKE '_transient_timeout_mt_jury_assignments_%'";
-        $wpdb->query($query);
+        $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", '\_transient\_mt\_jury\_assignments\_%', '\_transient\_timeout\_mt\_jury\_assignments\_%'));
     }
     
     /**
@@ -612,28 +579,22 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         
         $args = wp_parse_args($args, $defaults);
         
-        // Build query
-        $where_clauses = ['1=1'];
-        $values = [];
-        
+        $sql = "SELECT COUNT(*) FROM {$this->table_name}";
+        $params = [];
+
+        $where = ['1=1'];
         if ($args['jury_member_id'] !== null) {
-            $where_clauses[] = 'jury_member_id = %d';
-            $values[] = $args['jury_member_id'];
+            $where[] = 'jury_member_id = %d';
+            $params[] = $args['jury_member_id'];
         }
-        
         if ($args['candidate_id'] !== null) {
-            $where_clauses[] = 'candidate_id = %d';
-            $values[] = $args['candidate_id'];
+            $where[] = 'candidate_id = %d';
+            $params[] = $args['candidate_id'];
         }
-        
-        $where = implode(' AND ', $where_clauses);
-        $query = "SELECT COUNT(*) FROM {$this->table_name} WHERE {$where}";
-        
-        if (!empty($values)) {
-            $query = $wpdb->prepare($query, $values);
-        }
-        
-        return (int) $wpdb->get_var($query);
+
+        $sql .= " WHERE " . implode(' AND ', $where);
+
+        return (int) $wpdb->get_var($wpdb->prepare($sql, $params));
     }
     
     /**
@@ -652,31 +613,29 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         ];
         
         // Remove assignments for non-existent candidates
-        $orphaned_candidates = $wpdb->query("
-            DELETE a FROM {$this->table_name} a
-            LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID
-            WHERE p.ID IS NULL OR p.post_type != 'mt_candidate'
-        ");
-        $cleaned['orphaned_candidates'] = $orphaned_candidates;
+        $cleaned['orphaned_candidates'] = $wpdb->query(
+            $wpdb->prepare(
+                "DELETE a FROM {$this->table_name} a LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID WHERE p.ID IS NULL OR p.post_type != %s",
+                'mt_candidate'
+            )
+        );
         
         // Remove assignments for non-existent jury members
-        $orphaned_jury = $wpdb->query("
-            DELETE a FROM {$this->table_name} a
-            LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID
-            WHERE u.ID IS NULL
-        ");
-        $cleaned['orphaned_jury_members'] = $orphaned_jury;
+        $cleaned['orphaned_jury_members'] = $wpdb->query(
+            $wpdb->prepare(
+                "DELETE a FROM {$this->table_name} a LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID WHERE u.ID IS NULL"
+            )
+        );
         
         // Fix missing assigned_by values (set to admin user)
         $admin = get_users(['role' => 'administrator', 'number' => 1]);
         if (!empty($admin)) {
             $admin_id = $admin[0]->ID;
-            $missing_assigned_by = $wpdb->query($wpdb->prepare("
+            $cleaned['missing_assigned_by'] = $wpdb->query($wpdb->prepare("
                 UPDATE {$this->table_name}
                 SET assigned_by = %d
                 WHERE assigned_by IS NULL OR assigned_by = 0
             ", $admin_id));
-            $cleaned['missing_assigned_by'] = $missing_assigned_by;
         }
         
         // Clear all assignment caches
@@ -702,48 +661,27 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         $issues = [];
         
         // Check for orphaned candidates
-        $orphaned_candidates = $wpdb->get_var("
-            SELECT COUNT(*) FROM {$this->table_name} a
-            LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID
-            WHERE p.ID IS NULL OR p.post_type != 'mt_candidate'
-        ");
-        if ($orphaned_candidates > 0) {
-            $issues['orphaned_candidates'] = $orphaned_candidates;
-        }
+        $issues['orphaned_candidates'] = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$this->table_name} a LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID WHERE p.ID IS NULL OR p.post_type != %s",
+                'mt_candidate'
+            )
+        );
         
         // Check for orphaned jury members
-        $orphaned_jury = $wpdb->get_var("
-            SELECT COUNT(*) FROM {$this->table_name} a
-            LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID
-            WHERE u.ID IS NULL
-        ");
-        if ($orphaned_jury > 0) {
-            $issues['orphaned_jury_members'] = $orphaned_jury;
-        }
+        $issues['orphaned_jury_members'] = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$this->table_name} a LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID WHERE u.ID IS NULL"
+            )
+        );
         
         // Check for missing assigned_by
-        $missing_assigned_by = $wpdb->get_var("
-            SELECT COUNT(*) FROM {$this->table_name}
-            WHERE assigned_by IS NULL OR assigned_by = 0
-        ");
-        if ($missing_assigned_by > 0) {
-            $issues['missing_assigned_by'] = $missing_assigned_by;
-        }
+        $issues['missing_assigned_by'] = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name} WHERE assigned_by IS NULL OR assigned_by = 0");
         
         // Check for duplicate assignments
-        $duplicates = $wpdb->get_var("
-            SELECT COUNT(*) FROM (
-                SELECT jury_member_id, candidate_id, COUNT(*) as cnt
-                FROM {$this->table_name}
-                GROUP BY jury_member_id, candidate_id
-                HAVING cnt > 1
-            ) as duplicates
-        ");
-        if ($duplicates > 0) {
-            $issues['duplicate_assignments'] = $duplicates;
-        }
+        $issues['duplicate_assignments'] = $wpdb->get_var("SELECT COUNT(*) FROM (SELECT COUNT(*) as cnt FROM {$this->table_name} GROUP BY jury_member_id, candidate_id HAVING cnt > 1) as duplicates");
         
-        return $issues;
+        return array_filter($issues);
     }
     
     /**
@@ -885,14 +823,7 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
         
         try {
             // Get assignment counts per jury member
-            $assignment_counts = $wpdb->get_results("
-                SELECT 
-                    jury_member_id,
-                    COUNT(*) as assignment_count
-                FROM {$this->table_name}
-                GROUP BY jury_member_id
-                ORDER BY assignment_count DESC
-            ");
+            $assignment_counts = $wpdb->get_results("SELECT jury_member_id, COUNT(*) as assignment_count FROM {$this->table_name} GROUP BY jury_member_id ORDER BY assignment_count DESC");
             
             if (empty($assignment_counts)) {
                 $results['errors'][] = 'No assignments found to rebalance';
@@ -921,12 +852,7 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
                 $excess = $over->assignment_count - $target_per_jury;
                 
                 // Get some assignments from this jury member
-                $assignments_to_move = $wpdb->get_results($wpdb->prepare("
-                    SELECT * FROM {$this->table_name}
-                    WHERE jury_member_id = %d
-                    ORDER BY id ASC
-                    LIMIT %d
-                ", $over->jury_member_id, $excess));
+                $assignments_to_move = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$this->table_name} WHERE jury_member_id = %d ORDER BY id ASC LIMIT %d", $over->jury_member_id, $excess));
                 
                 foreach ($assignments_to_move as $assignment) {
                     // Find an underloaded jury member
@@ -963,7 +889,7 @@ class MT_Assignment_Repository implements MT_Assignment_Repository_Interface {
             
             MT_Logger::info('Assignment rebalancing completed', $results);
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $results['errors'][] = $e->getMessage();
             MT_Logger::error('Assignment rebalancing failed', ['error' => $e->getMessage()]);
         }
