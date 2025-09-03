@@ -565,9 +565,34 @@ class MT_Candidate_Columns {
      */
     public function handle_bulk_actions($redirect_to, $doaction, $post_ids) {
         if ($doaction === 'mt_export') {
-            // Redirect to MT_Import_Export handler
+            // Validate post IDs are integers and not empty
+            if (empty($post_ids)) {
+                // Redirect back with error message
+                return add_query_arg([
+                    'mt_bulk_action' => 'export_error',
+                    'error' => urlencode(__('No candidates selected for export.', 'mobility-trailblazers'))
+                ], $redirect_to);
+            }
+            
+            // Sanitize post IDs to ensure they are integers
+            $post_ids = array_map('intval', $post_ids);
+            $post_ids = array_filter($post_ids, function($id) { return $id > 0; });
+            
+            if (empty($post_ids)) {
+                // Redirect back with error message
+                return add_query_arg([
+                    'mt_bulk_action' => 'export_error',
+                    'error' => urlencode(__('Invalid candidate selection for export.', 'mobility-trailblazers'))
+                ], $redirect_to);
+            }
+            
+            // Store selected IDs in a transient for security (expires in 5 minutes)
+            $transient_key = 'mt_export_candidates_' . get_current_user_id() . '_' . wp_generate_password(8, false);
+            set_transient($transient_key, $post_ids, 300); // 5 minutes expiry
+            
+            // Redirect to MT_Import_Export handler with transient key
             wp_redirect(wp_nonce_url(
-                admin_url('admin-post.php?action=mt_export_candidates'),
+                admin_url('admin-post.php?action=mt_export_candidates&export_key=' . $transient_key),
                 'mt_export_candidates'
             ));
             exit;
@@ -812,6 +837,9 @@ class MT_Candidate_Columns {
                     $updated
                 );
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html($message) . '</p></div>';
+            } elseif ($_GET['mt_bulk_action'] === 'export_error') {
+                $error = isset($_GET['error']) ? urldecode($_GET['error']) : __('An error occurred during export.', 'mobility-trailblazers');
+                echo '<div class="notice notice-error is-dismissible"><p>' . esc_html($error) . '</p></div>';
             }
         }
     }
