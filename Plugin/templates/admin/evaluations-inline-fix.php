@@ -61,33 +61,33 @@ jQuery(document).ready(function($) {
                     boxShadow: '0 5px 20px rgba(0,0,0,0.3)'
                 },
                 html: `
-                    <h2 style="margin-top:0;">Evaluation Details #${data.id}</h2>
+                    <h2 style="margin-top:0;"><?php echo esc_js(__('Evaluation Details', 'mobility-trailblazers')); ?> #${data.id}</h2>
                     <table class="widefat striped">
                         <tr>
-                            <th style="width:30%;">Jury Member:</th>
+                            <th style="width:30%;"><?php echo esc_js(__('Jury Member', 'mobility-trailblazers')); ?>:</th>
                             <td>${data.juryLink ? '<a href="'+data.juryLink+'" target="_blank">'+data.jury+'</a>' : data.jury}</td>
                         </tr>
                         <tr>
-                            <th>Candidate:</th>
+                            <th><?php echo esc_js(__('Candidate', 'mobility-trailblazers')); ?>:</th>
                             <td>${data.candidateLink ? '<a href="'+data.candidateLink+'" target="_blank">'+data.candidate+'</a>' : data.candidate}</td>
                         </tr>
                         <tr>
-                            <th>Total Score:</th>
+                            <th><?php echo esc_js(__('Total Score', 'mobility-trailblazers')); ?>:</th>
                             <td><strong>${data.score}</strong></td>
                         </tr>
                         <tr>
-                            <th>Status:</th>
+                            <th><?php echo esc_js(__('Status', 'mobility-trailblazers')); ?>:</th>
                             <td>${data.status}</td>
                         </tr>
                         <tr>
-                            <th>Date:</th>
+                            <th><?php echo esc_js(__('Date', 'mobility-trailblazers')); ?>:</th>
                             <td>${data.date}</td>
                         </tr>
                     </table>
                     <div style="margin-top:20px;text-align:right;">
-                        <button class="button button-primary mt-close-modal">Close</button>
-                        ${data.candidateLink ? '<a href="'+data.candidateLink+'" class="button" target="_blank" style="margin-left:10px;">View Candidate</a>' : ''}
-                        <button class="button button-link-delete mt-delete-eval" data-id="${data.id}" style="margin-left:10px;">Delete</button>
+                        <button class="button button-primary mt-close-modal"><?php echo esc_js(__('Close', 'mobility-trailblazers')); ?></button>
+                        ${data.candidateLink ? '<a href="'+data.candidateLink+'" class="button" target="_blank" style="margin-left:10px;"><?php echo esc_js(__('View Candidate', 'mobility-trailblazers')); ?></a>' : ''}
+                        <button class="button button-link-delete mt-delete-eval" data-id="${data.id}" style="margin-left:10px;"><?php echo esc_js(__('Delete', 'mobility-trailblazers')); ?></button>
                     </div>
                 `
             });
@@ -106,7 +106,7 @@ jQuery(document).ready(function($) {
             
             // Delete handler
             $('.mt-delete-eval').on('click', function() {
-                if (confirm('Delete this evaluation?')) {
+                if (confirm('<?php echo esc_js(__('Delete this evaluation?', 'mobility-trailblazers')); ?>')) {
                     // Try to get nonce
                     var nonce = '';
                     if (window.ajaxurl && $('#_wpnonce').length) {
@@ -117,7 +117,7 @@ jQuery(document).ready(function($) {
                         window.location.href = 'admin.php?page=mt-evaluations&action=delete&id=' + $(this).data('id') + '&_wpnonce=' + nonce;
                     } else {
                         // Direct database approach via AJAX
-                        alert('To delete this evaluation, use phpMyAdmin with this query:\n\nDELETE FROM wp_mt_evaluations WHERE id = ' + $(this).data('id'));
+                        alert('<?php echo esc_js(__('To delete this evaluation, use phpMyAdmin with this query:', 'mobility-trailblazers')); ?>\n\nDELETE FROM wp_mt_evaluations WHERE id = ' + $(this).data('id'));
                     }
                 }
             });
@@ -135,6 +135,6 @@ jQuery(document).ready(function($) {
     // Initialize
     initEvaluationDetails();
     
-    console.log('Evaluation Details Fix Active');
+    console.log('<?php echo esc_js(__('Evaluation Details Fix Active', 'mobility-trailblazers')); ?>');
 });
 </script>

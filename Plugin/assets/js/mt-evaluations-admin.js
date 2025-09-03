@@ -310,13 +310,13 @@
                             });
                         
                         // Show success message
-                        self.showNotice(response.data.message || 'Evaluation deleted successfully', 'success');
+                        self.showNotice(response.data.message || (mt_evaluations_i18n.evaluation_deleted || 'Evaluation deleted successfully'), 'success');
                     } else {
-                        alert(response.data || 'Failed to delete evaluation');
+                        alert(response.data || (mt_evaluations_i18n.failed_delete || 'Failed to delete evaluation'));
                     }
                 },
                 error: function() {
-                    alert('Error deleting evaluation');
+                    alert(mt_evaluations_i18n.error_deleting || 'Error deleting evaluation');
                 }
             });
         },
@@ -341,11 +341,11 @@
                         // Reload page to show updated data
                         location.reload();
                     } else {
-                        alert(response.data || 'Failed to perform bulk action');
+                        alert(response.data || (mt_evaluations_i18n.failed_bulk || 'Failed to perform bulk action'));
                     }
                 },
                 error: function() {
-                    alert('Error performing bulk action');
+                    alert(mt_evaluations_i18n.error_bulk || 'Error performing bulk action');
                 }
             });
         },

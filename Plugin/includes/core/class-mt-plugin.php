@@ -874,7 +874,9 @@ class MT_Plugin {
                     'updated' => __('updated', 'mobility-trailblazers'),
                     'skipped' => __('skipped', 'mobility-trailblazers'),
                     'errors' => __('errors', 'mobility-trailblazers'),
-                    'error_details' => __('Error details:', 'mobility-trailblazers')
+                    'error_details' => __('Error details:', 'mobility-trailblazers'),
+                    'import_not_initialized' => __('Import functionality is not properly initialized. Please refresh the page and try again.', 'mobility-trailblazers'),
+                    'excel_to_csv_message' => __('Please convert your Excel file to CSV format first. Use "Save As" in Excel and choose "CSV (Comma delimited)" as the file type.', 'mobility-trailblazers')
                 ]
             ]);
         }

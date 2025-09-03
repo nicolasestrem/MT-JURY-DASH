@@ -91,8 +91,8 @@ if (isset($_POST['action']) && isset($_POST['_wpnonce']) && wp_verify_nonce($_PO
     ?>
     <table style="border-collapse: collapse; margin: 10px 0;">
         <tr style="background: #ddd;">
-            <th style="padding: 5px; border: 1px solid #999;">Jury Member ID</th>
-            <th style="padding: 5px; border: 1px solid #999;">Assignments Count</th>
+            <th style="padding: 5px; border: 1px solid #999;"><?php _e('Jury Member ID', 'mobility-trailblazers'); ?></th>
+            <th style="padding: 5px; border: 1px solid #999;"><?php _e('Assignments Count', 'mobility-trailblazers'); ?></th>
         </tr>
         <?php foreach ($distribution as $jury_id => $count) : ?>
         <tr>
@@ -105,8 +105,8 @@ if (isset($_POST['action']) && isset($_POST['_wpnonce']) && wp_verify_nonce($_PO
     <p>Average per Jury: <?php echo $distribution ? round(array_sum($distribution) / count($distribution), 2) : 0; ?></p>
     <p>Min/Max: <?php echo $distribution ? min($distribution) . '/' . max($distribution) : 'N/A'; ?></p>
     
-    <button onclick="testAjax()">Test AJAX</button>
-    <button onclick="testDistribution()">Test Distribution Algorithm</button>
+    <button onclick="testAjax()"><?php _e('Test AJAX', 'mobility-trailblazers'); ?></button>
+    <button onclick="testDistribution()"><?php _e('Test Distribution Algorithm', 'mobility-trailblazers'); ?></button>
 </div>
 <?php endif; ?>
 

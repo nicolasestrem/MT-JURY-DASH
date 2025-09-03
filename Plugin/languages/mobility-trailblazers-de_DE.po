@@ -1403,3 +1403,59 @@ msgstr "Behandelt kritische Aspekte der Verkehrswende und zukünftige Mobilität
 
 msgid "Serves as an inspiring example and actively promotes sustainable mobility solutions"
 msgstr "Dient als inspirierendes Beispiel und fördert aktiv nachhaltige Mobilitätslösungen"
+
+# New Admin Template Translations
+msgid "Jury Member ID"
+msgstr "Jurymitglied-ID"
+
+msgid "Assignments Count"
+msgstr "Anzahl Zuweisungen"
+
+msgid "Test AJAX"
+msgstr "AJAX testen"
+
+msgid "Test Distribution Algorithm"
+msgstr "Verteilungsalgorithmus testen"
+
+msgid "Jury Member"
+msgstr "Jurymitglied"
+
+msgid "Total Score"
+msgstr "Gesamtpunktzahl"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Delete this evaluation?"
+msgstr "Diese Bewertung löschen?"
+
+msgid "To delete this evaluation, use phpMyAdmin with this query:"
+msgstr "Um diese Bewertung zu löschen, verwenden Sie phpMyAdmin mit dieser Abfrage:"
+
+msgid "Evaluation Details Fix Active"
+msgstr "Bewertungsdetails-Fix aktiv"
+
+# New JavaScript Localization Strings
+msgid "Evaluation deleted successfully"
+msgstr "Bewertung erfolgreich gelöscht"
+
+msgid "Failed to delete evaluation"
+msgstr "Bewertung konnte nicht gelöscht werden"
+
+msgid "Error deleting evaluation"
+msgstr "Fehler beim Löschen der Bewertung"
+
+msgid "Failed to perform bulk action"
+msgstr "Massenaktion konnte nicht ausgeführt werden"
+
+msgid "Error performing bulk action"
+msgstr "Fehler beim Ausführen der Massenaktion"
+
+msgid "Please select at least one evaluation."
+msgstr "Bitte wählen Sie mindestens eine Bewertung aus."
+
+msgid "Import functionality is not properly initialized. Please refresh the page and try again."
+msgstr "Die Importfunktion ist nicht richtig initialisiert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut."
+
+msgid "Please convert your Excel file to CSV format first. Use \"Save As\" in Excel and choose \"CSV (Comma delimited)\" as the file type."
+msgstr "Bitte konvertieren Sie Ihre Excel-Datei zuerst in das CSV-Format. Verwenden Sie \"Speichern unter\" in Excel und wählen Sie \"CSV (Kommagetrennt)\" als Dateityp."

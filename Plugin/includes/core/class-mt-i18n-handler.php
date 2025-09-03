@@ -149,7 +149,13 @@ class MT_I18n_Handler {
             'confirm_bulk_delete' => __('Are you sure you want to delete the selected evaluations?', 'mobility-trailblazers'),
             'select_action' => __('Please select a bulk action', 'mobility-trailblazers'),
             'select_items' => __('Please select at least one evaluation', 'mobility-trailblazers'),
-            'error' => __('An error occurred. Please try again.', 'mobility-trailblazers')
+            'error' => __('An error occurred. Please try again.', 'mobility-trailblazers'),
+            'evaluation_deleted' => __('Evaluation deleted successfully', 'mobility-trailblazers'),
+            'failed_delete' => __('Failed to delete evaluation', 'mobility-trailblazers'),
+            'error_deleting' => __('Error deleting evaluation', 'mobility-trailblazers'),
+            'failed_bulk' => __('Failed to perform bulk action', 'mobility-trailblazers'),
+            'error_bulk' => __('Error performing bulk action', 'mobility-trailblazers'),
+            'no_selection' => __('Please select at least one evaluation.', 'mobility-trailblazers')
         ];
     }
     
