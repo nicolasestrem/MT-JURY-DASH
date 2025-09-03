@@ -87,7 +87,15 @@ class MT_Migration_Admin {
         }
 
         $count = 0;
+        $skipped = 0;
         foreach ($posts as $post) {
+            // Check if the candidate already exists in the new table
+            $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$table_name} WHERE post_id = %d", $post->ID));
+            if ($exists) {
+                $skipped++;
+                continue;
+            }
+
             $candidate_data = [
                 'post_id' => $post->ID,
                 'slug' => $post->post_name,
