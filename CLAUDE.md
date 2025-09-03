@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 **Mobility Trailblazers WordPress Plugin v2.5.41** - Enterprise award management platform for DACH mobility innovators. 50 candidates, 24 jury members, complete evaluation system with 5-criteria scoring.
 
 **URLs:** Production: https://mobilitytrailblazers.de/vote/ | Staging: http://localhost:8080/  
@@ -49,6 +51,74 @@ git checkout develop && git pull && git checkout -b feature/name
 git commit -m "type(scope): description"
 git push origin feature/name
 # Create PR → merge to develop → test → merge to main
+```
+
+## Common Development Commands
+
+### Building & Minification
+```bash
+# Build all assets (CSS & JS)
+npm run build
+
+# Build only CSS
+npm run build:css  
+
+# Build only JS
+npm run build:js
+
+# Clean build (remove all minified files, then rebuild)
+npm run build:clean && npm run build:prod
+```
+
+### Testing
+```bash
+# Run all Playwright E2E tests
+npx playwright test
+
+# Run tests with UI mode (interactive)
+npx playwright test --ui
+
+# Run specific test file or grep pattern
+npx playwright test --grep="evaluation"
+
+# Run tests with headed browser (see the browser)
+npx playwright test --headed
+
+# Run tests for specific project (admin, jury-member, mobile)
+npx playwright test --project=admin
+```
+
+### Localization & Translation
+```bash
+# Analyze German translations
+npm run i18n:analyze
+
+# Extract translatable strings
+npm run i18n:extract
+
+# Compile translation files
+npm run i18n:compile
+
+# Validate translation deployment
+npm run i18n:validate
+
+# Full i18n check
+npm run i18n:check
+```
+
+### Database & WordPress CLI
+```bash
+# Flush WordPress cache
+wp cache flush
+
+# Check custom tables
+wp db query "SHOW TABLES LIKE 'wp_mt_%'"
+
+# Rewrite rules flush (fixes 404 errors)
+wp rewrite flush
+
+# Import candidates from CSV
+wp mt import-candidates --file=candidates.csv
 ```
 
 ## Pre-Commit Requirements (Run Before EVERY Commit)
@@ -148,7 +218,9 @@ var_dump($data); console.log(data);
 | **CSS not loading** | CSS fixes not prioritized - use JavaScript workarounds if critical |
 | **AJAX failing** | Check nonce: `wp_create_nonce('mt_admin_ajax')` |
 
-## Architecture
+## Architecture Overview
+
+This WordPress plugin follows a modern service-oriented architecture with dependency injection, making it testable and maintainable while remaining compatible with WordPress patterns.
 
 ### Core Patterns
 - **Dependency Injection Container:** `MT_Container` manages service lifecycle
@@ -159,18 +231,22 @@ var_dump($data); console.log(data);
 - **Legacy Facade:** `mt_get_repository()`, `mt_get_service()` for backward compatibility
 
 ### Key Directories
-- `includes/core/` - Container, Plugin class, Service Provider base
-- `includes/providers/` - Service provider implementations  
-- `includes/interfaces/` - Service and repository interfaces
-- `includes/repositories/` - Data access layer (interface-based)
-- `includes/services/` - Business logic layer (DI-enabled)
-- `includes/ajax/` - AJAX handlers with base validation class
-- `includes/admin/` - Admin interfaces and columns
-- `includes/widgets/` - Dashboard widgets
-- `includes/legacy/` - Backward compatibility layer
+- `Plugin/` - Main plugin directory containing all PHP code
+- `Plugin/includes/core/` - Container, Plugin class, Service Provider base
+- `Plugin/includes/providers/` - Service provider implementations  
+- `Plugin/includes/interfaces/` - Service and repository interfaces
+- `Plugin/includes/repositories/` - Data access layer (interface-based)
+- `Plugin/includes/services/` - Business logic layer (DI-enabled)
+- `Plugin/includes/ajax/` - AJAX handlers with base validation class
+- `Plugin/includes/admin/` - Admin interfaces and columns
+- `Plugin/includes/widgets/` - Dashboard widgets
+- `Plugin/includes/legacy/` - Backward compatibility layer
+- `Plugin/includes/elementor/` - Elementor widget integrations
+- `Plugin/includes/fixes/` - Targeted bug fixes and patches
 - `assets/css/` - CSS files (v4 rollout on hold - editing allowed but not prioritized)
-- `templates/` - PHP templates (admin/, frontend/)
-- `tests/` - Consolidated test files (8 files, was 23)
+- `Plugin/templates/` - PHP templates (admin/, frontend/)
+- `scripts/` - Build and utility scripts
+- `docs/` - Documentation files
 
 ## Deployment
 
@@ -200,12 +276,11 @@ wp cache flush
 ## Critical Files & Components
 
 ### Core System Files
-- `mobility-trailblazers.php` - Main plugin file, bootstrap
-- `includes/core/class-mt-container.php` - DI container
-- `includes/core/class-mt-plugin.php` - Main plugin class
-- `includes/repositories/class-mt-evaluation-repository.php` - Core evaluation data
-- `includes/services/class-mt-evaluation-service.php` - Evaluation business logic
-- `assets/css/framework/mobility-trailblazers-framework-v4.css` - CSS framework (v4 rollout on hold)
+- `Plugin/mobility-trailblazers.php` - Main plugin file, bootstrap
+- `Plugin/includes/core/class-mt-container.php` - DI container  
+- `Plugin/includes/core/class-mt-plugin.php` - Main plugin class
+- `Plugin/includes/repositories/class-mt-evaluation-repository.php` - Core evaluation data
+- `Plugin/includes/services/class-mt-evaluation-service.php` - Evaluation business logic
 
 ### Database Tables
 - `wp_mt_evaluations` - 5-criteria scores (0-10, 0.5 increments)
@@ -224,6 +299,36 @@ wp cache flush
 4. **NEVER** use direct database queries - use repositories
 5. **NEVER** remove features without explicit confirmation
 6. **ALWAYS** update version in ALL locations when releasing
+
+## Key Implementation Details
+
+### Dependency Injection Container
+The plugin uses a custom lightweight DI container (`MT_Container`) that:
+- Auto-resolves dependencies through reflection
+- Supports singleton and transient bindings
+- Registers services through provider classes
+- Compatible with WordPress's global function patterns via facade methods
+
+### AJAX Handler Pattern
+All AJAX handlers extend `MT_Base_Ajax` which provides:
+- Automatic nonce verification
+- Permission checking
+- Standardized error responses
+- File upload validation
+
+### Repository Pattern
+All data access goes through repository interfaces:
+- Abstracts database queries
+- Provides testable interfaces
+- Handles caching automatically
+- Uses WordPress's `$wpdb` internally
+
+### Service Layer
+Business logic is encapsulated in service classes:
+- Injected dependencies via constructor
+- No direct database access
+- Handles validation and business rules
+- Orchestrates between repositories
 
 ---
 *v2.5.41 | Sep 2025 | WordPress 5.8+ | PHP 7.4+ (8.2+ recommended)*
