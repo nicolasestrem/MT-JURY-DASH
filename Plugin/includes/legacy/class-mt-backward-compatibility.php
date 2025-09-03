@@ -95,13 +95,5 @@ class MT_Backward_Compatibility {
         return $container->make('MobilityTrailblazers\Services\MT_Diagnostic_Service');
     }
     
-    /**
-     * Get Candidate Import Service instance
-     *
-     * @return \MobilityTrailblazers\Services\MT_Candidate_Import_Service
-     */
-    public static function get_candidate_import_service() {
-        $container = MT_Plugin::container();
-        return $container->make('MobilityTrailblazers\Services\MT_Candidate_Import_Service');
-    }
+    // Candidate Import Service has been removed
 }

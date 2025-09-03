@@ -1,1 +1,0 @@
-echo "Improve this prompt using the prompt-engineering-expert:" > .claude/commands/prompt.md

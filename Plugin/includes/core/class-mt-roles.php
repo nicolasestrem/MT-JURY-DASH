@@ -82,7 +82,6 @@ class MT_Roles {
             'mt_manage_assignments',
             'mt_manage_settings',
             'mt_export_data',
-            'mt_import_data',
             'mt_view_reports',
             'mt_jury_admin'
         ];
@@ -110,7 +109,8 @@ class MT_Roles {
             
             // Custom capabilities
             'mt_view_all_evaluations',
-            'mt_view_reports'
+            'mt_view_reports',
+            'mt_export_data'  // CRITICAL FIX: Add export capability for editors
         ];
         
         $editor_role = get_role('editor');
@@ -191,7 +191,6 @@ class MT_Roles {
             'mt_manage_assignments',
             'mt_manage_settings',
             'mt_export_data',
-            'mt_import_data',
             'mt_view_reports',
             'mt_view_assigned_candidates',
             'mt_jury_admin'
