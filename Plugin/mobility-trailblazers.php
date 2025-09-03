@@ -102,6 +102,12 @@ add_action('plugins_loaded', function() {
     
     // Initialize migration runner
     MobilityTrailblazers\Core\MT_Migration_Runner::init();
+
+    // Initialize migration admin page
+    if (is_admin()) {
+        $migration_admin = new \MobilityTrailblazers\Admin\MT_Migration_Admin();
+        $migration_admin->init();
+    }
 }, 5); // Run early with priority 5
 
 // Activation hook
