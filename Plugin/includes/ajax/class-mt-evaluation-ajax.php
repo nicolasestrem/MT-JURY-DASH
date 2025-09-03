@@ -785,38 +785,9 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
         
         MT_Logger::debug('Assignment existence check', ['assignment_exists' => $assignment_exists]);
         
-        // If assignment doesn't exist, let's check what assignments this jury member has
         if (!$assignment_exists) {
-            $jury_assignments = $assignment_repo->get_by_jury_member($jury_member->ID);
-            MT_Logger::debug('Jury member assignments check', [
-                'jury_member_id' => $jury_member->ID,
-                'total_assignments' => count($jury_assignments),
-                'assigned_candidate_ids' => array_map(function($assignment) {
-                    return $assignment->candidate_id;
-                }, $jury_assignments)
-            ]);
-            
-            // Check if user has special permissions that allow evaluating any candidate
-            $can_evaluate_all = current_user_can('administrator') || current_user_can('mt_manage_evaluations');
-            
-            // For table views from admin or managers, allow evaluation without assignment
-            $is_table_view = isset($_POST['context']) && $_POST['context'] === 'table';
-            
-            // Even administrators must have proper assignments for security
-            if (!$assignment_exists) {
-                if ($can_evaluate_all) {
-                    // Log this for audit purposes
-                    MT_Logger::warning('Admin/Manager evaluating without assignment', [
-                        'jury_member_id' => $jury_member->ID,
-                        'candidate_id' => $candidate_id
-                    ]);
-                    // For now, allow admins but this should be reviewed
-                    MT_Logger::info('Legacy behavior: allowing evaluation for admin/manager without assignment');
-                } else {
-                    $this->error(__('You are not assigned to evaluate this candidate', 'mobility-trailblazers'));
-                    return;
-                }
-            }
+            $this->error(__('You are not assigned to evaluate this candidate', 'mobility-trailblazers'));
+            return;
         }
         
         // Get existing evaluation if any
