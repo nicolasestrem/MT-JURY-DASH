@@ -13,6 +13,13 @@ The primary goal of this phase was to eliminate the dual data storage for candid
   - This script provides the `wp mt migrate_candidates` command to migrate all candidate data from the `mt_candidate` CPT (`wp_posts` and `wp_postmeta` tables) to the `wp_mt_candidates` custom table.
   - The script includes a `--dry-run` flag to allow for safe testing before performing the actual migration.
 
+- **Admin UI for Migration:**
+  - For users without WP-CLI access, a temporary admin page has been added under **Mobility Trailblazers -> Data Migration**.
+  - This UI allows triggering the migration process with a button, including a dry-run option.
+  - **Fixes to Admin UI:**
+    - Corrected the redirect URL after migration to ensure proper page display (`admin.php` instead of `tools.php`).
+    - Implemented a check to prevent duplicate entries during migration, making the process idempotent and safe to re-run. Existing candidates in the `wp_mt_candidates` table will be skipped.
+
 - **Data Access Refactoring:**
   - The `export_candidates()` method in `Plugin/includes/admin/class-mt-import-export.php` has been refactored.
   - It no longer uses `get_posts` or `get_post_meta` to fetch candidate data. Instead, it now uses the `MT_Candidate_Repository` to fetch data directly from the `wp_mt_candidates` custom table.
@@ -35,3 +42,14 @@ This task aimed to remove non-standard i18n practices.
 
 - **Fixed Non-Translatable String:**
   - The hardcoded `error_log` message in `Plugin/uninstall.php` has been wrapped in a `__()` function to make it translatable.
+
+## General Code Quality Improvements
+
+### Fixes for `wpdb::prepare` Incorrect Usage:
+
+- Addressed instances where `wpdb::prepare()` was incorrectly used with static SQL queries (queries without dynamic placeholders).
+- These calls have been replaced with direct `$wpdb->query()` or `$wpdb->get_results()` calls, as `prepare` is only necessary when sanitizing dynamic input within a query.
+- **Affected Files:**
+  - `Plugin/includes/admin/class-mt-maintenance-tools.php`
+  - `Plugin/includes/repositories/class-mt-candidate-repository.php` (initial fixes)
+  - `Plugin/includes/repositories/class-mt-assignment-repository.php` (initial fixes)
