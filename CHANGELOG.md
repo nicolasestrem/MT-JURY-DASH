@@ -5,6 +5,47 @@ All notable changes to the Mobility Trailblazers WordPress Plugin will be docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.44] - 2025-09-03
+
+### Removed
+- **Complete Import Functionality Removal**: Entirely removed all CSV import capabilities from the plugin
+  - Deleted 11 import-related files including handlers, AJAX processors, and UI assets
+  - Removed Import Data section from admin interface
+  - Removed Download Templates section
+  - Disabled all import-related hooks and actions
+  - Removed `mt_import_data` capability from all user roles
+  - Changed admin menu from "Import/Export" to "Export Data"
+
+### Fixed
+- **CSV Export Quality Issues**: Fixed critical problems with all CSV exports
+  - Removed UTF-8 BOM that was causing parsing issues in Excel and other tools
+  - Fixed candidates export using wrong/duplicate export method with inconsistent structure
+  - Fixed evaluations export to properly fetch ALL jury members' data (was only showing one)
+  - Fixed assignments export missing status and date columns
+  - Standardized jury member naming across all exports using COALESCE
+  - Consolidated export logic into single MT_Import_Export class
+
+### Changed
+- Admin menu renamed from "Import/Export" to "Export Data"
+- Deprecated duplicate export methods in MT_Candidate_Columns class
+- Improved SQL queries in export methods to properly join user and post tables
+
+### Technical Details
+- Files Deleted (11 total):
+  - `Plugin/includes/admin/class-mt-import-handler.php`
+  - `Plugin/includes/ajax/class-mt-csv-import-ajax.php`
+  - `Plugin/includes/ajax/class-mt-import-ajax.php`
+  - `Plugin/assets/js/csv-import.js` and minified versions
+  - `Plugin/assets/css/csv-import.css` and minified versions
+  - Plus associated map files
+- Modified Files:
+  - `Plugin/includes/admin/class-mt-import-export.php` - Complete rewrite for export-only
+  - `Plugin/includes/admin/class-mt-candidate-columns.php` - Disabled duplicate export
+  - `Plugin/includes/core/class-mt-plugin.php` - Removed import file requirements
+  - `Plugin/templates/admin/import-export.php` - Removed import UI sections
+  - `Plugin/includes/admin/class-mt-admin.php` - Updated menu labels
+  - `Plugin/includes/core/class-mt-roles.php` - Removed import capability
+
 ## [2.5.43] - 2025-09-01
 
 ### Changed
