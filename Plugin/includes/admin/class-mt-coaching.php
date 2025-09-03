@@ -72,6 +72,7 @@ class MT_Coaching {
                 'reminder_sent' => __('Reminder Sent', 'mobility-trailblazers'),
                 'sending' => __('Sending reminders...', 'mobility-trailblazers'),
                 'sent' => __('Reminders sent successfully', 'mobility-trailblazers'),
+                'loading' => __('Loading...', 'mobility-trailblazers'),
                 'export_success' => __('Report exported successfully', 'mobility-trailblazers'),
                 'error' => __('An error occurred. Please try again.', 'mobility-trailblazers')
             ]

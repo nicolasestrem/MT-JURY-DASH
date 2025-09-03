@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         // Double-check mt_ajax exists
         if (typeof mt_ajax === 'undefined') {
-            alert('Import functionality is not properly initialized. Please refresh the page and try again.');
+            alert(mt_ajax && mt_ajax.i18n && mt_ajax.i18n.import_not_initialized ? mt_ajax.i18n.import_not_initialized : 'Import functionality is not properly initialized. Please refresh the page and try again.');
             return;
         }
         // Create a temporary file input
@@ -42,7 +42,7 @@ jQuery(document).ready(function($) {
             if (!fileName.endsWith('.csv')) {
                 var fileExt = fileName.split('.').pop();
                 if (fileExt === 'xlsx' || fileExt === 'xls') {
-                    alert('Please convert your Excel file to CSV format first. Use "Save As" in Excel and choose "CSV (Comma delimited)" as the file type.');
+                    alert(mt_ajax && mt_ajax.i18n && mt_ajax.i18n.excel_to_csv_message ? mt_ajax.i18n.excel_to_csv_message : 'Please convert your Excel file to CSV format first. Use "Save As" in Excel and choose "CSV (Comma delimited)" as the file type.');
                 } else {
                     alert(mt_ajax.i18n.invalid_file_type || 'Please select a CSV file.');
                 }
@@ -205,7 +205,7 @@ jQuery(document).ready(function($) {
                 if (!fileName.endsWith('.csv')) {
                     var fileExt = fileName.split('.').pop();
                     if (fileExt === 'xlsx' || fileExt === 'xls') {
-                        alert('Please convert your Excel file to CSV format first. Use "Save As" in Excel and choose "CSV (Comma delimited)" as the file type.');
+                        alert(mt_ajax && mt_ajax.i18n && mt_ajax.i18n.excel_to_csv_message ? mt_ajax.i18n.excel_to_csv_message : 'Please convert your Excel file to CSV format first. Use "Save As" in Excel and choose "CSV (Comma delimited)" as the file type.');
                     } else {
                         alert(mt_ajax.i18n.invalid_file_type || 'Please select a CSV file.');
                     }
