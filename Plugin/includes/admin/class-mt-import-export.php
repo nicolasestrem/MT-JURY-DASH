@@ -167,7 +167,7 @@ class MT_Import_Export {
                 'user_id' => get_current_user_id()
             ]);
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             MT_Logger::error('Candidates export failed', [
                 'error' => $e->getMessage(),
                 'user_id' => get_current_user_id()
@@ -276,7 +276,7 @@ class MT_Import_Export {
                 'user_id' => get_current_user_id()
             ]);
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             MT_Logger::error('Evaluations export failed', [
                 'error' => $e->getMessage(),
                 'user_id' => get_current_user_id()
@@ -312,12 +312,13 @@ class MT_Import_Export {
             // Get assignments with proper data
             $table_name = $wpdb->prefix . 'mt_jury_assignments';
             $assignments = $wpdb->get_results("
-                SELECT a.*, 
-                       c.post_title as candidate_name,
-                       COALESCE(j.post_title, u.display_name, CONCAT('User #', a.jury_member_id)) as jury_member,
-                       a.status,
+                SELECT a.id,
+                       a.jury_member_id,
+                       a.candidate_id,
                        a.assigned_at,
-                       a.created_at
+                       a.assigned_by,
+                       c.post_title as candidate_name,
+                       COALESCE(j.post_title, u.display_name, CONCAT('User #', a.jury_member_id)) as jury_member
                 FROM {$table_name} a
                 LEFT JOIN {$wpdb->posts} c ON a.candidate_id = c.ID AND c.post_type = 'mt_candidate'
                 LEFT JOIN {$wpdb->posts} j ON a.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
@@ -354,8 +355,8 @@ class MT_Import_Export {
         fputcsv($output, [
             'Jury Member',
             'Candidate',
-            'Status',
-            'Date Assigned'
+            'Date Assigned',
+            'Assigned By'
         ]);
         
         // Write data
@@ -363,8 +364,8 @@ class MT_Import_Export {
             fputcsv($output, [
                 $assignment->jury_member ?: 'Unknown',
                 $assignment->candidate_name ?: 'Unknown',
-                $assignment->status ?: 'pending',
-                self::format_date_iso8601($assignment->assigned_at ?: $assignment->created_at)
+                self::format_date_iso8601($assignment->assigned_at),
+                $assignment->assigned_by ?: ''
             ]);
         }
         
@@ -375,7 +376,7 @@ class MT_Import_Export {
                 'user_id' => get_current_user_id()
             ]);
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             MT_Logger::error('Assignments export failed', [
                 'error' => $e->getMessage(),
                 'user_id' => get_current_user_id()
@@ -592,9 +593,9 @@ class MT_Import_Export {
         
         try {
             // Convert to DateTime object and format consistently
-            $datetime = new DateTime($date);
+            $datetime = new \DateTime($date);
             return $datetime->format('Y-m-d H:i:s');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             MT_Logger::warning('Date formatting failed', [
                 'input_date' => $date,
                 'error' => $e->getMessage()
