@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
             var evaluationId = $button.data('evaluation-id');
             
             if (!evaluationId) {
-                console.error('No evaluation ID found on button');
+                // No evaluation ID found on button - silent fail
                 return;
             }
             

@@ -239,7 +239,7 @@
             }
             // Plain textarea fallback
             else {
-                console.warn('WordPress editor not available, using plain textareas');
+                // WordPress editor not available, using plain textareas
                 
                 $('#mt-edit-overview').on('input', function() {
                     self.hasUnsavedChanges = true;
