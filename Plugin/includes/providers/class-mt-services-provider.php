@@ -13,7 +13,7 @@ namespace MobilityTrailblazers\Providers;
 use MobilityTrailblazers\Core\MT_Service_Provider;
 use MobilityTrailblazers\Services\MT_Evaluation_Service;
 use MobilityTrailblazers\Services\MT_Assignment_Service;
-use MobilityTrailblazers\Services\MT_Candidate_Import_Service;
+// Import service has been removed
 use MobilityTrailblazers\Services\MT_Diagnostic_Service;
 
 // Exit if accessed directly
@@ -77,13 +77,7 @@ class MT_Services_Provider extends MT_Service_Provider {
             }
         );
         
-        // Candidate Import Service
-        $this->singleton(
-            'MobilityTrailblazers\Services\MT_Candidate_Import_Service',
-            function($container) {
-                return new MT_Candidate_Import_Service();
-            }
-        );
+        // Candidate Import Service has been removed
         
         // Diagnostic Service
         $this->singleton(

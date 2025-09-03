@@ -139,7 +139,7 @@ if (defined('WP_CLI') && WP_CLI) {
         require_once $cli_commands_file;
         
         $cli_commands = new MobilityTrailblazers\CLI\MT_CLI_Commands();
-        WP_CLI::add_command('mt import-candidates', [$cli_commands, 'import_candidates']);
+        // Import candidates command has been removed
         WP_CLI::add_command('mt db-upgrade', [$cli_commands, 'db_upgrade']);
         WP_CLI::add_command('mt list-candidates', [$cli_commands, 'list_candidates']);
     }

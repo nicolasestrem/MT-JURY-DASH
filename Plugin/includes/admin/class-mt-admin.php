@@ -95,12 +95,12 @@ class MT_Admin {
             [$this, 'render_assignments_page']
         );
         
-        // Import/Export submenu
+        // Export submenu
         add_submenu_page(
             'mobility-trailblazers',
-            __('Import/Export', 'mobility-trailblazers'),
-            __('Import/Export', 'mobility-trailblazers'),
-            'mt_import_data',
+            __('Export Data', 'mobility-trailblazers'),
+            __('Export Data', 'mobility-trailblazers'),
+            'mt_export_data',
             'mt-import-export',
             [$this, 'render_import_export_page']
         );
@@ -782,37 +782,7 @@ class MT_Admin {
             );
         }
         
-        // Candidate import script for candidates list page
-        if ($is_candidates_page) {
-            wp_enqueue_script(
-                'mt-candidate-import',
-                MT_PLUGIN_URL . 'assets/js/candidate-import.js',
-                ['jquery'],
-                MT_VERSION,
-                true
-            );
-            
-            // Localize script for import functionality
-            wp_localize_script('mt-candidate-import', 'mt_ajax', [
-                'ajax_url' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('mt_ajax_nonce'),
-                'i18n' => [
-                    'importing' => __('Importing...', 'mobility-trailblazers'),
-                    'import_complete' => __('Import complete!', 'mobility-trailblazers'),
-                    'import_failed' => __('Import failed!', 'mobility-trailblazers'),
-                    'import_error' => __('An error occurred during import.', 'mobility-trailblazers'),
-                    'invalid_file_type' => __('Please select a CSV file.', 'mobility-trailblazers'),
-                    'file_too_large' => __('File is too large. Maximum size is 10MB.', 'mobility-trailblazers'),
-                    'created' => __('created', 'mobility-trailblazers'),
-                    'updated' => __('updated', 'mobility-trailblazers'),
-                    'skipped' => __('skipped', 'mobility-trailblazers'),
-                    'errors' => __('errors', 'mobility-trailblazers'),
-                    'error_details' => __('Error details:', 'mobility-trailblazers'),
-                    'no_file_selected' => __('No file selected', 'mobility-trailblazers'),
-                    'confirm_import' => __('Are you sure you want to import this CSV file?', 'mobility-trailblazers')
-                ]
-            ]);
-        }
+        // Candidate import functionality has been removed
     }
     
     /**
