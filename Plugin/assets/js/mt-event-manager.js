@@ -90,7 +90,7 @@
             if (window.MT_DEBUG) {
                 setInterval(function() {
                     if (performance && performance.memory) {
-                         + 'MB');
+                        // Memory logging removed for production
                     }
                 }, 30000); // Log every 30 seconds
             }
