@@ -477,30 +477,33 @@ class MT_Evaluation_Repository implements MT_Evaluation_Repository_Interface {
             'by_criteria' => []
         ];
         
-        // Total evaluations
-        $stats['total'] = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}");
+        // Total evaluations (prepared query for safety)
+        $stats['total'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$this->table_name} WHERE 1=%d", 1));
         
         // Completed evaluations
         $stats['completed'] = $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->table_name} WHERE status = 'completed'"
+            $wpdb->prepare("SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s", 'completed')
         );
         
         // Draft evaluations
         $stats['drafts'] = $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->table_name} WHERE status = 'draft'"
+            $wpdb->prepare("SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s", 'draft')
         );
         
         // Average scores
         $averages = $wpdb->get_row(
-            "SELECT 
-                AVG(total_score) as avg_total,
-                AVG(courage_score) as avg_courage,
-                AVG(innovation_score) as avg_innovation,
-                AVG(implementation_score) as avg_implementation,
-                AVG(relevance_score) as avg_relevance,
-                AVG(visibility_score) as avg_visibility
-             FROM {$this->table_name} 
-             WHERE status = 'completed'"
+            $wpdb->prepare(
+                "SELECT 
+                    AVG(total_score) as avg_total,
+                    AVG(courage_score) as avg_courage,
+                    AVG(innovation_score) as avg_innovation,
+                    AVG(implementation_score) as avg_implementation,
+                    AVG(relevance_score) as avg_relevance,
+                    AVG(visibility_score) as avg_visibility
+                 FROM {$this->table_name} 
+                 WHERE status = %s",
+                 'completed'
+            )
         );
         
         if ($averages) {
@@ -570,6 +573,10 @@ class MT_Evaluation_Repository implements MT_Evaluation_Repository_Interface {
     public function get_ranked_candidates_for_jury($jury_member_id, $limit = 10) {
         global $wpdb;
         
+        // Validate parameters
+        $jury_member_id = absint($jury_member_id);
+        $limit = absint($limit);
+        
         // Check transient cache first
         $cache_key = 'mt_jury_rankings_' . $jury_member_id . '_' . $limit;
         $cached = get_transient($cache_key);
@@ -591,9 +598,16 @@ class MT_Evaluation_Repository implements MT_Evaluation_Repository_Interface {
                     pm1.meta_value as organization,
                     pm2.meta_value as position
                   FROM {$wpdb->posts} c
-                  INNER JOIN {$this->table_name} e ON c.ID = e.candidate_id
-                  LEFT JOIN {$wpdb->postmeta} pm1 ON c.ID = pm1.post_id AND pm1.meta_key = '_mt_organization'
-                  LEFT JOIN {$wpdb->postmeta} pm2 ON c.ID = pm2.post_id AND pm2.meta_key = '_mt_position'
+                  USE INDEX (type_status_date)
+                  INNER JOIN {$this->table_name} e 
+                    USE INDEX (idx_jury_status, idx_candidate_status)
+                    ON c.ID = e.candidate_id
+                  LEFT JOIN {$wpdb->postmeta} pm1 
+                    USE INDEX (post_id)
+                    ON c.ID = pm1.post_id AND pm1.meta_key = '_mt_organization'
+                  LEFT JOIN {$wpdb->postmeta} pm2 
+                    USE INDEX (post_id)
+                    ON c.ID = pm2.post_id AND pm2.meta_key = '_mt_position'
                   WHERE e.jury_member_id = %d
                     AND c.post_type = 'mt_candidate'
                     AND c.post_status = 'publish'
@@ -865,14 +879,15 @@ class MT_Evaluation_Repository implements MT_Evaluation_Repository_Interface {
         
         $assignment_table = $wpdb->prefix . 'mt_jury_assignments';
         
-        // Find orphaned evaluations
+        // Find orphaned evaluations (limited batch for performance)
         $orphaned = $wpdb->get_results(
             "SELECT e.* FROM {$this->table_name} e
              WHERE NOT EXISTS (
                  SELECT 1 FROM {$assignment_table} a 
                  WHERE a.jury_member_id = e.jury_member_id 
                  AND a.candidate_id = e.candidate_id
-             )"
+             )
+             LIMIT 100"
         );
         
         $stats['orphaned_found'] = count($orphaned);
