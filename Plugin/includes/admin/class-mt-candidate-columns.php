@@ -35,17 +35,13 @@ class MT_Candidate_Columns {
         add_action('manage_mt_candidate_posts_custom_column', [$this, 'render_custom_columns'], 10, 2);
         add_filter('manage_edit-mt_candidate_sortable_columns', [$this, 'make_columns_sortable']);
         
-        // Add import button to the list page
-        add_action('admin_notices', [$this, 'add_import_button']);
+        // Import functionality has been removed - these hooks are disabled
+        // add_action('admin_notices', [$this, 'add_import_button']);
+        // add_action('admin_init', [$this, 'handle_csv_import']);
+        // add_action('admin_notices', [$this, 'display_import_notices']);
         
-        // Handle CSV import
-        add_action('admin_init', [$this, 'handle_csv_import']);
-        
-        // Handle CSV export
-        add_action('admin_post_mt_export_candidates', [$this, 'handle_export_candidates']);
-        
-        // Handle import success/error messages
-        add_action('admin_notices', [$this, 'display_import_notices']);
+        // Handle CSV export - DISABLED (now handled by MT_Import_Export class)
+        // add_action('admin_post_mt_export_candidates', [$this, 'handle_export_candidates']);
         
         // Add bulk actions
         add_filter('bulk_actions-edit-mt_candidate', [$this, 'add_bulk_actions']);
@@ -343,28 +339,15 @@ class MT_Candidate_Columns {
      * @return array Result
      */
     private function process_csv_import($file, $update_existing, $skip_duplicates) {
-        // Use the MT_Import_Handler for consistency
-        $handler = new \MobilityTrailblazers\Admin\MT_Import_Handler();
-        
-        $result = $handler->process_csv_import(
-            $file,
-            'candidates',
-            $update_existing
-        );
-        
-        if (!empty($result['messages'])) {
-            // Log messages for debugging
-            foreach ($result['messages'] as $message) {
-                MT_Logger::info('CSV Import', ['message' => $message]);
-            }
-        }
+        // Import functionality has been removed from this plugin
+        MT_Logger::warning('CSV Import attempted but functionality has been removed');
         
         return [
-            'success' => true,
-            'imported' => $result['success'],
-            'updated' => $result['updated'],
-            'skipped' => $result['skipped'],
-            'errors' => $result['error_details'] ?? []
+            'success' => false,
+            'imported' => 0,
+            'updated' => 0,
+            'skipped' => 0,
+            'errors' => ['Import functionality has been removed from this plugin.']
         ];
     }
     
@@ -582,8 +565,36 @@ class MT_Candidate_Columns {
      */
     public function handle_bulk_actions($redirect_to, $doaction, $post_ids) {
         if ($doaction === 'mt_export') {
-            // Handle export
-            $this->export_candidates($post_ids);
+            // Validate post IDs are integers and not empty
+            if (empty($post_ids)) {
+                // Redirect back with error message
+                return add_query_arg([
+                    'mt_bulk_action' => 'export_error',
+                    'error' => urlencode(__('No candidates selected for export.', 'mobility-trailblazers'))
+                ], $redirect_to);
+            }
+            
+            // Sanitize post IDs to ensure they are integers
+            $post_ids = array_map('intval', $post_ids);
+            $post_ids = array_filter($post_ids, function($id) { return $id > 0; });
+            
+            if (empty($post_ids)) {
+                // Redirect back with error message
+                return add_query_arg([
+                    'mt_bulk_action' => 'export_error',
+                    'error' => urlencode(__('Invalid candidate selection for export.', 'mobility-trailblazers'))
+                ], $redirect_to);
+            }
+            
+            // Store selected IDs in a transient for security (expires in 5 minutes)
+            $transient_key = 'mt_export_candidates_' . get_current_user_id() . '_' . wp_generate_password(8, false);
+            set_transient($transient_key, $post_ids, 300); // 5 minutes expiry
+            
+            // Redirect to MT_Import_Export handler with transient key
+            wp_redirect(wp_nonce_url(
+                admin_url('admin-post.php?action=mt_export_candidates&export_key=' . $transient_key),
+                'mt_export_candidates'
+            ));
             exit;
         }
         
@@ -628,11 +639,13 @@ class MT_Candidate_Columns {
     
     /**
      * Export candidates to CSV
+     * DEPRECATED - Now handled by MT_Import_Export class
      *
+     * @deprecated 2.5.41
      * @param array $post_ids Post IDs to export
      * @return void
      */
-    private function export_candidates($post_ids = []) {
+    private function export_candidates_deprecated($post_ids = []) {
         // Set headers for CSV download
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=candidates-' . date('Y-m-d') . '.csv');
@@ -744,10 +757,12 @@ class MT_Candidate_Columns {
     
     /**
      * Handle export candidates action
+     * DEPRECATED - Now handled by MT_Import_Export class
      *
+     * @deprecated 2.5.41
      * @return void
      */
-    public function handle_export_candidates() {
+    private function handle_export_candidates_deprecated() {
         // Verify nonce
         if (!wp_verify_nonce($_GET['_wpnonce'], 'mt_export_candidates')) {
             wp_die(__('Security check failed.', 'mobility-trailblazers'));
@@ -822,6 +837,9 @@ class MT_Candidate_Columns {
                     $updated
                 );
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html($message) . '</p></div>';
+            } elseif ($_GET['mt_bulk_action'] === 'export_error') {
+                $error = isset($_GET['error']) ? urldecode($_GET['error']) : __('An error occurred during export.', 'mobility-trailblazers');
+                echo '<div class="notice notice-error is-dismissible"><p>' . esc_html($error) . '</p></div>';
             }
         }
     }
