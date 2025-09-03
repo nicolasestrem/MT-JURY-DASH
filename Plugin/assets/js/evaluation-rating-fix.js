@@ -144,7 +144,7 @@
                 });
                 if (!allRated && unratedCriteria.length === 5) {
                     e.preventDefault();
-                    alert('Please rate at least one criterion before submitting.');
+                    alert(mt_ajax && mt_ajax.i18n && mt_ajax.i18n.please_rate_criteria ? mt_ajax.i18n.please_rate_criteria : 'Please rate at least one criterion before submitting.');
                     return false;
                 }
             });

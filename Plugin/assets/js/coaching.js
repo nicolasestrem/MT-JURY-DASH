@@ -37,7 +37,7 @@
             if (loading) {
                 $button.addClass('loading').prop('disabled', true);
                 $button.data('original-text', $button.html());
-                $button.html('<span class="spinner is-active"></span> Loading...');
+                $button.html('<span class="spinner is-active"></span> ' + (mt_coaching.i18n && mt_coaching.i18n.loading ? mt_coaching.i18n.loading : 'Loading...'));
             } else {
                 $button.removeClass('loading').prop('disabled', false);
                 if ($button.data('original-text')) {
