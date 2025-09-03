@@ -126,7 +126,7 @@ class MT_Migration_Admin {
     private function redirect_with_status($status) {
         wp_safe_redirect(add_query_arg(
             ['page' => 'mt-data-migration', 'migration_status' => urlencode($status)],
-            admin_url('tools.php')
+            admin_url('admin.php')
         ));
         exit;
     }
