@@ -23,7 +23,7 @@ class MT_Migration_Admin {
 
     public function add_migration_page() {
         add_submenu_page(
-            'mt-tools', // Parent slug
+            'mobility-trailblazers', // Parent slug
             __('Data Migration', 'mobility-trailblazers'),
             __('Data Migration', 'mobility-trailblazers'),
             'manage_options',
