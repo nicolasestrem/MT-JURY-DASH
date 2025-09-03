@@ -76,11 +76,7 @@ require_once MT_PLUGIN_DIR . 'includes/core/class-mt-autoloader.php';
 // Register autoloader
 MobilityTrailblazers\Core\MT_Autoloader::register();
 
-// German translation compatibility fallback
-// Provides fallback translations in case the .mo file fails to load
-if (file_exists(MT_PLUGIN_DIR . 'includes/german-translation-compatibility.php')) {
-    require_once MT_PLUGIN_DIR . 'includes/german-translation-compatibility.php';
-}
+
 
 // Load username dot fix to prevent dots in usernames
 if (file_exists(MT_PLUGIN_DIR . 'includes/fixes/class-mt-username-dot-fix.php')) {

@@ -158,15 +158,7 @@ class MT_Post_Types {
      * @return void
      */
     public function add_meta_boxes() {
-        // Candidate meta boxes
-        add_meta_box(
-            'mt_candidate_details',
-            __('Candidate Details', 'mobility-trailblazers'),
-            [$this, 'render_candidate_details_meta_box'],
-            'mt_candidate',
-            'normal',
-            'high'
-        );
+        
         
         // Jury member meta boxes
         add_meta_box(
