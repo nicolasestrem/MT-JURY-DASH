@@ -54,13 +54,72 @@ class MT_Import_Export {
         }
         
         try {
-            // Get candidates
-            $candidates = get_posts([
+            $specific_candidates = [];
+            $filename_suffix = '';
+            
+            // Check if specific candidate IDs were provided via transient (from bulk export)
+            if (isset($_GET['export_key'])) {
+                $export_key = sanitize_text_field($_GET['export_key']);
+                
+                // Verify the transient key belongs to the current user for security
+                if (strpos($export_key, 'mt_export_candidates_' . get_current_user_id() . '_') === 0) {
+                    $specific_candidates = get_transient($export_key);
+                    
+                    // Delete transient immediately after use for security
+                    delete_transient($export_key);
+                    
+                    if ($specific_candidates && is_array($specific_candidates)) {
+                        // Validate all IDs are integers and belong to mt_candidate post type
+                        $specific_candidates = array_map('intval', $specific_candidates);
+                        $specific_candidates = array_filter($specific_candidates, function($id) {
+                            return $id > 0 && get_post_type($id) === 'mt_candidate';
+                        });
+                        
+                        if (!empty($specific_candidates)) {
+                            $filename_suffix = '-selected';
+                            MT_Logger::info('Bulk export of selected candidates', [
+                                'count' => count($specific_candidates),
+                                'candidate_ids' => $specific_candidates,
+                                'user_id' => get_current_user_id()
+                            ]);
+                        } else {
+                            MT_Logger::warning('Invalid candidate IDs provided for bulk export', [
+                                'user_id' => get_current_user_id()
+                            ]);
+                            wp_die(__('Invalid candidate selection for export.', 'mobility-trailblazers'));
+                        }
+                    } else {
+                        MT_Logger::warning('Export transient expired or invalid', [
+                            'export_key' => $export_key,
+                            'user_id' => get_current_user_id()
+                        ]);
+                        wp_die(__('Export session expired. Please try again.', 'mobility-trailblazers'));
+                    }
+                } else {
+                    MT_Logger::security_event('Invalid export key attempted', [
+                        'export_key' => $export_key,
+                        'user_id' => get_current_user_id()
+                    ]);
+                    wp_die(__('Security check failed - invalid export key.', 'mobility-trailblazers'));
+                }
+            }
+            
+            // Build query arguments
+            $query_args = [
                 'post_type' => 'mt_candidate',
                 'posts_per_page' => -1,
                 'orderby' => 'title',
-                'order' => 'ASC'
-            ]);
+                'order' => 'ASC',
+                'post_status' => 'any'
+            ];
+            
+            // If specific candidates were requested, filter by them
+            if (!empty($specific_candidates)) {
+                $query_args['post__in'] = $specific_candidates;
+            }
+            
+            // Get candidates
+            $candidates = get_posts($query_args);
             
             if (empty($candidates)) {
                 MT_Logger::warning('No candidates found for export');
@@ -68,7 +127,7 @@ class MT_Import_Export {
             
             // Set headers for download
             header('Content-Type: text/csv; charset=utf-8');
-            header('Content-Disposition: attachment; filename=candidates-' . date('Y-m-d') . '.csv');
+            header('Content-Disposition: attachment; filename=candidates' . $filename_suffix . '-' . date('Y-m-d') . '.csv');
             header('Pragma: no-cache');
             header('Expires: 0');
             
