@@ -344,6 +344,16 @@ class MT_Evaluation_Service implements MT_Service_Interface {
                     );
                     $valid = false;
                 }
+                
+                // Validate 0.5 increments (scores must be whole or .5)
+                $decimal_part = $score - floor($score);
+                if ($decimal_part != 0 && $decimal_part != 0.5) {
+                    $this->errors[] = sprintf(
+                        __('%s score must be in 0.5 increments (e.g., 7.0, 7.5, 8.0).', 'mobility-trailblazers'),
+                        $label
+                    );
+                    $valid = false;
+                }
             }
         }
         
@@ -356,6 +366,16 @@ class MT_Evaluation_Service implements MT_Service_Interface {
                         $label
                     );
                     $valid = false;
+                } else {
+                    // Additional validation for completed submissions
+                    $score = floatval($data[$field]);
+                    if ($score < 1.0) {
+                        $this->errors[] = sprintf(
+                            __('%s score cannot be 0 for completed evaluations.', 'mobility-trailblazers'),
+                            $label
+                        );
+                        $valid = false;
+                    }
                 }
             }
         }
