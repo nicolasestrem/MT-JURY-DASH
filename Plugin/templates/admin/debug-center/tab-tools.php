@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 // Get maintenance tools instance
 $maintenance_tools = new \MobilityTrailblazers\Admin\MT_Maintenance_Tools();
 $operations = $maintenance_tools->get_operations();
-$environment = wp_get_environment_type();
+$environment = (new \MobilityTrailblazers\Admin\MT_Debug_Manager())->get_environment();
 ?>
 
 <div class="mt-debug-tools">

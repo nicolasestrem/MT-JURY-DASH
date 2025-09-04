@@ -1,9 +1,3 @@
-fix: Resolve fatal error in admin and fix debug center
+refactor: Remove dead code from post types
 
-This commit resolves a fatal error that was occurring in the admin area due to a missing `class-mt-debug-manager.php` file.
-
-- Removes the `require_once` call to the missing file in `class-mt-admin.php`.
-- Creates a new `debug-center.php` template to render the debug center tabs, excluding the broken "Scripts" tab.
-- Updates the "Tools" tab in the debug center to use `wp_get_environment_type()` instead of the missing `MT_Debug_Manager`.
-
-This also resolves the issue of the "Data Migration" tool not being visible in the admin menu, as the fatal error was preventing the menu from rendering correctly.
+Removes the `render_candidate_details_meta_box` method, which was orphaned after its meta box registration was commented out.
