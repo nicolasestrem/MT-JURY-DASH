@@ -81,10 +81,10 @@ class MT_Post_Types {
         
         $args = [
             'labels'             => $labels,
-            'public'             => false,
-            'publicly_queryable' => false,
-            'show_ui'            => false,
-            'show_in_menu'       => false,
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => 'mobility-trailblazers',
             'query_var'          => true,
             'rewrite'            => ['slug' => 'candidate'],
             'capability_type'    => ['mt_candidate', 'mt_candidates'],
@@ -158,7 +158,15 @@ class MT_Post_Types {
      * @return void
      */
     public function add_meta_boxes() {
-        
+        // Candidate meta boxes
+        add_meta_box(
+            'mt_candidate_details',
+            __('Candidate Details', 'mobility-trailblazers'),
+            [$this, 'render_candidate_details_meta_box'],
+            'mt_candidate',
+            'normal',
+            'high'
+        );
         
         // Jury member meta boxes
         add_meta_box(
@@ -171,7 +179,40 @@ class MT_Post_Types {
         );
     }
     
-    
+    /**
+     * Render candidate details meta box
+     *
+     * @param WP_Post $post Current post object
+     * @return void
+     */
+    public function render_candidate_details_meta_box($post) {
+        wp_nonce_field('mt_save_candidate_details', 'mt_candidate_details_nonce');
+        
+        $organization = get_post_meta($post->ID, '_mt_organization', true);
+        $position = get_post_meta($post->ID, '_mt_position', true);
+        $linkedin = get_post_meta($post->ID, '_mt_linkedin_url', true);
+        $website = get_post_meta($post->ID, '_mt_website_url', true);
+        ?>
+        <div class="mt-meta-box">
+            <p>
+                <label for="mt_organization"><?php _e('Organization', 'mobility-trailblazers'); ?></label>
+                <input type="text" id="mt_organization" name="mt_organization" value="<?php echo esc_attr($organization); ?>" class="widefat" />
+            </p>
+            <p>
+                <label for="mt_position"><?php _e('Position', 'mobility-trailblazers'); ?></label>
+                <input type="text" id="mt_position" name="mt_position" value="<?php echo esc_attr($position); ?>" class="widefat" />
+            </p>
+            <p>
+                <label for="mt_linkedin"><?php _e('LinkedIn URL', 'mobility-trailblazers'); ?></label>
+                <input type="url" id="mt_linkedin" name="mt_linkedin" value="<?php echo esc_url($linkedin); ?>" class="widefat" />
+            </p>
+            <p>
+                <label for="mt_website"><?php _e('Website URL', 'mobility-trailblazers'); ?></label>
+                <input type="url" id="mt_website" name="mt_website" value="<?php echo esc_url($website); ?>" class="widefat" />
+            </p>
+        </div>
+        <?php
+    }
     
     /**
      * Render jury member details meta box

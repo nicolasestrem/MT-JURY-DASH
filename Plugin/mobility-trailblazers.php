@@ -76,7 +76,11 @@ require_once MT_PLUGIN_DIR . 'includes/core/class-mt-autoloader.php';
 // Register autoloader
 MobilityTrailblazers\Core\MT_Autoloader::register();
 
-
+// German translation compatibility fallback
+// Provides fallback translations in case the .mo file fails to load
+if (file_exists(MT_PLUGIN_DIR . 'includes/german-translation-compatibility.php')) {
+    require_once MT_PLUGIN_DIR . 'includes/german-translation-compatibility.php';
+}
 
 // Load username dot fix to prevent dots in usernames
 if (file_exists(MT_PLUGIN_DIR . 'includes/fixes/class-mt-username-dot-fix.php')) {
@@ -102,12 +106,6 @@ add_action('plugins_loaded', function() {
     
     // Initialize migration runner
     MobilityTrailblazers\Core\MT_Migration_Runner::init();
-
-    // Initialize migration admin page
-    if (is_admin()) {
-        $migration_admin = new \MobilityTrailblazers\Admin\MT_Migration_Admin();
-        $migration_admin->init();
-    }
 }, 5); // Run early with priority 5
 
 // Activation hook
@@ -144,11 +142,5 @@ if (defined('WP_CLI') && WP_CLI) {
         // Import candidates command has been removed
         WP_CLI::add_command('mt db-upgrade', [$cli_commands, 'db_upgrade']);
         WP_CLI::add_command('mt list-candidates', [$cli_commands, 'list_candidates']);
-    }
-
-    // Load migration commands
-    $migration_commands_file = MT_PLUGIN_DIR . 'scripts/migrations/migrate-cpt-to-table.php';
-    if (file_exists($migration_commands_file)) {
-        require_once $migration_commands_file;
     }
 } 

@@ -374,9 +374,9 @@ class MT_Maintenance_Tools {
         
         // Find and delete orphaned assignments (candidate doesn't exist)
         $orphaned_candidates = $wpdb->query(
-            "DELETE a FROM {$wpdb->prefix}mt_jury_assignments a ".
-            "LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID ".
-            "WHERE p.ID IS NULL"
+            $wpdb->prepare(
+                "DELETE a FROM {$wpdb->prefix}mt_jury_assignments a LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID WHERE p.ID IS NULL"
+            )
         );
         
         $total_deleted = $orphaned_evaluations + $orphaned_assignments + $orphaned_candidates;
@@ -534,7 +534,11 @@ class MT_Maintenance_Tools {
         global $wpdb;
         
         // Clear transients
-                $transients_deleted = $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_mt_%' OR option_name LIKE '_transient_timeout_mt_%'");
+        $transients_deleted = $wpdb->query(
+            "DELETE FROM {$wpdb->options} 
+             WHERE option_name LIKE '_transient_mt_%' 
+             OR option_name LIKE '_transient_timeout_mt_%'"
+        );
         
         // Clear object cache
         wp_cache_flush();
@@ -599,7 +603,11 @@ class MT_Maintenance_Tools {
     private function clear_transients($params = []) {
         global $wpdb;
         
-                $deleted = $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_mt_%' OR option_name LIKE '_transient_timeout_mt_%'");
+        $deleted = $wpdb->query(
+            "DELETE FROM {$wpdb->options} 
+             WHERE option_name LIKE '_transient_mt_%' 
+             OR option_name LIKE '_transient_timeout_mt_%'"
+        );
         
         return [
             'success' => true,

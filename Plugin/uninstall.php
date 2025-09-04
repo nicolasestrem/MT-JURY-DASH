@@ -51,7 +51,7 @@ if ($remove_data === '1') {
     
     // Log the preservation
     if (function_exists('error_log')) {
-        error_log(__('Mobility Trailblazers: Plugin uninstalled. Data preserved as per user settings.', 'mobility-trailblazers'));
+        error_log('Mobility Trailblazers: Plugin uninstalled. Data preserved as per user settings.');
     }
 }
 
