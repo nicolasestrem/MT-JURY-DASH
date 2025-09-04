@@ -46,7 +46,22 @@ class MT_Import_Export {
 
         try {
             $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
-            $candidates = $candidate_repo->find_all(['limit' => -1]);
+
+            $export_key = $_GET['export_key'] ?? null;
+            if ($export_key) {
+                $candidate_ids = get_transient($export_key);
+                if ($candidate_ids && is_array($candidate_ids)) {
+                    $candidates = [];
+                    foreach ($candidate_ids as $id) {
+                        $candidate = $candidate_repo->find($id);
+                        if ($candidate) $candidates[] = $candidate;
+                    }
+                } else {
+                    $candidates = $candidate_repo->find_all(['limit' => -1]);
+                }
+            } else {
+                $candidates = $candidate_repo->find_all(['limit' => -1]);
+            }
 
             if (empty($candidates)) {
                 MT_Logger::warning('No candidates found for export');
@@ -248,10 +263,10 @@ class MT_Import_Export {
                        a.candidate_id,
                        a.assigned_at,
                        a.assigned_by,
-                       c.post_title as candidate_name,
+                       c.name as candidate_name,
                        COALESCE(j.post_title, u.display_name, CONCAT('User #', a.jury_member_id)) as jury_member
                 FROM {$table_name} a
-                LEFT JOIN {$wpdb->posts} c ON a.candidate_id = c.ID AND c.post_type = 'mt_candidate'
+                LEFT JOIN {$wpdb->prefix}mt_candidates c ON a.candidate_id = c.id
                 LEFT JOIN {$wpdb->posts} j ON a.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
                 LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID
                 ORDER BY a.jury_member_id, a.candidate_id, a.assigned_at DESC

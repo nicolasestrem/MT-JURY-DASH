@@ -50,6 +50,13 @@ class MT_Migration_Command extends \WP_CLI_Command {
 
         $count = 0;
         foreach ($posts as $post) {
+            // Check for duplicates
+            $existing_id = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$table_name} WHERE post_id = %d", $post->ID));
+            if ($existing_id) {
+                \WP_CLI::log("Skipping duplicate candidate: {$post->post_title} (Post ID: {$post->ID})");
+                continue;
+            }
+
             $candidate_data = [
                 'post_id' => $post->ID,
                 'slug' => $post->post_name,

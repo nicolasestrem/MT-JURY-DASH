@@ -374,9 +374,9 @@ class MT_Maintenance_Tools {
         
         // Find and delete orphaned assignments (candidate doesn't exist)
         $orphaned_candidates = $wpdb->query(
-            $wpdb->prepare(
-                "        $orphaned_candidates = $wpdb->query("DELETE a FROM {$wpdb->prefix}mt_jury_assignments a LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID WHERE p.ID IS NULL");"
-            )
+            "DELETE a FROM {$wpdb->prefix}mt_jury_assignments a ".
+            "LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID ".
+            "WHERE p.ID IS NULL"
         );
         
         $total_deleted = $orphaned_evaluations + $orphaned_assignments + $orphaned_candidates;

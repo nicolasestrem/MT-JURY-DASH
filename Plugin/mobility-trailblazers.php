@@ -145,4 +145,10 @@ if (defined('WP_CLI') && WP_CLI) {
         WP_CLI::add_command('mt db-upgrade', [$cli_commands, 'db_upgrade']);
         WP_CLI::add_command('mt list-candidates', [$cli_commands, 'list_candidates']);
     }
+
+    // Load migration commands
+    $migration_commands_file = MT_PLUGIN_DIR . 'scripts/migrations/migrate-cpt-to-table.php';
+    if (file_exists($migration_commands_file)) {
+        require_once $migration_commands_file;
+    }
 } 
