@@ -406,9 +406,7 @@ class MT_Admin {
      */
     public function render_debug_center_page() {
         // Load required classes
-        if (!class_exists('\MobilityTrailblazers\Admin\MT_Debug_Manager')) {
-            require_once MT_PLUGIN_DIR . 'includes/admin/class-mt-debug-manager.php';
-        }
+        
         if (!class_exists('\MobilityTrailblazers\Services\MT_Diagnostic_Service')) {
             require_once MT_PLUGIN_DIR . 'includes/services/class-mt-diagnostic-service.php';
         }
