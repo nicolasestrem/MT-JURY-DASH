@@ -37,8 +37,15 @@ class MT_Template_Loader {
      * @return string Modified template path
      */
     public static function load_candidate_template($template) {
-        // Only apply to single candidate posts
-        if (!is_singular('mt_candidate')) {
+        // Check if this is a candidate page using query var or global
+        $candidate_slug = get_query_var('mt_candidate_slug');
+        
+        // Check if we have candidate data from the router
+        if (!empty($candidate_slug) || isset($GLOBALS['mt_current_candidate'])) {
+            // Candidate data should already be set by template_redirect hook
+            // Just need to ensure we're on a candidate page
+        } else if (!is_singular('mt_candidate')) {
+            // Not a candidate page
             return $template;
         }
         
@@ -81,7 +88,8 @@ class MT_Template_Loader {
      */
     public static function enqueue_enhanced_styles() {
         // Only load on candidate pages
-        if (!is_singular('mt_candidate')) {
+        $candidate_slug = get_query_var('mt_candidate_slug');
+        if (empty($candidate_slug) && !is_singular('mt_candidate')) {
             return;
         }
         
@@ -103,7 +111,7 @@ class MT_Template_Loader {
         // Enqueue hotfix for single candidate pages
         // TODO: Remove in v2.5.39 - All fixes have been merged into enhanced-candidate-profile.css
         // Keeping for now to ensure no visual regression
-        if (is_singular('mt_candidate')) {
+        if (!empty($candidate_slug) || is_singular('mt_candidate')) {
             wp_enqueue_style(
                 'mt-candidate-single-hotfix',
                 MT_PLUGIN_URL . 'assets/css/candidate-single-hotfix.css',

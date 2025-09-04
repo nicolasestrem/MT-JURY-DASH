@@ -81,6 +81,7 @@ class MT_Roles {
             'mt_view_all_evaluations',
             'mt_manage_assignments',
             'mt_manage_settings',
+            'mt_manage_candidates',
             'mt_export_data',
             'mt_view_reports',
             'mt_jury_admin'

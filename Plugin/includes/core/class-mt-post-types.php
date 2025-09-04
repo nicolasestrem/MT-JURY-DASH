@@ -80,27 +80,26 @@ class MT_Post_Types {
         ];
         
         /**
-         * DEPRECATED: This CPT is deprecated as of v2.5.42
-         * Data has been migrated to wp_mt_candidates custom table
-         * Keeping registration for backward compatibility only
+         * Phase 2 Architecture: CPT is maintained for admin editing
+         * but repository is used as primary data source
          * 
-         * @deprecated 2.5.42 Use MT_Candidate_Repository instead
+         * @since 2.5.43 Re-enabled for admin functionality
          */
         $args = [
             'labels'             => $labels,
-            'public'             => false, // DEPRECATED: Hide from public
-            'publicly_queryable' => false, // DEPRECATED: Prevent front-end queries
-            'show_ui'            => false, // DEPRECATED: Hide from admin UI
-            'show_in_menu'       => false, // DEPRECATED: Remove from admin menu
-            'query_var'          => false, // DEPRECATED: Disable query var
-            'rewrite'            => false, // DEPRECATED: No rewrites needed
+            'public'             => true, // Re-enabled for viewing
+            'publicly_queryable' => true, // Allow front-end queries
+            'show_ui'            => true, // Show in admin UI for editing
+            'show_in_menu'       => 'mobility-trailblazers', // Show in plugin menu
+            'query_var'          => true,
+            'rewrite'            => ['slug' => 'candidate', 'with_front' => false],
             'capability_type'    => ['mt_candidate', 'mt_candidates'],
             'map_meta_cap'       => true,
-            'has_archive'        => false, // DEPRECATED: No archive pages
+            'has_archive'        => false,
             'hierarchical'       => false,
             'menu_position'      => null,
             'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
-            'show_in_rest'       => false, // DEPRECATED: Hide from REST API
+            'show_in_rest'       => true,
         ];
         
         register_post_type('mt_candidate', $args);

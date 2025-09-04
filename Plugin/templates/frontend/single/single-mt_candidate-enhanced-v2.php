@@ -20,7 +20,22 @@ wp_enqueue_style('mt-candidate-profile-override', MT_PLUGIN_URL . 'assets/css/ca
 get_header();
 
 // Get candidate data
-if (have_posts()) : 
+$candidate_data = null;
+$candidate_id = 0;
+
+// Check if we have candidate data from the router first
+if (isset($GLOBALS['mt_current_candidate'])) {
+    $candidate_data = $GLOBALS['mt_current_candidate'];
+    $candidate_id = $candidate_data->post_id ?? 0;
+    
+    // Set up post data if we have a post_id
+    if ($candidate_id && have_posts()) {
+        while (have_posts()) : the_post();
+            break; // We just need to set up the post data
+        endwhile;
+    }
+} elseif (have_posts()) {
+    // Fallback to traditional method
     while (have_posts()) : the_post();
     
     $candidate_id = get_the_ID();
@@ -30,21 +45,25 @@ if (have_posts()) :
     if (!$candidate_data) {
         $candidate_data = mt_get_candidate($candidate_id);
     }
-    
+}
+
+// Now process the candidate data regardless of how we got it
+if ($candidate_data) :
+
     // Decode description sections if from repository
     $description_sections = null;
-    if ($candidate_data && !empty($candidate_data->description_sections)) {
+    if (!empty($candidate_data->description_sections)) {
         $description_sections = is_string($candidate_data->description_sections)
             ? json_decode($candidate_data->description_sections, true)
             : $candidate_data->description_sections;
     }
     
     // Extract data from candidate object
-    $organization = $candidate_data ? $candidate_data->organization : '';
-    $position = $candidate_data ? $candidate_data->position : '';
-    $display_name = $candidate_data ? $candidate_data->name : get_the_title();
-    $linkedin = $candidate_data ? $candidate_data->linkedin_url : '';
-    $website = $candidate_data ? $candidate_data->website_url : '';
+    $organization = $candidate_data->organization ?? '';
+    $position = $candidate_data->position ?? '';
+    $display_name = $candidate_data->name ?? get_the_title();
+    $linkedin = $candidate_data->linkedin_url ?? '';
+    $website = $candidate_data->website_url ?? '';
     
     // Get category from description_sections
     $categories = array();
@@ -359,8 +378,7 @@ if (have_posts()) :
 </div>
 
 <?php
-    endwhile;
-endif;
+endif; // End if ($candidate_data)
 
 get_footer();
 ?>

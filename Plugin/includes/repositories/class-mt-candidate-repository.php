@@ -111,7 +111,12 @@ class MT_Candidate_Repository implements MT_Repository_Interface {
             $params[] = $args['offset'];
         }
         
-        $results = $wpdb->get_results($wpdb->prepare($sql, $params));
+        // Only use prepare if we have parameters, otherwise execute directly
+        if (!empty($params)) {
+            $results = $wpdb->get_results($wpdb->prepare($sql, $params));
+        } else {
+            $results = $wpdb->get_results($sql);
+        }
         
         // Decode JSON fields
         foreach ($results as &$result) {

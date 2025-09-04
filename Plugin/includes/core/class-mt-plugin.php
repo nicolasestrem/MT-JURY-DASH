@@ -337,6 +337,8 @@ class MT_Plugin {
             }
         }
         
+        // Candidate routing is handled directly in mobility-trailblazers.php
+        
         // Initialize template loader for enhanced candidate profiles
         MT_Template_Loader::init();
         

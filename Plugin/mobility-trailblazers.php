@@ -36,6 +36,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Debug: Log plugin loading
+error_log('MT Plugin: Loading at ' . date('Y-m-d H:i:s'));
+
 // Define plugin constants
 define('MT_VERSION', '2.5.41');
 define('MT_PLUGIN_FILE', __FILE__);
@@ -108,7 +111,300 @@ add_action('plugins_loaded', function() {
     
     // Initialize migration runner
     MobilityTrailblazers\Core\MT_Migration_Runner::init();
+    
+    // Register simple candidate profile shortcode
+    add_shortcode('mt_candidate', function($atts) {
+        $atts = shortcode_atts([
+            'slug' => ''
+        ], $atts);
+        
+        if (empty($atts['slug'])) {
+            return '<p>No candidate specified</p>';
+        }
+        
+        // Load repository
+        require_once MT_PLUGIN_DIR . 'includes/repositories/class-mt-candidate-repository.php';
+        $repository = new MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+        $candidate = $repository->find_by_slug($atts['slug']);
+        
+        if (!$candidate) {
+            return '<p>Candidate not found: ' . esc_html($atts['slug']) . '</p>';
+        }
+        
+        // Simple output
+        $output = '<div class="mt-candidate-profile">';
+        $output .= '<h2>' . esc_html($candidate->name) . '</h2>';
+        if ($candidate->photo_url) {
+            $output .= '<img src="' . esc_url($candidate->photo_url) . '" alt="' . esc_attr($candidate->name) . '" style="max-width: 300px; height: auto;" />';
+        }
+        if ($candidate->organization) {
+            $output .= '<p><strong>Organization:</strong> ' . esc_html($candidate->organization) . '</p>';
+        }
+        if ($candidate->position) {
+            $output .= '<p><strong>Position:</strong> ' . esc_html($candidate->position) . '</p>';
+        }
+        if ($candidate->description) {
+            $output .= '<div class="description">' . wp_kses_post($candidate->description) . '</div>';
+        }
+        $output .= '</div>';
+        
+        return $output;
+    });
 }, 5); // Run early with priority 5
+
+// Simple candidate router - handles /candidate/slug/ URLs
+add_action('template_redirect', function() {
+    try {
+        $request_uri = $_SERVER['REQUEST_URI'];
+        
+        // Debug: Log that we're in template_redirect
+        if (strpos($request_uri, '/candidate/') === 0) {
+            error_log('MT: template_redirect hook reached for: ' . $request_uri);
+        }
+        
+        // Check if this is a candidate URL
+        if (preg_match('#^/candidate/([^/]+)/?$#', $request_uri, $matches)) {
+            error_log('MT: Candidate URL matched: ' . $matches[1]);
+            $candidate_slug = $matches[1];
+            
+            // Load candidate from repository
+            error_log('MT: Loading repository...');
+            require_once MT_PLUGIN_DIR . 'includes/repositories/class-mt-candidate-repository.php';
+            error_log('MT: Creating repository instance...');
+            $repository = new MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+            error_log('MT: Finding candidate by slug: ' . $candidate_slug);
+            $candidate = $repository->find_by_slug($candidate_slug);
+            error_log('MT: Candidate found: ' . ($candidate ? 'yes' : 'no'));
+        
+        if (!$candidate) {
+            // Candidate not found
+            global $wp_query;
+            $wp_query->set_404();
+            status_header(404);
+            return;
+        }
+        
+        // Store candidate for template use
+        $GLOBALS['mt_current_candidate'] = $candidate;
+        
+        // Override WordPress query
+        global $wp_query, $post;
+        
+        // Create fake post object for compatibility
+        $fake_post = new WP_Post((object)[
+            'ID' => $candidate->id,
+            'post_title' => $candidate->name,
+            'post_name' => $candidate->slug,
+            'post_content' => $candidate->description ?? '',
+            'post_excerpt' => '',
+            'post_status' => 'publish',
+            'post_type' => 'mt_candidate',
+            'comment_status' => 'closed',
+            'ping_status' => 'closed',
+            'post_author' => 1,
+            'post_date' => current_time('mysql'),
+            'post_date_gmt' => current_time('mysql', true),
+            'post_modified' => current_time('mysql'),
+            'post_modified_gmt' => current_time('mysql', true),
+            'guid' => home_url('/candidate/' . $candidate->slug . '/'),
+            'post_parent' => 0,
+            'menu_order' => 0
+        ]);
+        
+        // Set up query state
+        $post = $fake_post;
+        $GLOBALS['post'] = $fake_post;
+        
+        $wp_query->post = $fake_post;
+        $wp_query->posts = [$fake_post];
+        $wp_query->queried_object = $fake_post;
+        $wp_query->queried_object_id = $fake_post->ID;
+        $wp_query->post_count = 1;
+        $wp_query->found_posts = 1;
+        $wp_query->max_num_pages = 1;
+        
+        $wp_query->is_404 = false;
+        $wp_query->is_page = false;
+        $wp_query->is_single = true;
+        $wp_query->is_singular = true;
+        $wp_query->is_home = false;
+        $wp_query->is_archive = false;
+        
+        setup_postdata($post);
+        
+        // Load the template
+        $template = '';
+        $use_enhanced = get_option('mt_use_enhanced_template', true);
+        
+        if ($use_enhanced && file_exists(MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate-enhanced-v2.php')) {
+            $template = MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate-enhanced-v2.php';
+        } else if ($use_enhanced && file_exists(MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate-enhanced.php')) {
+            $template = MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate-enhanced.php';
+        } else if (file_exists(MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate.php')) {
+            $template = MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate.php';
+        }
+        
+        if ($template) {
+            // Debug log
+            error_log('MT: Loading template: ' . $template);
+            error_log('MT: Candidate data: ' . print_r($candidate, true));
+            
+            // Load the template
+            include($template);
+            exit;
+        } else {
+            error_log('MT: No template found for candidate');
+        }
+    }
+    } catch (\Exception $e) {
+        error_log('MT Candidate Router Error: ' . $e->getMessage());
+        error_log('Stack trace: ' . $e->getTraceAsString());
+        wp_die('Error loading candidate page: ' . $e->getMessage());
+    }
+}, 1);
+
+// Keep the old router class for now but disable it
+class MT_Candidate_Router_OLD {
+    public static function init() {
+        // Disabled for now
+    }
+    
+    public static function add_endpoint() {
+        // Add rewrite endpoint for candidates
+        add_rewrite_endpoint('candidate', EP_ROOT);
+        
+        // Also add our custom rewrite rule
+        add_rewrite_rule(
+            '^candidate/([^/]+)/?$',
+            'index.php?candidate=$matches[1]',
+            'top'
+        );
+        
+        // Check if we need to flush
+        $rules = get_option('rewrite_rules');
+        if (!$rules || !isset($rules['^candidate/([^/]+)/?$'])) {
+            flush_rewrite_rules();
+        }
+    }
+    
+    public static function handle_candidate_request() {
+        try {
+            // Check if we're on a candidate page
+            $candidate_slug = get_query_var('candidate', '');
+            
+            if (empty($candidate_slug)) {
+                // Check the URL directly as a fallback
+                $request_uri = $_SERVER['REQUEST_URI'];
+                if (preg_match('#^/candidate/([^/]+)/?$#', $request_uri, $matches)) {
+                    $candidate_slug = $matches[1];
+                }
+            }
+            
+            if (!empty($candidate_slug)) {
+                // Load candidate data from repository
+                require_once MT_PLUGIN_DIR . 'includes/repositories/class-mt-candidate-repository.php';
+                $repository = new MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+                $candidate = $repository->find_by_slug($candidate_slug);
+                
+                if ($candidate) {
+                    // Store candidate data for template use
+                    $GLOBALS['mt_current_candidate'] = $candidate;
+                    $GLOBALS['mt_is_candidate_page'] = true;
+                } else {
+                    // Candidate not found - trigger 404
+                    global $wp_query;
+                    $wp_query->set_404();
+                    status_header(404);
+                }
+            }
+        } catch (\Exception $e) {
+            error_log('MT_Candidate_Router Error: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+    
+    public static function template_include($template) {
+        try {
+            global $wp_query;
+            
+            // Check if this is a candidate page
+            if (!empty($GLOBALS['mt_is_candidate_page']) && !empty($GLOBALS['mt_current_candidate'])) {
+                $candidate = $GLOBALS['mt_current_candidate'];
+            
+            // Set up WordPress query state for template compatibility
+            $wp_query->is_404 = false;
+            $wp_query->is_single = true;
+            $wp_query->is_singular = true;
+            $wp_query->is_page = false;
+            $wp_query->is_home = false;
+            
+            // Create a fake post object for template compatibility
+            $post = new WP_Post((object)[
+                'ID' => $candidate->id,
+                'post_title' => $candidate->name,
+                'post_name' => $candidate->slug,
+                'post_content' => $candidate->description ?? '',
+                'post_status' => 'publish',
+                'post_type' => 'mt_candidate',
+                'comment_status' => 'closed',
+                'ping_status' => 'closed',
+                'post_author' => 1,
+                'post_date' => current_time('mysql'),
+                'post_date_gmt' => current_time('mysql', true),
+                'post_modified' => current_time('mysql'),
+                'post_modified_gmt' => current_time('mysql', true),
+                'guid' => home_url('/candidate/' . $candidate->slug . '/'),
+                'post_parent' => 0,
+                'menu_order' => 0,
+                'post_mime_type' => '',
+                'filter' => 'raw'
+            ]);
+            
+            // Set up global post object
+            $GLOBALS['post'] = $post;
+            $wp_query->post = $post;
+            $wp_query->posts = [$post];
+            $wp_query->queried_object = $post;
+            $wp_query->queried_object_id = $post->ID;
+            $wp_query->post_count = 1;
+            $wp_query->found_posts = 1;
+            $wp_query->max_num_pages = 1;
+            setup_postdata($post);
+            
+            // Check if enhanced template should be used
+            $use_enhanced = get_option('mt_use_enhanced_template', true);
+            
+            // Determine which template to use
+            $templates = [];
+            if ($use_enhanced) {
+                $templates[] = MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate-enhanced-v2.php';
+                $templates[] = MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate-enhanced.php';
+            }
+            $templates[] = MT_PLUGIN_DIR . 'templates/frontend/single/single-mt_candidate.php';
+            
+            // Find first existing template
+            foreach ($templates as $tmpl) {
+                if (file_exists($tmpl)) {
+                    return $tmpl;
+                }
+            }
+        }
+        } catch (\Exception $e) {
+            error_log('MT_Candidate_Router template_include Error: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+        }
+        
+        return $template;
+    }
+    
+    public static function flush_rules() {
+        self::add_endpoint();
+        flush_rewrite_rules();
+    }
+}
+
+// Initialize the router - DISABLED (using simpler approach above)
+// MT_Candidate_Router::init();
 
 // Activation hook
 register_activation_hook(__FILE__, function() {

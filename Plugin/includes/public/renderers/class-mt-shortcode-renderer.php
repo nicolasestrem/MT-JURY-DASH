@@ -85,31 +85,86 @@ class MT_Shortcode_Renderer {
         
         $args = wp_parse_args($args, $defaults);
         
-        // Query candidates
-        $query_args = [
-            'post_type' => 'mt_candidate',
-            'posts_per_page' => intval($args['limit']),
-            'orderby' => $args['orderby'],
-            'order' => $args['order'],
-            'post_status' => 'publish'
+        // Use repository to get candidates
+        $repository = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+        
+        // Build query arguments for repository
+        $query_args = [];
+        
+        // Handle ordering - map WP orderby to repository fields
+        $orderby_map = [
+            'title' => 'name',
+            'date' => 'created_at',
+            'modified' => 'updated_at',
+            'rand' => 'RAND()'
         ];
+        $query_args['orderby'] = isset($orderby_map[$args['orderby']]) ? $orderby_map[$args['orderby']] : 'name';
+        $query_args['order'] = $args['order'];
+        
+        // Handle limit
+        if ($args['limit'] > 0) {
+            $query_args['limit'] = intval($args['limit']);
+        }
         
         // Filter by category if specified
         if (!empty($args['category'])) {
-            $query_args['tax_query'] = [
-                [
-                    'taxonomy' => 'mt_award_category',
-                    'field' => 'slug',
-                    'terms' => $args['category']
-                ]
+            // Categories are stored in description_sections JSON
+            $query_args['where'] = [
+                'description_sections' => ['LIKE', '%"category":"' . esc_sql($args['category']) . '"%']
             ];
         }
         
-        $candidates = new \WP_Query($query_args);
+        // Get candidates from repository
+        $candidates_data = $repository->find_all($query_args);
         
-        if (!$candidates->have_posts()) {
+        if (empty($candidates_data)) {
             return '<div class="mt-notice">' . esc_html__('No candidates found.', 'mobility-trailblazers') . '</div>';
         }
+        
+        // Convert to WP_Query-like structure for template compatibility
+        // Use a custom class that mimics WP_Query behavior
+        $candidates = new class($candidates_data) {
+            public $posts = [];
+            public $post_count;
+            public $found_posts;
+            public $current_post = -1;
+            public $post;
+            
+            public function __construct($candidates_data) {
+                $this->post_count = count($candidates_data);
+                $this->found_posts = count($candidates_data);
+                
+                // Convert each candidate to WP_Post-like object
+                foreach ($candidates_data as $candidate) {
+                    // Use helper function to convert to post format
+                    if (function_exists('mt_candidate_to_post')) {
+                        $this->posts[] = mt_candidate_to_post($candidate);
+                    } else {
+                        // Fallback conversion if helper not available
+                        $post_like = new \stdClass();
+                        $post_like->ID = $candidate->post_id ?: $candidate->id;
+                        $post_like->post_title = $candidate->name;
+                        $post_like->post_name = $candidate->slug;
+                        $post_like->post_type = 'mt_candidate';
+                        $post_like->post_status = 'publish';
+                        $post_like->candidate_data = $candidate;
+                        $this->posts[] = $post_like;
+                    }
+                }
+            }
+            
+            public function have_posts() {
+                return $this->current_post + 1 < $this->post_count;
+            }
+            
+            public function the_post() {
+                $this->current_post++;
+                $this->post = $this->posts[$this->current_post];
+                $GLOBALS['post'] = $this->post;
+                setup_postdata($GLOBALS['post']);
+                return $this->post;
+            }
+        };
         
         // Enqueue grid assets
         $this->enqueue_grid_assets();
@@ -196,6 +251,49 @@ class MT_Shortcode_Renderer {
         if (empty($winners)) {
             return '<div class="mt-notice">' . esc_html__('Winners have not been announced yet.', 'mobility-trailblazers') . '</div>';
         }
+        
+        // Get candidate repository
+        $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+        
+        // Enhance winner data with full candidate information
+        foreach ($winners as &$winner) {
+            // Get full candidate data from repository
+            $candidate = $candidate_repo->find($winner->candidate_id);
+            if (!$candidate) {
+                // Fallback: try by post_id if candidate_id doesn't work
+                $candidate = $candidate_repo->find_by_post_id($winner->candidate_id);
+            }
+            
+            if ($candidate) {
+                // Add full candidate data to winner object
+                $winner->candidate = $candidate;
+                
+                // Convert to WP_Post-like structure for template compatibility
+                if (function_exists('mt_candidate_to_post')) {
+                    $winner->post = mt_candidate_to_post($candidate);
+                } else {
+                    // Fallback conversion
+                    $post_like = new \stdClass();
+                    $post_like->ID = $candidate->post_id ?: $candidate->id;
+                    $post_like->post_title = $candidate->name;
+                    $post_like->post_name = $candidate->slug;
+                    $post_like->post_type = 'mt_candidate';
+                    $post_like->post_status = 'publish';
+                    $post_like->post_excerpt = '';
+                    if (!empty($candidate->description_sections)) {
+                        $sections = is_string($candidate->description_sections) 
+                            ? json_decode($candidate->description_sections, true) 
+                            : $candidate->description_sections;
+                        if (isset($sections['description'])) {
+                            $post_like->post_excerpt = wp_trim_words($sections['description'], 30);
+                        }
+                    }
+                    $post_like->candidate_data = $candidate;
+                    $winner->post = $post_like;
+                }
+            }
+        }
+        unset($winner); // Break reference
         
         // Enqueue winners assets
         $this->enqueue_winners_assets();

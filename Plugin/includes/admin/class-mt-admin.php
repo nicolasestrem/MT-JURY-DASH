@@ -44,8 +44,10 @@ class MT_Admin {
             $this->init_elementor_templates();
         }
         
-        // Initialize Candidate Editor
-        require_once MT_PLUGIN_DIR . 'includes/admin/class-mt-candidate-editor.php';
+        // Initialize Candidates Admin (replaces CPT)
+        require_once MT_PLUGIN_DIR . 'includes/admin/class-mt-candidates-admin.php';
+        $candidates_admin = new MT_Candidates_Admin();
+        $candidates_admin->init();
     }
     
     /**

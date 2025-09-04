@@ -12,6 +12,8 @@ services:
       - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    networks:
+      - wordpress_network
 
   wordpress:
     build: .
@@ -37,19 +39,36 @@ services:
       - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
     depends_on:
       - db
+    networks:
+      - wordpress_network
 
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: mt_phpmyadmin
-    restart: always
-    ports:
-      - "${PHPMYADMIN_PORT:-8081}:80"
-    environment:
-      PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  wpcli:
+    image: wordpress:cli-php8.2
+    container_name: mobility_wpcli_dev
+    user: "33:33"
     depends_on:
       - db
+      - wordpress
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WP_CLI_CACHE_DIR: /var/www/.wp-cli/cache
+    volumes:
+      - wordpress_data:/var/www/html:rw
+      - wordpress_uploads:/var/www/html/wp-content/uploads:rw
+      - wordpress_plugins:/var/www/html/wp-content/plugins:rw
+    command: tail -f /dev/null
+    networks:
+      - wordpress_network
 
 volumes:
   db_data:
   wordpress_data:
+  wordpress_uploads:
+  wordpress_plugins:
+
+networks:
+  wordpress_network:
+    driver: bridge

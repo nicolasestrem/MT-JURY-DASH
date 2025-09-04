@@ -143,7 +143,7 @@ function mt_candidate_to_post($candidate) {
         return null;
     }
     
-    $post_like = new stdClass();
+    $post_like = new \stdClass();
     
     // Map to WP_Post properties
     $post_like->ID = $candidate->post_id ?: $candidate->id;
@@ -184,4 +184,71 @@ function mt_get_candidate_repository() {
     }
     
     return $repository;
+}
+
+/**
+ * Get all unique categories from candidates
+ *
+ * Returns an array of category objects compatible with get_terms() format
+ *
+ * @return array Array of category objects with name and slug
+ */
+function mt_get_candidate_categories() {
+    static $categories = null;
+    
+    if ($categories !== null) {
+        return $categories;
+    }
+    
+    $repository = mt_get_candidate_repository();
+    $candidates = $repository->find_all();
+    
+    $unique_categories = [];
+    $category_map = [
+        'startup' => __('Startup', 'mobility-trailblazers'),
+        'tech' => __('Technology', 'mobility-trailblazers'),
+        'gov' => __('Government', 'mobility-trailblazers'),
+        'innovation' => __('Innovation', 'mobility-trailblazers'),
+        'mobility' => __('Mobility', 'mobility-trailblazers'),
+        'sustainability' => __('Sustainability', 'mobility-trailblazers'),
+        'corporate' => __('Corporate', 'mobility-trailblazers'),
+        'research' => __('Research', 'mobility-trailblazers')
+    ];
+    
+    foreach ($candidates as $candidate) {
+        if (!empty($candidate->description_sections)) {
+            $sections = is_string($candidate->description_sections) 
+                ? json_decode($candidate->description_sections, true) 
+                : $candidate->description_sections;
+            
+            if (isset($sections['category']) && !empty($sections['category'])) {
+                $cat_slug = $sections['category'];
+                
+                if (!isset($unique_categories[$cat_slug])) {
+                    // Create term-like object for compatibility
+                    $term = new \stdClass();
+                    $term->slug = $cat_slug;
+                    $term->name = isset($category_map[$cat_slug]) 
+                        ? $category_map[$cat_slug] 
+                        : ucfirst($cat_slug);
+                    $term->term_id = crc32($cat_slug); // Generate consistent ID
+                    $term->taxonomy = 'mt_award_category';
+                    $term->count = 0;
+                    
+                    $unique_categories[$cat_slug] = $term;
+                }
+                
+                // Increment count
+                $unique_categories[$cat_slug]->count++;
+            }
+        }
+    }
+    
+    // Convert to indexed array and sort by name
+    $categories = array_values($unique_categories);
+    usort($categories, function($a, $b) {
+        return strcmp($a->name, $b->name);
+    });
+    
+    return $categories;
 }
