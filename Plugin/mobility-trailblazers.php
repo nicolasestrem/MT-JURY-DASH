@@ -85,6 +85,11 @@ if (file_exists(MT_PLUGIN_DIR . 'includes/fixes/class-mt-username-dot-fix.php'))
     add_action('init', ['MobilityTrailblazers\Fixes\MT_Username_Dot_Fix', 'init']);
 }
 
+// Load candidate helper functions for backward compatibility
+if (file_exists(MT_PLUGIN_DIR . 'includes/functions/mt-candidate-helpers.php')) {
+    require_once MT_PLUGIN_DIR . 'includes/functions/mt-candidate-helpers.php';
+}
+
 // Bootstrap container early for AJAX requests
 // This ensures the container is ready before any AJAX handlers try to use it
 if (defined('DOING_AJAX') && DOING_AJAX) {

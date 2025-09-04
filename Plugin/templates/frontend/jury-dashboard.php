@@ -16,8 +16,13 @@ if (isset($_GET['evaluate']) && is_numeric($_GET['evaluate'])) {
     $candidate_id = intval($_GET['evaluate']);
     
     // Verify candidate exists and is valid
-    $candidate = get_post($candidate_id);
-    if (!$candidate || $candidate->post_type !== 'mt_candidate') {
+    $candidate = mt_get_candidate($candidate_id);
+    if (!$candidate) {
+        // Try by post_id for backward compatibility
+        $candidate = mt_get_candidate_by_post_id($candidate_id);
+    }
+    
+    if (!$candidate) {
         echo '<div class="mt-notice mt-notice-error">' . 
              __('Invalid candidate.', 'mobility-trailblazers') . 
              '</div>';
@@ -209,7 +214,11 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
     <?php if (!empty($assignments)) : ?>
         <div class="mt-candidates-list <?php echo esc_attr($layout_class); ?> mt-candidates-v3" id="mt-candidates-list">
             <?php foreach ($assignments as $assignment) : 
-                $candidate = get_post($assignment->candidate_id);
+                $candidate = mt_get_candidate($assignment->candidate_id);
+                if (!$candidate) {
+                    // Try by post_id for backward compatibility
+                    $candidate = mt_get_candidate_by_post_id($assignment->candidate_id);
+                }
                 if (!$candidate) continue;
                 
                 // Get evaluation status
@@ -222,11 +231,23 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
                 }
                 
                 $status = $evaluation ? $evaluation['status'] : 'draft';
-                $organization = get_post_meta($candidate->ID, '_mt_organization', true);
-                $categories = wp_get_post_terms($candidate->ID, 'mt_award_category');
+                $organization = $candidate->organization;
                 
-                // Get the category from post meta
-                $category_type = get_post_meta($candidate->ID, '_mt_category_type', true);
+                // Get categories from description sections
+                $category_type = '';
+                if (!empty($candidate->description_sections)) {
+                    $sections = is_string($candidate->description_sections) 
+                        ? json_decode($candidate->description_sections, true) 
+                        : $candidate->description_sections;
+                    $category_type = isset($sections['category']) ? $sections['category'] : 
+                                   (isset($sections['award_category']) ? $sections['award_category'] : '');
+                }
+                
+                // Get categories from taxonomy if we have post_id
+                $categories = [];
+                if (!empty($candidate->post_id)) {
+                    $categories = wp_get_post_terms($candidate->post_id, 'mt_award_category');
+                }
                 $category_slug = '';
                 if ($category_type) {
                     // Map category names to slugs - exact matching for German categories
@@ -240,9 +261,9 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
                     }
                 }
             ?>
-                <div class="mt-candidate-card" data-status="<?php echo esc_attr($status); ?>" data-name="<?php echo esc_attr(strtolower($candidate->post_title)); ?>" data-category="<?php echo esc_attr($category_slug); ?>">
+                <div class="mt-candidate-card" data-status="<?php echo esc_attr($status); ?>" data-name="<?php echo esc_attr(strtolower($candidate->name)); ?>" data-category="<?php echo esc_attr($category_slug); ?>">
                     <div class="mt-candidate-header">
-                        <h3 class="mt-candidate-name"><?php echo esc_html($candidate->post_title); ?></h3>
+                        <h3 class="mt-candidate-name"><?php echo esc_html($candidate->name); ?></h3>
                         <?php if ($organization) : ?>
                             <p class="mt-candidate-org"><?php echo esc_html($organization); ?></p>
                         <?php endif; ?>
@@ -285,7 +306,7 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
                         
                         <a href="#" 
                            class="mt-evaluate-btn" 
-                           data-candidate-id="<?php echo esc_attr($candidate->ID); ?>">
+                           data-candidate-id="<?php echo esc_attr($candidate->post_id ?: $candidate->id); ?>">
                             <?php
                             if ($status === 'completed') {
                                 _e('View/Edit Evaluation', 'mobility-trailblazers');
