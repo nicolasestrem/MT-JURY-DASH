@@ -1,0 +1,6 @@
+fix: Correct join key for candidate exports
+
+This commit fixes two issues related to data integrity in candidate exports:
+
+1.  The evaluations export was still referencing the `wp_posts` table to get the candidate name. It has been updated to use the `mt_candidates` table.
+2.  The assignments export was using the wrong join key (`id` instead of `post_id`) when joining with the `mt_candidates` table. This has been corrected to ensure that candidate names are correctly resolved for legacy assignments.

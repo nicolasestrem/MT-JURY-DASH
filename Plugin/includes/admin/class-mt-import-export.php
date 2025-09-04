@@ -150,10 +150,10 @@ class MT_Import_Export {
             $table_name = $wpdb->prefix . 'mt_evaluations';
             $evaluations = $wpdb->get_results("
                 SELECT e.*, 
-                       c.post_title as candidate_name, 
+                       c.name as candidate_name, 
                        COALESCE(j.post_title, u.display_name, CONCAT('User #', e.jury_member_id)) as jury_member
                 FROM {$table_name} e
-                LEFT JOIN {$wpdb->posts} c ON e.candidate_id = c.ID AND c.post_type = 'mt_candidate'
+                LEFT JOIN {$wpdb->prefix}mt_candidates c ON e.candidate_id = c.post_id
                 LEFT JOIN {$wpdb->posts} j ON e.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
                 LEFT JOIN {$wpdb->users} u ON e.jury_member_id = u.ID
                 WHERE e.status IN ('completed', 'draft', 'in_progress')
