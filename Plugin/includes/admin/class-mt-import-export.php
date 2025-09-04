@@ -266,7 +266,7 @@ class MT_Import_Export {
                        c.name as candidate_name,
                        COALESCE(j.post_title, u.display_name, CONCAT('User #', a.jury_member_id)) as jury_member
                 FROM {$table_name} a
-                LEFT JOIN {$wpdb->prefix}mt_candidates c ON a.candidate_id = c.id
+                LEFT JOIN {$wpdb->prefix}mt_candidates c ON a.candidate_id = c.post_id
                 LEFT JOIN {$wpdb->posts} j ON a.jury_member_id = j.ID AND j.post_type = 'mt_jury_member'
                 LEFT JOIN {$wpdb->users} u ON a.jury_member_id = u.ID
                 ORDER BY a.jury_member_id, a.candidate_id, a.assigned_at DESC

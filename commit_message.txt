@@ -1,0 +1,11 @@
+fix: Address critical issues from PR review
+
+This commit addresses several critical and medium priority issues identified during code review.
+
+High Priority Fixes:
+- Fixes a WP-CLI command registration conflict for the candidate migration command.
+- Corrects data integrity issues in exports by using consistent join keys for the `mt_candidates` table.
+- Fixes a JSON serialization bug in the data migration scripts where array data was not being correctly encoded.
+
+Medium Priority Fixes:
+- Hides the legacy `mt_candidate` Custom Post Type from the admin UI to reflect its deprecation.

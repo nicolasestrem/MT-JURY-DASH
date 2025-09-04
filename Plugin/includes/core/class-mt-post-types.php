@@ -81,10 +81,10 @@ class MT_Post_Types {
         
         $args = [
             'labels'             => $labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => 'mobility-trailblazers',
+            'public'             => false,
+            'publicly_queryable' => false,
+            'show_ui'            => false,
+            'show_in_menu'       => false,
             'query_var'          => true,
             'rewrite'            => ['slug' => 'candidate'],
             'capability_type'    => ['mt_candidate', 'mt_candidates'],

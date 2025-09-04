@@ -67,7 +67,7 @@ class MT_Migration_Command extends \WP_CLI_Command {
                 'linkedin_url' => get_post_meta($post->ID, '_mt_linkedin_url', true),
                 'website_url' => get_post_meta($post->ID, '_mt_website_url', true),
                 'article_url' => get_post_meta($post->ID, '_mt_article_url', true),
-                'description_sections' => get_post_meta($post->ID, '_mt_description_sections', true),
+                'description_sections' => wp_json_encode(get_post_meta($post->ID, '_mt_description_sections', true)),
                 'photo_attachment_id' => get_post_thumbnail_id($post->ID),
                 'created_at' => $post->post_date,
                 'updated_at' => $post->post_modified,
@@ -94,4 +94,4 @@ class MT_Migration_Command extends \WP_CLI_Command {
     }
 }
 
-\WP_CLI::add_command('mt', 'MobilityTrailblazers\CLI\MT_Migration_Command');
+\WP_CLI::add_command('mt migrate-candidates', 'MobilityTrailblazers\CLI\MT_Migration_Command');
