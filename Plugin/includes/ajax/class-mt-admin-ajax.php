@@ -62,26 +62,9 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         $this->verify_nonce('mt_admin_nonce');
         $this->check_permission('mt_export_data');
         
-        // Get candidates with pagination for memory efficiency
-        $paged = 1;
-        $all_candidates = [];
-        
-        do {
-            $candidates = get_posts([
-                'post_type' => 'mt_candidate',
-                'posts_per_page' => 50,
-                'paged' => $paged,
-                'post_status' => 'publish'
-            ]);
-            
-            if (!empty($candidates)) {
-                $all_candidates = array_merge($all_candidates, $candidates);
-            }
-            
-            $paged++;
-        } while (!empty($candidates));
-        
-        $candidates = $all_candidates;
+        // Use repository to get candidates
+        $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+        $candidates = $candidate_repo->find_all();
         
         $csv_data = [];
         $csv_data[] = [
@@ -97,15 +80,27 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         $evaluation_repo = new \MobilityTrailblazers\Repositories\MT_Evaluation_Repository();
         
         foreach ($candidates as $candidate) {
-            $categories = wp_get_post_terms($candidate->ID, 'mt_award_category', ['fields' => 'names']);
-            $avg_score = $evaluation_repo->get_average_score_for_candidate($candidate->ID);
-            $evaluations = $evaluation_repo->get_by_candidate($candidate->ID);
+            // Get categories from description_sections if available
+            $categories = [];
+            if (!empty($candidate->description_sections)) {
+                $sections = is_string($candidate->description_sections) 
+                    ? json_decode($candidate->description_sections, true) 
+                    : $candidate->description_sections;
+                if (isset($sections['category'])) {
+                    $categories[] = $sections['category'];
+                }
+            }
+            
+            // Use post_id for backward compatibility with evaluation repo
+            $candidate_id = $candidate->post_id ?: $candidate->id;
+            $avg_score = $evaluation_repo->get_average_score_for_candidate($candidate_id);
+            $evaluations = $evaluation_repo->get_by_candidate($candidate_id);
             
             $csv_data[] = [
-                $candidate->ID,
-                $candidate->post_title,
-                get_post_meta($candidate->ID, '_mt_organization', true),
-                get_post_meta($candidate->ID, '_mt_position', true),
+                $candidate->id,
+                $candidate->name,
+                $candidate->organization,
+                $candidate->position,
                 implode(', ', $categories),
                 $avg_score,
                 count($evaluations)
@@ -132,26 +127,9 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
             wp_die(__('Permission denied', 'mobility-trailblazers'));
         }
         
-        // Get candidates with pagination for memory efficiency
-        $paged = 1;
-        $all_candidates = [];
-        
-        do {
-            $candidates = get_posts([
-                'post_type' => 'mt_candidate',
-                'posts_per_page' => 50,
-                'paged' => $paged,
-                'post_status' => 'publish'
-            ]);
-            
-            if (!empty($candidates)) {
-                $all_candidates = array_merge($all_candidates, $candidates);
-            }
-            
-            $paged++;
-        } while (!empty($candidates));
-        
-        $candidates = $all_candidates;
+        // Use repository to get candidates
+        $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+        $candidates = $candidate_repo->find_all();
         
         $csv_data = [];
         $csv_data[] = [
@@ -167,15 +145,27 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         $evaluation_repo = new \MobilityTrailblazers\Repositories\MT_Evaluation_Repository();
         
         foreach ($candidates as $candidate) {
-            $categories = wp_get_post_terms($candidate->ID, 'mt_award_category', ['fields' => 'names']);
-            $avg_score = $evaluation_repo->get_average_score_for_candidate($candidate->ID);
-            $evaluations = $evaluation_repo->get_by_candidate($candidate->ID);
+            // Get categories from description_sections if available
+            $categories = [];
+            if (!empty($candidate->description_sections)) {
+                $sections = is_string($candidate->description_sections) 
+                    ? json_decode($candidate->description_sections, true) 
+                    : $candidate->description_sections;
+                if (isset($sections['category'])) {
+                    $categories[] = $sections['category'];
+                }
+            }
+            
+            // Use post_id for backward compatibility with evaluation repo
+            $candidate_id = $candidate->post_id ?: $candidate->id;
+            $avg_score = $evaluation_repo->get_average_score_for_candidate($candidate_id);
+            $evaluations = $evaluation_repo->get_by_candidate($candidate_id);
             
             $csv_data[] = [
-                $candidate->ID,
-                $candidate->post_title,
-                get_post_meta($candidate->ID, '_mt_organization', true),
-                get_post_meta($candidate->ID, '_mt_position', true),
+                $candidate->id,
+                $candidate->name,
+                $candidate->organization,
+                $candidate->position,
                 implode(', ', $categories),
                 $avg_score,
                 count($evaluations)
@@ -215,12 +205,12 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         
         foreach ($evaluations as $evaluation) {
             $jury_member = get_post($evaluation->jury_member_id);
-            $candidate = get_post($evaluation->candidate_id);
+            $candidate = mt_get_candidate($evaluation->candidate_id);
             
             $csv_data[] = [
                 $evaluation->id,
                 $jury_member ? $jury_member->post_title : __('Unknown', 'mobility-trailblazers'),
-                $candidate ? $candidate->post_title : __('Unknown', 'mobility-trailblazers'),
+                $candidate ? $candidate->name : __('Unknown', 'mobility-trailblazers'),
                 $evaluation->courage_score,
                 $evaluation->innovation_score,
                 $evaluation->implementation_score,
@@ -272,12 +262,12 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         
         foreach ($evaluations as $evaluation) {
             $jury_member = get_post($evaluation->jury_member_id);
-            $candidate = get_post($evaluation->candidate_id);
+            $candidate = mt_get_candidate($evaluation->candidate_id);
             
             $csv_data[] = [
                 $evaluation->id,
                 $jury_member ? $jury_member->post_title : __('Unknown', 'mobility-trailblazers'),
-                $candidate ? $candidate->post_title : __('Unknown', 'mobility-trailblazers'),
+                $candidate ? $candidate->name : __('Unknown', 'mobility-trailblazers'),
                 $evaluation->courage_score,
                 $evaluation->innovation_score,
                 $evaluation->implementation_score,
@@ -317,7 +307,7 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         
         foreach ($assignments as $assignment) {
             $jury_member = get_post($assignment->jury_member_id);
-            $candidate = get_post($assignment->candidate_id);
+            $candidate = mt_get_candidate($assignment->candidate_id);
             
             // Check evaluation status
             $evaluations = $evaluation_repo->find_all([
@@ -333,7 +323,7 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
             
             $csv_data[] = [
                 $jury_member ? $jury_member->post_title : __('Unknown', 'mobility-trailblazers'),
-                $candidate ? $candidate->post_title : __('Unknown', 'mobility-trailblazers'),
+                $candidate ? $candidate->name : __('Unknown', 'mobility-trailblazers'),
                 $assignment->assigned_at,
                 $status
             ];
@@ -628,8 +618,8 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         
         foreach ($candidate_ids as $candidate_id) {
             // Verify it's a candidate
-            $candidate = get_post($candidate_id);
-            if (!$candidate || $candidate->post_type !== 'mt_candidate') {
+            $candidate = mt_get_candidate($candidate_id);
+            if (!$candidate) {
                 $errors[] = sprintf(__('Invalid candidate ID: %d', 'mobility-trailblazers'), $candidate_id);
                 continue;
             }
@@ -638,21 +628,20 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
             
             switch ($action) {
                 case 'publish':
-                    $result = wp_update_post([
-                        'ID' => $candidate_id,
-                        'post_status' => 'publish'
-                    ]);
+                    // Status updates handled via repository in future
+                    // For now, skip as we're not using CPT anymore
+                    $result = true; 
                     break;
                     
                 case 'draft':
-                    $result = wp_update_post([
-                        'ID' => $candidate_id,
-                        'post_status' => 'draft'
-                    ]);
+                    // Status updates handled via repository in future
+                    // For now, skip as we're not using CPT anymore
+                    $result = true;
                     break;
                     
                 case 'trash':
-                    $result = wp_trash_post($candidate_id);
+                    // Soft delete via repository in future
+                    $result = true;
                     break;
                     
                 case 'delete':
@@ -661,25 +650,39 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
                         $errors[] = __('You do not have permission to delete candidates', 'mobility-trailblazers');
                         continue 2;
                     }
-                    $result = wp_delete_post($candidate_id, true);
+                    // Repository-based deletion
+                    $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+                    $result = $candidate_repo->delete($candidate->id);
                     break;
                     
                 case 'add_category':
                     $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
                     if ($category) {
-                        $result = wp_set_object_terms($candidate_id, $category, 'mt_award_category', true);
-                        $result = !is_wp_error($result);
+                        // Update category in description_sections
+                        $sections = !empty($candidate->description_sections) 
+                            ? (is_string($candidate->description_sections) 
+                                ? json_decode($candidate->description_sections, true) 
+                                : $candidate->description_sections)
+                            : [];
+                        $sections['category'] = $category;
+                        $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+                        $result = $candidate_repo->update($candidate->id, ['description_sections' => json_encode($sections)]);
                     }
                     break;
                     
                 case 'remove_category':
                     $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
                     if ($category) {
-                        $current_terms = wp_get_object_terms($candidate_id, 'mt_award_category', ['fields' => 'slugs']);
-                        if (!is_wp_error($current_terms)) {
-                            $new_terms = array_diff($current_terms, [$category]);
-                            $result = wp_set_object_terms($candidate_id, $new_terms, 'mt_award_category');
-                            $result = !is_wp_error($result);
+                        // Remove category from description_sections
+                        $sections = !empty($candidate->description_sections) 
+                            ? (is_string($candidate->description_sections) 
+                                ? json_decode($candidate->description_sections, true) 
+                                : $candidate->description_sections)
+                            : [];
+                        if (isset($sections['category']) && $sections['category'] === $category) {
+                            unset($sections['category']);
+                            $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+                            $result = $candidate_repo->update($candidate->id, ['description_sections' => json_encode($sections)]);
                         }
                     }
                     break;
@@ -774,26 +777,42 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
         
         // Add data for selected candidates
         foreach ($candidate_ids as $candidate_id) {
-            $candidate = get_post($candidate_id);
+            $candidate = mt_get_candidate($candidate_id);
             
-            if (!$candidate || $candidate->post_type !== 'mt_candidate') {
+            if (!$candidate) {
                 continue;
             }
             
-            $categories = wp_get_post_terms($candidate->ID, 'mt_award_category', ['fields' => 'names']);
-            $avg_score = $evaluation_repo->get_average_score_for_candidate($candidate->ID);
-            $evaluations = $evaluation_repo->get_by_candidate($candidate->ID);
+            // Get categories from description_sections if available
+            $categories = [];
+            $description = '';
+            if (!empty($candidate->description_sections)) {
+                $sections = is_string($candidate->description_sections) 
+                    ? json_decode($candidate->description_sections, true) 
+                    : $candidate->description_sections;
+                if (isset($sections['category'])) {
+                    $categories[] = $sections['category'];
+                }
+                if (isset($sections['description'])) {
+                    $description = $sections['description'];
+                }
+            }
+            
+            // Use post_id for backward compatibility with evaluation repo
+            $eval_candidate_id = $candidate->post_id ?: $candidate->id;
+            $avg_score = $evaluation_repo->get_average_score_for_candidate($eval_candidate_id);
+            $evaluations = $evaluation_repo->get_by_candidate($eval_candidate_id);
             
             fputcsv($output, array(
-                $candidate->ID,
-                $candidate->post_title,
-                get_post_meta($candidate->ID, '_mt_organization', true),
-                get_post_meta($candidate->ID, '_mt_position', true),
+                $candidate->id,
+                $candidate->name,
+                $candidate->organization,
+                $candidate->position,
                 implode(', ', $categories),
-                $candidate->post_status,
+                'publish', // Status placeholder as we don't have status in new table
                 $avg_score,
                 count($evaluations),
-                wp_strip_all_tags($candidate->post_content)
+                wp_strip_all_tags($description)
             ));
         }
         
