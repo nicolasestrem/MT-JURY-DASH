@@ -51,11 +51,14 @@ class MT_Candidates_Admin {
      * Add menu page
      */
     public function add_menu_page() {
+        // Fallback to manage_options so admins always see the page
+        $capability = current_user_can('mt_manage_candidates') ? 'mt_manage_candidates' : 'manage_options';
+
         add_submenu_page(
             'mobility-trailblazers',
             __('Candidates', 'mobility-trailblazers'),
             __('Candidates', 'mobility-trailblazers'),
-            'mt_manage_candidates',
+            $capability,
             'mt-candidates',
             [$this, 'render_page']
         );

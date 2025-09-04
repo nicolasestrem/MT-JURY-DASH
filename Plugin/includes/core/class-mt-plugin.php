@@ -337,8 +337,12 @@ class MT_Plugin {
             }
         }
         
-        // Candidate routing is handled directly in mobility-trailblazers.php
-        
+        // Initialize CPT-free candidate router and template loader
+        if (file_exists(MT_PLUGIN_DIR . 'includes/core/class-mt-candidate-router.php')) {
+            require_once MT_PLUGIN_DIR . 'includes/core/class-mt-candidate-router.php';
+            \MobilityTrailblazers\Core\MT_Candidate_Router::init();
+        }
+
         // Initialize template loader for enhanced candidate profiles
         MT_Template_Loader::init();
         

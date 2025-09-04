@@ -89,6 +89,12 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
 
 <div class="mt-root">
 <div class="mt-jury-dashboard mt-dashboard-v3">
+    <style>
+    /* Improve candidate card image framing to reduce head cropping */
+    .mt-card-image-wrap { overflow: hidden; border-radius: 10px; }
+    .mt-card__image { width: 100%; height: 180px; object-fit: cover; object-position: 50% 20%; display: block; }
+    @media (max-width: 768px) { .mt-card__image { height: 200px; } }
+    </style>
     <?php if ($progress['completion_rate'] == 100) : ?>
         <div class="mt-completion-status-banner">
             <div class="mt-completion-status-content">
@@ -268,8 +274,24 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
                             <p class="mt-candidate-org"><?php echo esc_html($organization); ?></p>
                         <?php endif; ?>
                     </div>
-                    
+
                     <div class="mt-candidate-body">
+                        <?php
+                        // Candidate card image (photo_attachment_id -> post thumbnail -> placeholder)
+                        $card_img = '';
+                        if (!empty($candidate->photo_attachment_id)) {
+                            $card_img = wp_get_attachment_image($candidate->photo_attachment_id, 'medium', false, ['class' => 'mt-card__image']);
+                        } elseif (!empty($candidate->post_id) && has_post_thumbnail($candidate->post_id)) {
+                            $card_img = get_the_post_thumbnail($candidate->post_id, 'medium', ['class' => 'mt-card__image']);
+                        }
+                        ?>
+                        <div class="mt-card-image-wrap" style="width:100%;max-height:180px;overflow:hidden;border-radius:10px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+                            <?php if ($card_img) : ?>
+                                <?php echo $card_img; ?>
+                            <?php else : ?>
+                                <span class="dashicons dashicons-businessperson" style="font-size:48px;color:#cbd5e1;"></span>
+                            <?php endif; ?>
+                        </div>
                         <?php 
                         // Display category badge - prioritize category_type from meta, fallback to taxonomy
                         $category_display_name = '';

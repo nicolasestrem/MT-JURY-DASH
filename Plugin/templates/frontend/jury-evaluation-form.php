@@ -46,12 +46,17 @@ if (!empty($candidate->description_sections)) {
     $category_type = isset($sections['category']) ? $sections['category'] : 
                     (isset($sections['award_category']) ? $sections['award_category'] : '');
     
-    // Get evaluation criteria from sections
-    $criterion_courage = isset($sections['courage']) ? $sections['courage'] : '';
-    $criterion_innovation = isset($sections['innovation']) ? $sections['innovation'] : '';
-    $criterion_implementation = isset($sections['implementation']) ? $sections['implementation'] : '';
-    $criterion_relevance = isset($sections['relevance']) ? $sections['relevance'] : '';
-    $criterion_visibility = isset($sections['visibility']) ? $sections['visibility'] : '';
+    // Get evaluation criteria from sections (support both English and German keys)
+    $criterion_courage = $sections['courage']
+        ?? ($sections['mut_pioniergeist'] ?? '');
+    $criterion_innovation = $sections['innovation']
+        ?? ($sections['innovationsgrad'] ?? '');
+    $criterion_implementation = $sections['implementation']
+        ?? ($sections['umsetzungskraft_wirkung'] ?? '');
+    $criterion_relevance = $sections['relevance']
+        ?? ($sections['relevanz_mobilitaetswende'] ?? '');
+    $criterion_visibility = $sections['visibility']
+        ?? ($sections['vorbild_sichtbarkeit'] ?? '');
 }
 
 // Get photo

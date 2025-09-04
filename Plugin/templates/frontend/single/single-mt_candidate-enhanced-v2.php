@@ -23,27 +23,21 @@ get_header();
 $candidate_data = null;
 $candidate_id = 0;
 
-// Check if we have candidate data from the router first
+// Prefer router-provided candidate; otherwise map current post to repo
 if (isset($GLOBALS['mt_current_candidate'])) {
     $candidate_data = $GLOBALS['mt_current_candidate'];
     $candidate_id = $candidate_data->post_id ?? 0;
-    
-    // Set up post data if we have a post_id
     if ($candidate_id && have_posts()) {
-        while (have_posts()) : the_post();
-            break; // We just need to set up the post data
-        endwhile;
+        the_post();
     }
-} elseif (have_posts()) {
-    // Fallback to traditional method
-    while (have_posts()) : the_post();
-    
-    $candidate_id = get_the_ID();
-    
-    // Get candidate from repository using helper function
-    $candidate_data = mt_get_candidate_by_post_id($candidate_id);
-    if (!$candidate_data) {
-        $candidate_data = mt_get_candidate($candidate_id);
+} else {
+    if (have_posts()) {
+        the_post();
+        $candidate_id = get_the_ID();
+        $candidate_data = mt_get_candidate_by_post_id($candidate_id);
+        if (!$candidate_data) {
+            $candidate_data = mt_get_candidate($candidate_id);
+        }
     }
 }
 
@@ -74,12 +68,9 @@ if ($candidate_data) :
     // Get overview (Überblick) from description_sections
     $overview = '';
     if ($description_sections) {
-        if (!empty($description_sections['overview'])) {
-            $overview = $description_sections['overview'];
-        } elseif (!empty($description_sections['ueberblick'])) {
-            $overview = $description_sections['ueberblick'];
-        } elseif (!empty($description_sections['description'])) {
-            $overview = $description_sections['description'];
+        $overview_keys = ['overview', 'ueberblick', 'überblick', 'uberblick', 'description', 'summary'];
+        foreach ($overview_keys as $ok) {
+            if (!empty($description_sections[$ok])) { $overview = $description_sections[$ok]; break; }
         }
     }
     
@@ -90,6 +81,25 @@ if ($candidate_data) :
     $eval_criteria_meta = '';
     if ($description_sections && isset($description_sections['evaluation_criteria'])) {
         $eval_criteria_meta = $description_sections['evaluation_criteria'];
+    }
+
+    // Prefer structured keys if present
+    if ($description_sections) {
+        $criteria_map = [
+            'mut_pioniergeist' => ['key' => 'courage', 'label' => 'Mut & Pioniergeist'],
+            'innovationsgrad' => ['key' => 'innovation', 'label' => 'Innovationsgrad'],
+            'umsetzungskraft_wirkung' => ['key' => 'implementation', 'label' => 'Umsetzungskraft & Wirkung'],
+            'relevanz_mobilitaetswende' => ['key' => 'relevance', 'label' => 'Relevanz f&uuml;r die Mobilit&auml;tswende'],
+            'vorbild_sichtbarkeit' => ['key' => 'visibility', 'label' => 'Vorbildfunktion & Sichtbarkeit'],
+        ];
+        foreach ($criteria_map as $section_key => $meta) {
+            if (!empty($description_sections[$section_key])) {
+                $parsed_criteria[$meta['key']] = [
+                    'label' => $meta['label'],
+                    'content' => nl2br($description_sections[$section_key])
+                ];
+            }
+        }
     }
     
     if ($eval_criteria_meta && !empty(trim($eval_criteria_meta))) {
