@@ -49,8 +49,9 @@ if ($remove_data === '1') {
     $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_site_transient_mt_%'");
     $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_site_transient_timeout_mt_%'");
     
-    // Log the preservation
+    // Log the preservation (Note: translations not available during uninstall)
     if (function_exists('error_log')) {
+        // Using English string as translations are not loaded during uninstall
         error_log('Mobility Trailblazers: Plugin uninstalled. Data preserved as per user settings.');
     }
 }

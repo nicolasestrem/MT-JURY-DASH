@@ -79,21 +79,28 @@ class MT_Post_Types {
             'items_list'            => _x('Candidates list', 'Screen reader text', 'mobility-trailblazers'),
         ];
         
+        /**
+         * DEPRECATED: This CPT is deprecated as of v2.5.42
+         * Data has been migrated to wp_mt_candidates custom table
+         * Keeping registration for backward compatibility only
+         * 
+         * @deprecated 2.5.42 Use MT_Candidate_Repository instead
+         */
         $args = [
             'labels'             => $labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => 'mobility-trailblazers',
-            'query_var'          => true,
-            'rewrite'            => ['slug' => 'candidate'],
+            'public'             => false, // DEPRECATED: Hide from public
+            'publicly_queryable' => false, // DEPRECATED: Prevent front-end queries
+            'show_ui'            => false, // DEPRECATED: Hide from admin UI
+            'show_in_menu'       => false, // DEPRECATED: Remove from admin menu
+            'query_var'          => false, // DEPRECATED: Disable query var
+            'rewrite'            => false, // DEPRECATED: No rewrites needed
             'capability_type'    => ['mt_candidate', 'mt_candidates'],
             'map_meta_cap'       => true,
-            'has_archive'        => true,
+            'has_archive'        => false, // DEPRECATED: No archive pages
             'hierarchical'       => false,
             'menu_position'      => null,
             'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
-            'show_in_rest'       => true,
+            'show_in_rest'       => false, // DEPRECATED: Hide from REST API
         ];
         
         register_post_type('mt_candidate', $args);

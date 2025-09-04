@@ -69,10 +69,10 @@ class MT_Import_Export {
                     delete_transient($export_key);
                     
                     if ($specific_candidates && is_array($specific_candidates)) {
-                        // Validate all IDs are integers and belong to mt_candidate post type
+                        // Validate all IDs are integers
                         $specific_candidates = array_map('intval', $specific_candidates);
                         $specific_candidates = array_filter($specific_candidates, function($id) {
-                            return $id > 0 && get_post_type($id) === 'mt_candidate';
+                            return $id > 0;
                         });
                         
                         if (!empty($specific_candidates)) {
@@ -104,22 +104,28 @@ class MT_Import_Export {
                 }
             }
             
-            // Build query arguments
-            $query_args = [
-                'post_type' => 'mt_candidate',
-                'posts_per_page' => -1,
-                'orderby' => 'title',
-                'order' => 'ASC',
-                'post_status' => 'any'
-            ];
+            // Use repository to get candidates
+            $repository = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
             
-            // If specific candidates were requested, filter by them
+            // Get candidates based on selection
             if (!empty($specific_candidates)) {
-                $query_args['post__in'] = $specific_candidates;
-            }
+                // Get specific candidates by post IDs
+                $candidates = [];
+                foreach ($specific_candidates as $post_id) {
+                    // Get candidate by post_id from custom table
+                    $candidate = $wpdb->get_row($wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}mt_candidates WHERE post_id = %d",
+                        $post_id
+                    ));
+                    if ($candidate) {
+                        $candidates[] = $candidate;
+                    }
+                }
+            } else {
+                // Get all candidates from repository
+                $candidates = $repository->find_all();
             
-            // Get candidates
-            $candidates = get_posts($query_args);
+            }
             
             if (empty($candidates)) {
                 MT_Logger::warning('No candidates found for export');
@@ -140,84 +146,53 @@ class MT_Import_Export {
                 wp_die(__('Export failed: Unable to create output file.', 'mobility-trailblazers'));
             }
         
-        // Write headers with consistent structure
-        fputcsv($output, [
-            'ID',
-            'Name',
-            'Company',
-            'Category',
-            'Description',
-            'Innovation',
-            'Website',
-            'LinkedIn',
-            'Email',
-            'Status',
-            'Created Date',
-            'Modified Date'
-        ]);
-        
-        // Optimize meta data fetching - get all meta at once
-        $candidate_ids = wp_list_pluck($candidates, 'ID');
-        if (!empty($candidate_ids)) {
-            // SECURITY FIX: Properly handle IN clause to prevent SQL injection
-            // Ensure all IDs are integers
-            $candidate_ids = array_map('intval', $candidate_ids);
+            // Write headers with consistent structure
+            fputcsv($output, [
+                'ID',
+                'Name',
+                'Organization',
+                'Position',
+                'Country',
+                'Description',
+                'Category',
+                'Website',
+                'LinkedIn',
+                'Article URL',
+                'Created Date',
+                'Updated Date'
+            ]);
             
-            // Build the query with proper placeholders
-            $placeholders = array_fill(0, count($candidate_ids), '%d');
-            $in_placeholders = implode(',', $placeholders);
-            
-            // Build the complete query with all parameters
-            $query = "SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta} 
-                     WHERE post_id IN ({$in_placeholders}) 
-                     AND meta_key IN (%s, %s, %s, %s, %s, %s, %s, %s)";
-            
-            // Merge all parameters for prepare
-            $query_params = array_merge(
-                $candidate_ids,
-                [
-                    '_mt_candidate_name',
-                    '_mt_organization', 
-                    '_mt_category_type',
-                    '_mt_description_full',
-                    '_mt_innovation',
-                    '_mt_website_url',
-                    '_mt_linkedin_url',
-                    '_mt_email'
-                ]
-            );
-            
-            $meta_query = $wpdb->prepare($query, $query_params);
-            $all_meta = $wpdb->get_results($meta_query);
-            
-            // Organize meta by post ID
-            $meta_by_post = [];
-            foreach ($all_meta as $meta) {
-                if (!isset($meta_by_post[$meta->post_id])) {
-                    $meta_by_post[$meta->post_id] = [];
+            // Write data using repository data structure
+            if (!empty($candidates)) {
+                foreach ($candidates as $candidate) {
+                    // Decode description sections if stored as JSON
+                    $description_sections = !empty($candidate->description_sections) 
+                        ? json_decode($candidate->description_sections, true) 
+                        : [];
+                    
+                    // Extract category from description sections if available
+                    $category = isset($description_sections['category']) ? $description_sections['category'] : 
+                               (isset($description_sections['award_category']) ? $description_sections['award_category'] : '');
+                    
+                    // Get main description
+                    $description = isset($description_sections['description']) ? $description_sections['description'] : '';
+                    
+                    fputcsv($output, [
+                        $candidate->id,
+                        $candidate->name,
+                        $candidate->organization,
+                        $candidate->position ?? '',
+                        $candidate->country ?? 'Germany',
+                        $description,
+                        $category,
+                        $candidate->website_url ?? '',
+                        $candidate->linkedin_url ?? '',
+                        $candidate->article_url ?? '',
+                        self::format_date_iso8601($candidate->created_at),
+                        self::format_date_iso8601($candidate->updated_at)
+                    ]);
                 }
-                $meta_by_post[$meta->post_id][$meta->meta_key] = $meta->meta_value;
             }
-            
-            // Write data using cached meta
-            foreach ($candidates as $candidate) {
-                $meta = isset($meta_by_post[$candidate->ID]) ? $meta_by_post[$candidate->ID] : [];
-                fputcsv($output, [
-                    $candidate->ID,
-                    isset($meta['_mt_candidate_name']) ? $meta['_mt_candidate_name'] : $candidate->post_title,
-                    isset($meta['_mt_organization']) ? $meta['_mt_organization'] : '',
-                    isset($meta['_mt_category_type']) ? $meta['_mt_category_type'] : '',
-                    isset($meta['_mt_description_full']) ? $meta['_mt_description_full'] : $candidate->post_content,
-                    isset($meta['_mt_innovation']) ? $meta['_mt_innovation'] : '',
-                    isset($meta['_mt_website_url']) ? $meta['_mt_website_url'] : '',
-                    isset($meta['_mt_linkedin_url']) ? $meta['_mt_linkedin_url'] : '',
-                    isset($meta['_mt_email']) ? $meta['_mt_email'] : '',
-                    $candidate->post_status,
-                    self::format_date_iso8601($candidate->post_date),
-                    self::format_date_iso8601($candidate->post_modified)
-                ]);
-            }
-        }
         
             fclose($output);
             
