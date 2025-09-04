@@ -15,58 +15,68 @@ get_header();
 
 while (have_posts()) : the_post();
     $candidate_id = get_the_ID();
-    $organization = get_post_meta($candidate_id, '_mt_organization', true) ?: '';
-    $position = get_post_meta($candidate_id, '_mt_position', true) ?: '';
-    $display_name = get_post_meta($candidate_id, '_mt_candidate_name', true) ?: get_the_title();
     
-    // Get content from all possible sources in priority order
-    $full_description = get_the_content();
-    if (empty($full_description)) {
-        // Check the custom editor's overview field
-        $full_description = get_post_meta($candidate_id, '_mt_overview', true);
+    // Get candidate from repository
+    $candidate = mt_get_candidate_by_post_id($candidate_id);
+    if (!$candidate) {
+        // Fallback - try by ID
+        $candidate = mt_get_candidate($candidate_id);
     }
-    if (empty($full_description)) {
-        // Fallback to legacy description field
-        $full_description = get_post_meta($candidate_id, '_mt_description_full', true);
-    }
-    $linkedin = get_post_meta($candidate_id, '_mt_linkedin_url', true) ?: '';
-    $website = get_post_meta($candidate_id, '_mt_website_url', true) ?: '';
     
-    // Get individual evaluation criteria
-    $eval_courage = get_post_meta($candidate_id, '_mt_evaluation_courage', true) ?: '';
-    $eval_innovation = get_post_meta($candidate_id, '_mt_evaluation_innovation', true) ?: '';
-    $eval_implementation = get_post_meta($candidate_id, '_mt_evaluation_implementation', true) ?: '';
-    $eval_relevance = get_post_meta($candidate_id, '_mt_evaluation_relevance', true) ?: '';
-    $eval_visibility = get_post_meta($candidate_id, '_mt_evaluation_visibility', true) ?: '';
-    $categories = wp_get_post_terms($candidate_id, 'mt_award_category');
-    $category_slug = !empty($categories) ? $categories[0]->slug : 'default';
+    // Extract data from candidate object
+    $organization = $candidate ? $candidate->organization : '';
+    $position = $candidate ? $candidate->position : '';
+    $display_name = $candidate ? $candidate->name : get_the_title();
+    $linkedin = $candidate ? $candidate->linkedin_url : '';
+    $website = $candidate ? $candidate->website_url : '';
     
-    // Build criteria sections from individual fields
+    // Get content from description_sections
+    $full_description = '';
+    $category_slug = 'default';
     $criteria_sections = [];
-    if ($eval_courage) {
-        $criteria_sections['mut'] = $eval_courage;
-    }
-    if ($eval_innovation) {
-        $criteria_sections['innovation'] = $eval_innovation;
-    }
-    if ($eval_implementation) {
-        $criteria_sections['umsetzung'] = $eval_implementation;
-    }
-    if ($eval_relevance) {
-        $criteria_sections['relevanz'] = $eval_relevance;
-    }
-    if ($eval_visibility) {
-        $criteria_sections['vorbild'] = $eval_visibility;
+    
+    if ($candidate && !empty($candidate->description_sections)) {
+        $sections = is_string($candidate->description_sections) 
+            ? json_decode($candidate->description_sections, true) 
+            : $candidate->description_sections;
+        
+        // Extract description
+        $full_description = isset($sections['description']) ? $sections['description'] : '';
+        if (empty($full_description) && isset($sections['overview'])) {
+            $full_description = $sections['overview'];
+        }
+        
+        // Extract category
+        if (isset($sections['category'])) {
+            $category_slug = strtolower($sections['category']);
+        }
+        
+        // Extract evaluation criteria
+        if (isset($sections['evaluation_courage'])) {
+            $criteria_sections['mut'] = $sections['evaluation_courage'];
+        }
+        if (isset($sections['evaluation_innovation'])) {
+            $criteria_sections['innovation'] = $sections['evaluation_innovation'];
+        }
+        if (isset($sections['evaluation_implementation'])) {
+            $criteria_sections['umsetzung'] = $sections['evaluation_implementation'];
+        }
+        if (isset($sections['evaluation_relevance'])) {
+            $criteria_sections['relevanz'] = $sections['evaluation_relevance'];
+        }
+        if (isset($sections['evaluation_visibility'])) {
+            $criteria_sections['vorbild'] = $sections['evaluation_visibility'];
+        }
+        
+        // Check for combined criteria
+        if (empty($criteria_sections) && isset($sections['evaluation_criteria'])) {
+            $criteria_sections['combined'] = $sections['evaluation_criteria'];
+        }
     }
     
-    // If no individual criteria, check for combined criteria field from editor
-    if (empty($criteria_sections)) {
-        $combined_criteria = get_post_meta($candidate_id, '_mt_evaluation_criteria', true);
-        if ($combined_criteria) {
-            // Parse the combined criteria text to extract sections
-            // This maintains compatibility with the custom editor
-            $criteria_sections['combined'] = $combined_criteria;
-        }
+    // Fallback to WordPress content if no description found
+    if (empty($full_description)) {
+        $full_description = get_the_content();
     }
 ?>
 

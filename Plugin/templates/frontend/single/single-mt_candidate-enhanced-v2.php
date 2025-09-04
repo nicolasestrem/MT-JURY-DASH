@@ -25,43 +25,53 @@ if (have_posts()) :
     
     $candidate_id = get_the_ID();
     
-    // Try to get data from new candidates table first
-    global $wpdb;
-    $candidates_table = $wpdb->prefix . 'mt_candidates';
-    $candidate_data = $wpdb->get_row($wpdb->prepare(
-        "SELECT * FROM {$candidates_table} WHERE post_id = %d",
-        $candidate_id
-    ));
+    // Get candidate from repository using helper function
+    $candidate_data = mt_get_candidate_by_post_id($candidate_id);
+    if (!$candidate_data) {
+        $candidate_data = mt_get_candidate($candidate_id);
+    }
     
-    // Decode description sections if from new table
+    // Decode description sections if from repository
     $description_sections = null;
     if ($candidate_data && !empty($candidate_data->description_sections)) {
-        $description_sections = json_decode($candidate_data->description_sections, true);
+        $description_sections = is_string($candidate_data->description_sections)
+            ? json_decode($candidate_data->description_sections, true)
+            : $candidate_data->description_sections;
     }
     
-    // Fallback to post meta
-    $organization = $candidate_data ? $candidate_data->organization : get_post_meta($candidate_id, '_mt_organization', true);
-    $position = $candidate_data ? $candidate_data->position : get_post_meta($candidate_id, '_mt_position', true);
-    $display_name = get_the_title();
-    $linkedin = $candidate_data ? $candidate_data->linkedin_url : get_post_meta($candidate_id, '_mt_linkedin_url', true);
-    $website = $candidate_data ? $candidate_data->website_url : get_post_meta($candidate_id, '_mt_website_url', true);
+    // Extract data from candidate object
+    $organization = $candidate_data ? $candidate_data->organization : '';
+    $position = $candidate_data ? $candidate_data->position : '';
+    $display_name = $candidate_data ? $candidate_data->name : get_the_title();
+    $linkedin = $candidate_data ? $candidate_data->linkedin_url : '';
+    $website = $candidate_data ? $candidate_data->website_url : '';
     
-    // Get category from meta field instead of taxonomy
-    $category_meta = get_post_meta($candidate_id, '_mt_category_type', true);
-    $categories = $category_meta ? array((object)array('name' => $category_meta)) : array();
-    
-    // Get overview (Überblick) - prioritize meta field (from editor) over database table
-    $overview = get_post_meta($candidate_id, '_mt_overview', true);
-    if (empty($overview) && $description_sections && !empty($description_sections['ueberblick'])) {
-        $overview = $description_sections['ueberblick'];
+    // Get category from description_sections
+    $categories = array();
+    if ($description_sections && isset($description_sections['category'])) {
+        $categories = array((object)array('name' => $description_sections['category']));
     }
     
+    // Get overview (Überblick) from description_sections
+    $overview = '';
+    if ($description_sections) {
+        if (!empty($description_sections['overview'])) {
+            $overview = $description_sections['overview'];
+        } elseif (!empty($description_sections['ueberblick'])) {
+            $overview = $description_sections['ueberblick'];
+        } elseif (!empty($description_sections['description'])) {
+            $overview = $description_sections['description'];
+        }
+    }
     
-    // Parse evaluation criteria - prioritize meta fields over database
+    // Parse evaluation criteria from description_sections
     $parsed_criteria = [];
     
-    // First check if we have the combined criteria field from editor
-    $eval_criteria_meta = get_post_meta($candidate_id, '_mt_evaluation_criteria', true);
+    // Check if we have evaluation criteria in description_sections
+    $eval_criteria_meta = '';
+    if ($description_sections && isset($description_sections['evaluation_criteria'])) {
+        $eval_criteria_meta = $description_sections['evaluation_criteria'];
+    }
     
     if ($eval_criteria_meta && !empty(trim($eval_criteria_meta))) {
         // Parse the meta field for sections - handle both ** and <strong> formats
