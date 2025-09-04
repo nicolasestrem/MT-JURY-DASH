@@ -1,0 +1,3 @@
+refactor: Remove dead code from post types
+
+Removes the `render_candidate_details_meta_box` method, which was orphaned after its meta box registration was commented out.
