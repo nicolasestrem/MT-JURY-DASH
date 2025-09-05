@@ -50,7 +50,7 @@ class MT_Post_Types {
      * @return void
      */
     private function register_candidate_post_type() {
-        // Keep CPT registered but hidden to support migrations and legacy APIs
+        // Keep registered but hidden during migration phase
         $labels = [
             'name'          => _x('Candidates', 'Post type general name', 'mobility-trailblazers'),
             'singular_name' => _x('Candidate', 'Post type singular name', 'mobility-trailblazers'),
