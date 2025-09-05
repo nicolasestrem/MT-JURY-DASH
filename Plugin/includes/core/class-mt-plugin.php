@@ -788,7 +788,7 @@ class MT_Plugin {
         // Scripts
         wp_enqueue_script(
             'mt-admin',
-            MT_PLUGIN_URL . 'assets/js/admin.js',
+            MT_PLUGIN_URL . 'assets/js/mt-admin.js',
             ['jquery', 'wp-util'],
             MT_VERSION,
             true
