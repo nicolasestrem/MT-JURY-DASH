@@ -10,3 +10,4 @@ Welcome to the developer documentation for the Mobility Trailblazers WordPress p
 *   **[Shortcodes](shortcodes.md):** A list of available shortcodes and their usage.
 *   **[AJAX API](ajax-api.md):** Documentation for the plugin's AJAX endpoints.
 *   **[CLI Commands](cli-commands.md):** A guide to the available WP-CLI commands for managing the plugin.
+*   **[Candidates: Data Coverage](candidates-data-coverage.md):** End‑to‑end mapping of candidate fields (admin → public → evaluation), including `description_sections` and category/overview behavior.

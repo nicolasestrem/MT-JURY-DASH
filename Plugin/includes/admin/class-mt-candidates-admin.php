@@ -148,9 +148,29 @@ class MT_Candidates_Admin {
         // Decode description sections if exists
         $description_sections = [];
         if ($candidate && !empty($candidate->description_sections)) {
-            $description_sections = is_string($candidate->description_sections) 
-                ? json_decode($candidate->description_sections, true) 
+            $description_sections = is_string($candidate->description_sections)
+                ? json_decode($candidate->description_sections, true)
                 : $candidate->description_sections;
+        }
+        // Prepare prefilled values from sections
+        $prefill_overview = '';
+        $prefill_criteria = '';
+        $prefill_category = '';
+        if (!empty($description_sections)) {
+            // Overview keys: prefer 'overview', fallback to variants or legacy 'description'
+            foreach (['overview', 'ueberblick', 'überblick', 'uberblick', 'description', 'summary'] as $okey) {
+                if (!empty($description_sections[$okey])) { $prefill_overview = $description_sections[$okey]; break; }
+            }
+            // Combined evaluation criteria (rich text)
+            if (!empty($description_sections['evaluation_criteria'])) {
+                $prefill_criteria = $description_sections['evaluation_criteria'];
+            }
+            // Category name stored in sections (string)
+            if (!empty($description_sections['category'])) {
+                $prefill_category = $description_sections['category'];
+            } elseif (!empty($description_sections['award_category'])) {
+                $prefill_category = $description_sections['award_category'];
+            }
         }
         
         ?>
@@ -230,36 +250,88 @@ class MT_Candidates_Admin {
                                 <label for="candidate_linkedin"><?php _e('LinkedIn URL', 'mobility-trailblazers'); ?></label>
                             </th>
                             <td>
-                                <input type="url" name="candidate[linkedin_url]" id="candidate_linkedin" 
-                                       value="<?php echo $candidate ? esc_url($candidate->linkedin_url) : ''; ?>" 
+                                <input type="url" name="candidate[linkedin_url]" id="candidate_linkedin"
+                                       value="<?php echo $candidate ? esc_url($candidate->linkedin_url) : ''; ?>"
                                        class="regular-text" />
                             </td>
                         </tr>
-                        
+
                         <tr>
                             <th scope="row">
                                 <label for="candidate_website"><?php _e('Website URL', 'mobility-trailblazers'); ?></label>
                             </th>
                             <td>
-                                <input type="url" name="candidate[website_url]" id="candidate_website" 
-                                       value="<?php echo $candidate ? esc_url($candidate->website_url) : ''; ?>" 
+                                <input type="url" name="candidate[website_url]" id="candidate_website"
+                                       value="<?php echo $candidate ? esc_url($candidate->website_url) : ''; ?>"
                                        class="regular-text" />
                             </td>
                         </tr>
-                        
+
                         <tr>
                             <th scope="row">
-                                <label for="candidate_description"><?php _e('Description', 'mobility-trailblazers'); ?></label>
+                                <label for="candidate_article_url"><?php _e('Article URL', 'mobility-trailblazers'); ?></label>
+                            </th>
+                            <td>
+                                <input type="url" name="candidate[article_url]" id="candidate_article_url"
+                                       value="<?php echo $candidate ? esc_url($candidate->article_url) : ''; ?>"
+                                       class="regular-text" />
+                                <p class="description"><?php _e('Optional: Link to press article or reference.', 'mobility-trailblazers'); ?></p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="candidate_category"><?php _e('Category', 'mobility-trailblazers'); ?></label>
                             </th>
                             <td>
                                 <?php
-                                $description = isset($description_sections['description']) ? $description_sections['description'] : '';
-                                wp_editor($description, 'candidate_description', [
-                                    'textarea_name' => 'candidate[description]',
+                                $categories = [
+                                    'Etablierte Unternehmen' => __('Etablierte Unternehmen', 'mobility-trailblazers'),
+                                    'Governance & Verwaltungen, Politik, öffentliche Unternehmen' => __('Governance & Verwaltungen, Politik, öffentliche Unternehmen', 'mobility-trailblazers'),
+                                    'Start-ups, Scale-ups & Katalysatoren' => __('Start-ups, Scale-ups & Katalysatoren', 'mobility-trailblazers'),
+                                ];
+                                ?>
+                                <select name="candidate[category]" id="candidate_category">
+                                    <option value=""><?php _e('- No Category -', 'mobility-trailblazers'); ?></option>
+                                    <?php foreach ($categories as $value => $label) : ?>
+                                        <option value="<?php echo esc_attr($value); ?>" <?php selected($prefill_category, $value); ?>>
+                                            <?php echo esc_html($label); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description"><?php _e('Displayed and used for filtering and evaluation groupings.', 'mobility-trailblazers'); ?></p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="candidate_overview"><?php _e('Overview (Überblick)', 'mobility-trailblazers'); ?></label>
+                            </th>
+                            <td>
+                                <?php
+                                wp_editor($prefill_overview, 'candidate_overview', [
+                                    'textarea_name' => 'candidate[overview]',
                                     'textarea_rows' => 10,
                                     'media_buttons' => false,
                                 ]);
                                 ?>
+                                <p class="description"><?php _e('Short overview shown on candidate pages and evaluation.', 'mobility-trailblazers'); ?></p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="candidate_evaluation_criteria"><?php _e('Evaluation Criteria (combined)', 'mobility-trailblazers'); ?></label>
+                            </th>
+                            <td>
+                                <?php
+                                wp_editor($prefill_criteria, 'candidate_evaluation_criteria', [
+                                    'textarea_name' => 'candidate[evaluation_criteria]',
+                                    'textarea_rows' => 12,
+                                    'media_buttons' => false,
+                                ]);
+                                ?>
+                                <p class="description"><?php _e('Use bold headers, e.g., "Mut & Pioniergeist:" on new lines for each criterion.', 'mobility-trailblazers'); ?></p>
                             </td>
                         </tr>
                         
@@ -376,11 +448,19 @@ class MT_Candidates_Admin {
         
         // Prepare description sections
         $description_sections = [];
-        if (!empty($candidate_data['description'])) {
-            $description_sections['description'] = wp_kses_post($candidate_data['description']);
+        if (!empty($candidate_data['overview'])) {
+            $description_sections['overview'] = wp_kses_post($candidate_data['overview']);
+            // Keep legacy field in sync for backward compatibility
+            $description_sections['description'] = $description_sections['overview'];
+        }
+        if (!empty($candidate_data['evaluation_criteria'])) {
+            $description_sections['evaluation_criteria'] = wp_kses_post($candidate_data['evaluation_criteria']);
+        }
+        if (!empty($candidate_data['category'])) {
+            $description_sections['category'] = sanitize_text_field($candidate_data['category']);
         }
         $candidate_data['description_sections'] = $description_sections;
-        unset($candidate_data['description']);
+        unset($candidate_data['overview'], $candidate_data['evaluation_criteria'], $candidate_data['category']);
         
         if ($candidate_id) {
             // Update existing

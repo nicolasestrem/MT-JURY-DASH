@@ -92,6 +92,20 @@ class MT_Candidate_Repository implements MT_Repository_Interface {
             $where[] = "country = %s";
             $params[] = $args['country'];
         }
+        // Support additional simple where clauses (restricted to safe columns)
+        if (!empty($args['where']) && is_array($args['where'])) {
+            foreach ($args['where'] as $column => $condition) {
+                // Only allow filtering on description_sections via LIKE for safety
+                if ($column === 'description_sections' && is_array($condition) && count($condition) === 2) {
+                    list($op, $val) = $condition;
+                    $op = strtoupper(trim($op));
+                    if ($op === 'LIKE') {
+                        $where[] = "description_sections LIKE %s";
+                        $params[] = $val;
+                    }
+                }
+            }
+        }
         
         if (!empty($where)) {
             $sql .= " WHERE " . implode(' AND ', $where);

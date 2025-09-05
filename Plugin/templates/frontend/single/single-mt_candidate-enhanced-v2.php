@@ -58,6 +58,7 @@ if ($candidate_data) :
     $display_name = $candidate_data->name ?? get_the_title();
     $linkedin = $candidate_data->linkedin_url ?? '';
     $website = $candidate_data->website_url ?? '';
+    $article = $candidate_data->article_url ?? '';
     
     // Get category from description_sections
     $categories = array();
@@ -215,7 +216,7 @@ if ($candidate_data) :
 
                     
                     <!-- Social Links -->
-                    <?php if ($linkedin || $website) : ?>
+                    <?php if ($linkedin || $website || $article) : ?>
                         <div class="mt-hero-social">
                             <?php if ($linkedin) : ?>
                                 <a href="<?php echo esc_url($linkedin); ?>" target="_blank" rel="noopener" class="mt-social-link linkedin">
@@ -227,6 +228,12 @@ if ($candidate_data) :
                                 <a href="<?php echo esc_url($website); ?>" target="_blank" rel="noopener" class="mt-social-link website">
                                     <i class="dashicons dashicons-admin-links"></i>
                                     <span><?php _e('Website', 'mobility-trailblazers'); ?></span>
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($article) : ?>
+                                <a href="<?php echo esc_url($article); ?>" target="_blank" rel="noopener" class="mt-social-link article">
+                                    <i class="dashicons dashicons-media-document"></i>
+                                    <span><?php _e('Article', 'mobility-trailblazers'); ?></span>
                                 </a>
                             <?php endif; ?>
                         </div>
