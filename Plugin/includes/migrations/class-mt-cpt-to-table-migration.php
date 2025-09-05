@@ -296,10 +296,32 @@ class MT_CPT_To_Table_Migration {
         try {
             // Create backup table name with timestamp
             $backup_table = $wpdb->prefix . 'mt_candidates_backup_' . date('YmdHis');
-            
-            // Create backup table as copy of current table
-            $wpdb->query("CREATE TABLE IF NOT EXISTS `$backup_table` LIKE `{$wpdb->prefix}mt_candidates`");
-            $wpdb->query("INSERT INTO `$backup_table` SELECT * FROM `{$wpdb->prefix}mt_candidates`");
+            $source_table = $wpdb->prefix . 'mt_candidates';
+
+            // Validate identifiers strictly (allow only alphanumerics and underscores)
+            $is_valid_identifier = function ($name) {
+                return is_string($name) && preg_match('/^[A-Za-z0-9_]+$/', $name);
+            };
+            if (!$is_valid_identifier($backup_table) || !$is_valid_identifier($source_table)) {
+                throw new \Exception('Invalid table name for backup operation');
+            }
+
+            // Build safe DDL statements (identifiers backticked + esc_sql)
+            $backup_esc = esc_sql($backup_table);
+            $source_esc = esc_sql($source_table);
+
+            $create_sql = sprintf('CREATE TABLE IF NOT EXISTS `%s` LIKE `%s`', $backup_esc, $source_esc);
+            $insert_sql = sprintf('INSERT INTO `%s` SELECT * FROM `%s`', $backup_esc, $source_esc);
+
+            $create_result = $wpdb->query($create_sql);
+            if ($create_result === false) {
+                throw new \Exception('Failed to create backup table: ' . $wpdb->last_error);
+            }
+
+            $insert_result = $wpdb->query($insert_sql);
+            if ($insert_result === false) {
+                throw new \Exception('Failed to copy data to backup table: ' . $wpdb->last_error);
+            }
             
             MT_Logger::info('Backup created', ['table' => $backup_table]);
             

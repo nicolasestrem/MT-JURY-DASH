@@ -112,14 +112,14 @@ $candidates = get_posts([
                     <tr>
                         <th scope="row" class="check-column">
                             <label class="screen-reader-text" for="cb-select-<?php echo esc_attr($evaluation->id); ?>">
-                                <?php printf(__('Select evaluation %s', 'mobility-trailblazers'), $evaluation->id); ?>
+                                <?php printf(esc_html__('Select evaluation %s', 'mobility-trailblazers'), esc_html($evaluation->id)); ?>
                             </label>
                             <input id="cb-select-<?php echo esc_attr($evaluation->id); ?>" type="checkbox" name="evaluation[]" value="<?php echo esc_attr($evaluation->id); ?>">
                         </th>
                         <td><?php echo esc_html($evaluation->id); ?></td>
                         <td>
                             <?php if ($jury_member) : ?>
-                                <a href="<?php echo get_edit_post_link($jury_member->ID); ?>">
+                                <a href="<?php echo esc_url(get_edit_post_link($jury_member->ID)); ?>">
                                     <?php echo esc_html($jury_member->post_title); ?>
                                 </a>
                             <?php else : ?>
@@ -128,7 +128,7 @@ $candidates = get_posts([
                         </td>
                         <td>
                             <?php if ($candidate) : ?>
-                                <a href="<?php echo get_edit_post_link($candidate->ID); ?>">
+                                <a href="<?php echo esc_url(get_edit_post_link($candidate->ID)); ?>">
                                     <?php echo esc_html($candidate->post_title); ?>
                                 </a>
                             <?php else : ?>

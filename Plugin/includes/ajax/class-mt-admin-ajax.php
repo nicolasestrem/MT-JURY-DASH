@@ -590,8 +590,8 @@ class MT_Admin_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        // Check permissions
-        if (!current_user_can('edit_posts')) {
+        // Check permissions (require plugin-specific capability)
+        if (!current_user_can('mt_manage_candidates')) {
             $this->error(__('Permission denied', 'mobility-trailblazers'));
             return;
         }

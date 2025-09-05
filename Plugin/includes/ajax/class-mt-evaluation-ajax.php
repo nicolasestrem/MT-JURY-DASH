@@ -164,9 +164,23 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        // Debug: Log raw POST data
+        // Debug: Log filtered POST data (redact sensitive values)
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            MT_Logger::debug('Evaluation AJAX POST data', ['post_data' => $_POST]);
+            $filtered_post = $_POST;
+            $sensitive_keys = [
+                'password', 'pass', 'pwd', 'nonce', '_wpnonce', 'token', 'api_key', 'apikey',
+                'authorization', 'auth', 'cookie', 'session', 'csrf', 'secret', 'key'
+            ];
+            $redact = function (&$value, $key) use ($sensitive_keys) {
+                $k = strtolower((string) $key);
+                if (in_array($k, $sensitive_keys, true)) {
+                    $value = '[redacted]';
+                }
+            };
+            if (is_array($filtered_post)) {
+                array_walk_recursive($filtered_post, $redact);
+            }
+            MT_Logger::debug('Evaluation AJAX POST data', ['post_data' => $filtered_post]);
         }
         
         // Get current user as jury member
