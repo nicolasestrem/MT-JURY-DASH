@@ -3315,7 +3315,6 @@ body.page .mt-candidates-grid {
 .mt-candidate-grid-item {
     position: relative !important;
 }
-}
 
 /* Fix for numbered candidate cards with dark backgrounds - Added 2025-08-17 */
 .elementor-widget-container [style*='background: linear-gradient'],
