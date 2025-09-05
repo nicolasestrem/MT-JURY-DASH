@@ -17,9 +17,8 @@ if (empty($rankings)) {
     return;
 }
 
-// Get evaluation criteria and repository
+// Get evaluation criteria
 $evaluation_service = new \MobilityTrailblazers\Services\MT_Evaluation_Service();
-$evaluation_repo = new \MobilityTrailblazers\Repositories\MT_Evaluation_Repository();
 $criteria = $evaluation_service->get_criteria();
 
 // Get current jury member
@@ -67,15 +66,7 @@ if (!empty($jury_members)) {
                 $organization = $ranking->organization ?? '';
                 $position_title = $ranking->position ?? '';
                 $total_score = floatval($ranking->total_score ?? 0);
-                $evaluation = null;
-                if ($jury_member) {
-                    $evaluations = $evaluation_repo->find_all([
-                        'jury_member_id' => $jury_member->ID,
-                        'candidate_id' => $candidate_id,
-                        'limit' => 1
-                    ]);
-                    $evaluation = !empty($evaluations) ? $evaluations[0] : null;
-                }
+                $evaluation = $ranking;
                 $position_class = '';
                 if ($position === 1) $position_class = 'position-gold';
                 elseif ($position === 2) $position_class = 'position-silver';
@@ -113,8 +104,13 @@ if (!empty($jury_members)) {
                             </div>
                         <?php endif; ?>
                         <?php 
-                        // Add biography/excerpt
-                        $excerpt = get_the_excerpt($candidate_id);
+                        // Add biography/excerpt without extra queries
+                        $excerpt = '';
+                        if (!empty($ranking->candidate_excerpt)) {
+                            $excerpt = $ranking->candidate_excerpt;
+                        } elseif (!empty($ranking->candidate_content)) {
+                            $excerpt = wp_trim_words(wp_strip_all_tags($ranking->candidate_content), 30, '...');
+                        }
                         if ($excerpt) : ?>
                             <div class="mt-candidate-bio">
                                 <?php echo esc_html(wp_trim_words($excerpt, 15, '...')); ?>

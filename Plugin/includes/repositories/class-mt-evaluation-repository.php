@@ -581,6 +581,8 @@ class MT_Evaluation_Repository implements MT_Evaluation_Repository_Interface {
         $query = "SELECT 
                     c.ID as candidate_id,
                     c.post_title as candidate_name,
+                    c.post_excerpt as candidate_excerpt,
+                    c.post_content as candidate_content,
                     e.total_score,
                     e.courage_score,
                     e.innovation_score,
