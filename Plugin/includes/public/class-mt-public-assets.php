@@ -197,15 +197,22 @@ class MT_Public_Assets {
             return;
         }
         
-        // Register all v4 styles first (WordPress best practice)
-        $this->register_v4_styles();
-        
-        // Enqueue styles in dependency order
-        wp_enqueue_style('mt-v4-tokens');
-        wp_enqueue_style('mt-v4-reset');
-        wp_enqueue_style('mt-v4-base');
-        wp_enqueue_style('mt-v4-components');
-        wp_enqueue_style('mt-v4-pages');
+        $use_bundles = apply_filters('mt_use_asset_bundles', !(defined('WP_DEBUG') && WP_DEBUG));
+        $bundle_path = MT_PLUGIN_DIR . 'assets/css/v4/mt-v4.bundle.min.css';
+
+        if ($use_bundles && file_exists($bundle_path)) {
+            // Use single bundled CSS to reduce HTTP requests
+            wp_enqueue_style('mt-v4-bundle', MT_PLUGIN_URL . 'assets/css/v4/mt-v4.bundle.min.css', [], self::V4_VERSION);
+        } else {
+            // Register all v4 styles first (WordPress best practice)
+            $this->register_v4_styles();
+            // Enqueue styles in dependency order
+            wp_enqueue_style('mt-v4-tokens');
+            wp_enqueue_style('mt-v4-reset');
+            wp_enqueue_style('mt-v4-base');
+            wp_enqueue_style('mt-v4-components');
+            wp_enqueue_style('mt-v4-pages');
+        }
         
         // HOTFIX: Jury dashboard filter fix - Critical for category filtering
         wp_enqueue_style(

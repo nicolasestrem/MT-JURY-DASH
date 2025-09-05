@@ -361,31 +361,35 @@ include __DIR__ . '/assignments-modals.php';
 </div>
 
 <?php
-// Enqueue the dedicated assignments script
-wp_enqueue_script(
-    'mt-assignments',
-    MT_PLUGIN_URL . 'assets/js/mt-assignments.js',
-    ['jquery'],
-    MT_VERSION,
-    true
-);
+// Conditionally enqueue per-file assets only if bundles are not in use
+$use_bundles = apply_filters('mt_use_asset_bundles', !(defined('WP_DEBUG') && WP_DEBUG));
+if (!($use_bundles && file_exists(MT_PLUGIN_DIR . 'assets/bundles/mt-admin.bundle.min.js'))) {
+    // Enqueue the dedicated assignments script
+    wp_enqueue_script(
+        'mt-assignments',
+        MT_PLUGIN_URL . 'assets/js/mt-assignments.js',
+        ['jquery'],
+        MT_VERSION,
+        true
+    );
 
-// Enqueue modal debug script - load it last to override everything
-wp_enqueue_script(
-    'mt-modal-debug',
-    MT_PLUGIN_URL . 'assets/js/mt-modal-debug.js',
-    ['jquery'],
-    MT_VERSION . '.2',
-    true
-);
+    // Enqueue modal debug script - load it last to override everything
+    wp_enqueue_script(
+        'mt-modal-debug',
+        MT_PLUGIN_URL . 'assets/js/mt-modal-debug.js',
+        ['jquery'],
+        MT_VERSION . '.2',
+        true
+    );
 
-// Enqueue modal fix CSS
-wp_enqueue_style(
-    'mt-modal-fix',
-    MT_PLUGIN_URL . 'assets/css/mt-modal-fix.css',
-    [],
-    MT_VERSION
-);
+    // Enqueue modal fix CSS
+    wp_enqueue_style(
+        'mt-modal-fix',
+        MT_PLUGIN_URL . 'assets/css/mt-modal-fix.css',
+        [],
+        MT_VERSION
+    );
+}
 ?>
 
 <script type="text/javascript">

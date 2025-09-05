@@ -8,12 +8,13 @@
 */
 
 const { spawnSync } = require('child_process');
-const { readdirSync, statSync } = require('fs');
+const { readdirSync, statSync, existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs');
 const { join, extname, basename, dirname } = require('path');
 
 const root = join(__dirname, '..');
 const jsRoot = join(root, 'Plugin', 'assets', 'js');
 const cssRoot = join(root, 'Plugin', 'assets', 'css');
+const bundleRoot = join(root, 'Plugin', 'assets', 'bundles');
 
 let jsCount = 0;
 let cssCount = 0;
@@ -73,3 +74,63 @@ console.log('\nSummary:');
 console.log(`  Minified JS files: ${jsCount}`);
 console.log(`  Minified CSS files: ${cssCount}`);
 
+// ------------------------------------------------------------
+// Bundling phase: concatenate key assets into a few bundles
+// ------------------------------------------------------------
+
+function ensureDir(dir) {
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
+}
+
+function concatFiles(outFile, files) {
+  const contents = [];
+  for (const f of files) {
+    if (!existsSync(f)) {
+      console.warn(`[bundle] Skip missing: ${f}`);
+      continue;
+    }
+    contents.push(readFileSync(f, 'utf8'));
+  }
+  writeFileSync(outFile, contents.join('\n;\n'));
+  console.log(`  bundle -> ${outFile}`);
+}
+
+console.log('\nCreating bundles...');
+ensureDir(bundleRoot);
+
+// Admin JS bundle (5–10 files → 1)
+const adminJsBundle = join(bundleRoot, 'mt-admin.bundle.min.js');
+const adminJsFiles = [
+  join(jsRoot, 'mt-admin.min.js'),
+  join(jsRoot, 'mt-evaluations-admin.min.js'),
+  join(jsRoot, 'mt-assignments.min.js'),
+  join(jsRoot, 'mt-settings-admin.min.js'),
+  join(jsRoot, 'mt-debug-center.min.js'),
+  join(jsRoot, 'mt-modal-debug.min.js'),
+].filter(Boolean);
+concatFiles(adminJsBundle, adminJsFiles);
+
+// Admin CSS bundle
+const adminCssBundle = join(bundleRoot, 'mt-admin.bundle.min.css');
+const adminCssFiles = [
+  join(cssRoot, 'admin.min.css'),
+  join(cssRoot, 'mt-evaluations-admin.min.css'),
+  join(cssRoot, 'mt-modal-fix.min.css'),
+].filter(Boolean);
+concatFiles(adminCssBundle, adminCssFiles);
+
+// Frontend v4 CSS bundle
+const v4Dir = join(cssRoot, 'v4');
+const v4Bundle = join(v4Dir, 'mt-v4.bundle.min.css');
+const v4CssFiles = [
+  join(v4Dir, 'mt-tokens.min.css'),
+  join(v4Dir, 'mt-reset.min.css'),
+  join(v4Dir, 'mt-base.min.css'),
+  join(v4Dir, 'mt-components.min.css'),
+  join(v4Dir, 'mt-pages.min.css'),
+].filter(Boolean);
+concatFiles(v4Bundle, v4CssFiles);
+
+console.log('\nBundles created successfully.');
