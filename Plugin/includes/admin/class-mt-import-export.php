@@ -165,17 +165,26 @@ class MT_Import_Export {
             // Write data using repository data structure
             if (!empty($candidates)) {
                 foreach ($candidates as $candidate) {
-                    // Decode description sections if stored as JSON
-                    $description_sections = !empty($candidate->description_sections) 
-                        ? json_decode($candidate->description_sections, true) 
-                        : [];
+                    // Decode description sections safely (repo already decodes to array)
+                    $description_sections = [];
+                    if (!empty($candidate->description_sections)) {
+                        if (is_array($candidate->description_sections)) {
+                            $description_sections = $candidate->description_sections;
+                        } elseif (is_string($candidate->description_sections)) {
+                            $decoded = json_decode($candidate->description_sections, true);
+                            $description_sections = is_array($decoded) ? $decoded : [];
+                        }
+                    }
                     
                     // Extract category from description sections if available
                     $category = isset($description_sections['category']) ? $description_sections['category'] : 
                                (isset($description_sections['award_category']) ? $description_sections['award_category'] : '');
                     
-                    // Get main description
-                    $description = isset($description_sections['description']) ? $description_sections['description'] : '';
+                    // Get main description (fallbacks for robustness)
+                    $description = $description_sections['description']
+                        ?? ($description_sections['overview']
+                            ?? ($description_sections['ueberblick']
+                                ?? ($description_sections['überblick'] ?? '')));
                     
                     fputcsv($output, [
                         $candidate->id,
