@@ -49,7 +49,32 @@ class MT_Post_Types {
      *
      * @return void
      */
-    private function register_candidate_post_type() { /* intentionally removed (CPT-free) */ }
+    private function register_candidate_post_type() {
+        // Keep CPT registered but hidden to support migrations and legacy APIs
+        $labels = [
+            'name'          => _x('Candidates', 'Post type general name', 'mobility-trailblazers'),
+            'singular_name' => _x('Candidate', 'Post type singular name', 'mobility-trailblazers'),
+        ];
+
+        $args = [
+            'labels'             => $labels,
+            'public'             => false,
+            'publicly_queryable' => false,
+            'show_ui'            => false,
+            'show_in_menu'       => false,
+            'show_in_rest'       => false,
+            'exclude_from_search'=> true,
+            'query_var'          => true,
+            'rewrite'            => false,
+            'has_archive'        => false,
+            'hierarchical'       => false,
+            'supports'           => ['title','editor','thumbnail','excerpt'],
+            'capability_type'    => ['mt_candidate', 'mt_candidates'],
+            'map_meta_cap'       => true,
+        ];
+
+        register_post_type('mt_candidate', $args);
+    }
     
     /**
      * Register Jury Member post type
