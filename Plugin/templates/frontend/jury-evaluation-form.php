@@ -27,6 +27,7 @@ $organization = $candidate->organization ?: '';
 $position = $candidate->position ?: '';
 $linkedin_url = $candidate->linkedin_url ?: '';
 $website_url = $candidate->website_url ?: '';
+$article_url = $candidate->article_url ?: '';
 
 // Get data from description sections
 $biography = '';
@@ -189,7 +190,7 @@ $criteria = [
                     <?php endif; ?>
                 </div>
                 
-                <?php if ($linkedin_url || $website_url) : ?>
+                <?php if ($linkedin_url || $website_url || $article_url) : ?>
                     <div class="mt-candidate-links">
                         <?php if ($linkedin_url) : ?>
                             <a href="<?php echo esc_url($linkedin_url); ?>" target="_blank" class="mt-link-button">
@@ -201,6 +202,12 @@ $criteria = [
                             <a href="<?php echo esc_url($website_url); ?>" target="_blank" class="mt-link-button">
                                 <span class="dashicons dashicons-admin-site"></span>
                                 <?php _e('Website', 'mobility-trailblazers'); ?>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($article_url) : ?>
+                            <a href="<?php echo esc_url($article_url); ?>" target="_blank" class="mt-link-button">
+                                <span class="dashicons dashicons-media-document"></span>
+                                <?php _e('Article', 'mobility-trailblazers'); ?>
                             </a>
                         <?php endif; ?>
                     </div>
