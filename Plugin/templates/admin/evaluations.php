@@ -14,16 +14,12 @@ if (!defined('ABSPATH')) {
 // Get evaluation repository
 $evaluation_repo = new \MobilityTrailblazers\Repositories\MT_Evaluation_Repository();
 
-// Get filters
-$filter_status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
+// Get filters (status filter removed)
 $filter_jury = isset($_GET['jury_member']) ? intval($_GET['jury_member']) : 0;
 $filter_candidate = isset($_GET['candidate']) ? intval($_GET['candidate']) : 0;
 
 // Build query args
 $args = [];
-if ($filter_status) {
-    $args['status'] = $filter_status;
-}
 if ($filter_jury) {
     $args['jury_member_id'] = $filter_jury;
 }
@@ -60,11 +56,6 @@ $candidates = get_posts([
             <input type="hidden" name="page" value="mt-evaluations">
             
             <div class="alignleft actions">
-                <select name="status" id="filter-status">
-                    <option value=""><?php _e('All Statuses', 'mobility-trailblazers'); ?></option>
-                    <option value="completed" <?php selected($filter_status, 'completed'); ?>><?php _e('Completed', 'mobility-trailblazers'); ?></option>
-                </select>
-                
                 <select name="jury_member" id="filter-jury">
                     <option value=""><?php _e('All Jury Members', 'mobility-trailblazers'); ?></option>
                     <?php foreach ($jury_members as $jury) : ?>
@@ -108,7 +99,6 @@ $candidates = get_posts([
                 <th><?php _e('Jury Member', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Candidate', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Total Score', 'mobility-trailblazers'); ?></th>
-                <th><?php _e('Status', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Date', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Actions', 'mobility-trailblazers'); ?></th>
             </tr>
@@ -148,11 +138,7 @@ $candidates = get_posts([
                         <td>
                             <strong><?php echo esc_html($evaluation->total_score); ?></strong> / 50
                         </td>
-                        <td>
-                            <span class="status-<?php echo esc_attr($evaluation->status); ?>">
-                                <?php echo esc_html(ucfirst($evaluation->status)); ?>
-                            </span>
-                        </td>
+                        
                         <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($evaluation->updated_at))); ?></td>
                         <td>
                             <button class="button view-details" data-evaluation-id="<?php echo esc_attr($evaluation->id); ?>">
@@ -177,7 +163,6 @@ $candidates = get_posts([
                 <th><?php _e('Jury Member', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Candidate', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Total Score', 'mobility-trailblazers'); ?></th>
-                <th><?php _e('Status', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Date', 'mobility-trailblazers'); ?></th>
                 <th><?php _e('Actions', 'mobility-trailblazers'); ?></th>
             </tr>
