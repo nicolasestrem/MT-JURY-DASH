@@ -186,6 +186,7 @@ if (defined('WP_CLI') && WP_CLI) {
         $cli_commands = new MobilityTrailblazers\CLI\MT_CLI_Commands();
         // Import candidates command has been removed
         WP_CLI::add_command('mt db-upgrade', [$cli_commands, 'db_upgrade']);
+        WP_CLI::add_command('mt migrate-candidates', [$cli_commands, 'migrate_candidates']);
         WP_CLI::add_command('mt list-candidates', [$cli_commands, 'list_candidates']);
     }
 } 

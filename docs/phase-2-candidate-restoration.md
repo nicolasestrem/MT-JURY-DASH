@@ -136,3 +136,15 @@ Advantages:
 - Reintroduced admin candidate management as a dedicated plugin page.
 - Improved image handling and criteria presentation.
 
+## Migration Instructions
+
+Run these on the target environment (back up DB first):
+
+- Ensure tables: `wp mt db-upgrade`
+- Dry-run migration: `wp mt migrate-candidates --dry-run`
+- Full migration in batches: `wp mt migrate-candidates --batch-size=100`
+- Verify integrity only: `wp mt migrate-candidates --verify`
+
+Notes:
+- CPT `mt_candidate` remains registered but hidden during migration so legacy APIs like `wp_count_posts('mt_candidate')` and `get_posts(['post_type' => 'mt_candidate'])` continue to work for migration tooling.
+- Front‑end remains CPT‑free; you may remove the hidden CPT in a later major release after successful verification.
