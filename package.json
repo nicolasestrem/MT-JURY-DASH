@@ -1,6 +1,6 @@
 {
   "name": "mobility-trailblazers",
-  "version": "2.5.41",
+  "version": "2.6.0",
   "description": "E2E tests for Mobility Trailblazers WordPress plugin",
   "scripts": {
     "test": "playwright test",

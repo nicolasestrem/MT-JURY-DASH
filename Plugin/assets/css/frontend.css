@@ -3317,10 +3317,10 @@ body.page .mt-candidates-grid {
 }
 
 /* Fix for numbered candidate cards with dark backgrounds - Added 2025-08-17 */
-.elementor-widget-container [style*='background: linear-gradient'],
+.elementor-widget-container [style*="background:linear-gradient"],
 .elementor-widget-container [style*='background-color: #003C3D'],
 .elementor-widget-container [style*='background-color: #004C5F'],
-div[style*='background: linear-gradient'] {
+div[style*="background:linear-gradient"] {
     background: #f8f9fa !important;
     border: 2px solid #dee2e6 !important;
 }
