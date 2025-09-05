@@ -11,29 +11,60 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Get candidate
-$candidate = get_post($candidate_id);
+// Get candidate using repository
+$candidate = mt_get_candidate($candidate_id);
+if (!$candidate) {
+    // Try by post_id for backward compatibility
+    $candidate = mt_get_candidate_by_post_id($candidate_id);
+}
 if (!$candidate) {
     echo '<div class="mt-notice mt-notice-error">' . __('Candidate not found.', 'mobility-trailblazers') . '</div>';
     return;
 }
 
-// Get candidate meta
-$organization = get_post_meta($candidate->ID, '_mt_organization', true) ?: '';
-$position = get_post_meta($candidate->ID, '_mt_position', true) ?: '';
-$biography = get_post_meta($candidate->ID, '_mt_description_full', true) ?: '';
-$linkedin_url = get_post_meta($candidate->ID, '_mt_linkedin_url', true) ?: '';
-$website_url = get_post_meta($candidate->ID, '_mt_website_url', true) ?: '';
-// Get category from new meta field system (3 categories)
-$category_type = get_post_meta($candidate->ID, '_mt_category_type', true) ?: '';
-$photo_id = get_post_thumbnail_id($candidate->ID);
+// Get candidate data from repository object
+$organization = $candidate->organization ?: '';
+$position = $candidate->position ?: '';
+$linkedin_url = $candidate->linkedin_url ?: '';
+$website_url = $candidate->website_url ?: '';
 
-// Get individual evaluation criteria content
-$criterion_courage = get_post_meta($candidate->ID, '_mt_criterion_courage', true) ?: '';
-$criterion_innovation = get_post_meta($candidate->ID, '_mt_criterion_innovation', true) ?: '';
-$criterion_implementation = get_post_meta($candidate->ID, '_mt_criterion_implementation', true) ?: '';
-$criterion_relevance = get_post_meta($candidate->ID, '_mt_criterion_relevance', true) ?: '';
-$criterion_visibility = get_post_meta($candidate->ID, '_mt_criterion_visibility', true) ?: '';
+// Get data from description sections
+$biography = '';
+$category_type = '';
+$criterion_courage = '';
+$criterion_innovation = '';
+$criterion_implementation = '';
+$criterion_relevance = '';
+$criterion_visibility = '';
+
+if (!empty($candidate->description_sections)) {
+    $sections = is_string($candidate->description_sections) 
+        ? json_decode($candidate->description_sections, true) 
+        : $candidate->description_sections;
+    
+    $biography = isset($sections['description']) ? $sections['description'] : '';
+    $category_type = isset($sections['category']) ? $sections['category'] : 
+                    (isset($sections['award_category']) ? $sections['award_category'] : '');
+    
+    // Get evaluation criteria from sections (support both English and German keys)
+    $criterion_courage = $sections['courage']
+        ?? ($sections['mut_pioniergeist'] ?? '');
+    $criterion_innovation = $sections['innovation']
+        ?? ($sections['innovationsgrad'] ?? '');
+    $criterion_implementation = $sections['implementation']
+        ?? ($sections['umsetzungskraft_wirkung'] ?? '');
+    $criterion_relevance = $sections['relevance']
+        ?? ($sections['relevanz_mobilitaetswende'] ?? '');
+    $criterion_visibility = $sections['visibility']
+        ?? ($sections['vorbild_sichtbarkeit'] ?? '');
+}
+
+// Get photo
+$photo_id = $candidate->photo_attachment_id;
+if (!$photo_id && $candidate->post_id) {
+    // Fallback to post thumbnail
+    $photo_id = get_post_thumbnail_id($candidate->post_id);
+}
 
 // Get existing evaluation if any
 $evaluation_repo = new \MobilityTrailblazers\Repositories\MT_Evaluation_Repository();
@@ -133,7 +164,7 @@ $criteria = [
             <?php endif; ?>
             
             <div class="mt-candidate-details">
-                <h2 class="mt-candidate-name"><?php echo esc_html($candidate->post_title); ?></h2>
+                <h2 class="mt-candidate-name"><?php echo esc_html($candidate->name); ?></h2>
                 
                 <div class="mt-candidate-meta">
                     <?php if ($presentation_settings['show_organization'] && $organization) : ?>
@@ -177,8 +208,8 @@ $criteria = [
                 
                 <?php 
                 // Show Innovation Summary / Description
-                $overview = get_post_meta($candidate->ID, '_mt_overview', true);
-                $full_description = !empty($candidate->post_content) ? $candidate->post_content : $overview;
+                $overview = isset($sections['overview']) ? $sections['overview'] : '';
+                $full_description = !empty($biography) ? $biography : $overview;
                 
                 if (!empty($full_description)) : ?>
                     <div class="mt-candidate-description" style="margin-top: 20px;">

@@ -29,6 +29,7 @@ class MT_Post_Types {
      */
     public function init() {
         add_action('init', [$this, 'register_post_types']);
+        // Only jury member meta boxes remain; candidate CPT removed
         add_action('add_meta_boxes', [$this, 'add_meta_boxes']);
         add_action('save_post', [$this, 'save_meta_box_data']);
     }
@@ -39,9 +40,6 @@ class MT_Post_Types {
      * @return void
      */
     public function register_post_types() {
-        // Register Candidate post type
-        $this->register_candidate_post_type();
-        
         // Register Jury Member post type
         $this->register_jury_member_post_type();
     }
@@ -52,50 +50,29 @@ class MT_Post_Types {
      * @return void
      */
     private function register_candidate_post_type() {
+        // Keep registered but hidden during migration phase
         $labels = [
-            'name'                  => _x('Candidates', 'Post type general name', 'mobility-trailblazers'),
-            'singular_name'         => _x('Candidate', 'Post type singular name', 'mobility-trailblazers'),
-            'menu_name'             => _x('Candidates', 'Admin Menu text', 'mobility-trailblazers'),
-            'name_admin_bar'        => _x('Candidate', 'Add New on Toolbar', 'mobility-trailblazers'),
-            'add_new'               => __('Add New', 'mobility-trailblazers'),
-            'add_new_item'          => __('Add New Candidate', 'mobility-trailblazers'),
-            'new_item'              => __('New Candidate', 'mobility-trailblazers'),
-            'edit_item'             => __('Edit Candidate', 'mobility-trailblazers'),
-            'view_item'             => __('View Candidate', 'mobility-trailblazers'),
-            'all_items'             => __('All Candidates', 'mobility-trailblazers'),
-            'search_items'          => __('Search Candidates', 'mobility-trailblazers'),
-            'parent_item_colon'     => __('Parent Candidates:', 'mobility-trailblazers'),
-            'not_found'             => __('No candidates found.', 'mobility-trailblazers'),
-            'not_found_in_trash'    => __('No candidates found in Trash.', 'mobility-trailblazers'),
-            'featured_image'        => _x('Candidate Photo', 'Overrides the "Featured Image" phrase', 'mobility-trailblazers'),
-            'set_featured_image'    => _x('Set candidate photo', 'Overrides the "Set featured image" phrase', 'mobility-trailblazers'),
-            'remove_featured_image' => _x('Remove candidate photo', 'Overrides the "Remove featured image" phrase', 'mobility-trailblazers'),
-            'use_featured_image'    => _x('Use as candidate photo', 'Overrides the "Use as featured image" phrase', 'mobility-trailblazers'),
-            'archives'              => _x('Candidate archives', 'The post type archive label', 'mobility-trailblazers'),
-            'insert_into_item'      => _x('Insert into candidate', 'Overrides the "Insert into post" phrase', 'mobility-trailblazers'),
-            'uploaded_to_this_item' => _x('Uploaded to this candidate', 'Overrides the "Uploaded to this post" phrase', 'mobility-trailblazers'),
-            'filter_items_list'     => _x('Filter candidates list', 'Screen reader text', 'mobility-trailblazers'),
-            'items_list_navigation' => _x('Candidates list navigation', 'Screen reader text', 'mobility-trailblazers'),
-            'items_list'            => _x('Candidates list', 'Screen reader text', 'mobility-trailblazers'),
+            'name'          => _x('Candidates', 'Post type general name', 'mobility-trailblazers'),
+            'singular_name' => _x('Candidate', 'Post type singular name', 'mobility-trailblazers'),
         ];
-        
+
         $args = [
             'labels'             => $labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => 'mobility-trailblazers',
+            'public'             => false,
+            'publicly_queryable' => false,
+            'show_ui'            => false,
+            'show_in_menu'       => false,
+            'show_in_rest'       => false,
+            'exclude_from_search'=> true,
             'query_var'          => true,
-            'rewrite'            => ['slug' => 'candidate'],
+            'rewrite'            => false,
+            'has_archive'        => false,
+            'hierarchical'       => false,
+            'supports'           => ['title','editor','thumbnail','excerpt'],
             'capability_type'    => ['mt_candidate', 'mt_candidates'],
             'map_meta_cap'       => true,
-            'has_archive'        => true,
-            'hierarchical'       => false,
-            'menu_position'      => null,
-            'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
-            'show_in_rest'       => true,
         ];
-        
+
         register_post_type('mt_candidate', $args);
     }
     
@@ -158,16 +135,6 @@ class MT_Post_Types {
      * @return void
      */
     public function add_meta_boxes() {
-        // Candidate meta boxes
-        add_meta_box(
-            'mt_candidate_details',
-            __('Candidate Details', 'mobility-trailblazers'),
-            [$this, 'render_candidate_details_meta_box'],
-            'mt_candidate',
-            'normal',
-            'high'
-        );
-        
         // Jury member meta boxes
         add_meta_box(
             'mt_jury_member_details',
@@ -185,34 +152,7 @@ class MT_Post_Types {
      * @param WP_Post $post Current post object
      * @return void
      */
-    public function render_candidate_details_meta_box($post) {
-        wp_nonce_field('mt_save_candidate_details', 'mt_candidate_details_nonce');
-        
-        $organization = get_post_meta($post->ID, '_mt_organization', true);
-        $position = get_post_meta($post->ID, '_mt_position', true);
-        $linkedin = get_post_meta($post->ID, '_mt_linkedin_url', true);
-        $website = get_post_meta($post->ID, '_mt_website_url', true);
-        ?>
-        <div class="mt-meta-box">
-            <p>
-                <label for="mt_organization"><?php _e('Organization', 'mobility-trailblazers'); ?></label>
-                <input type="text" id="mt_organization" name="mt_organization" value="<?php echo esc_attr($organization); ?>" class="widefat" />
-            </p>
-            <p>
-                <label for="mt_position"><?php _e('Position', 'mobility-trailblazers'); ?></label>
-                <input type="text" id="mt_position" name="mt_position" value="<?php echo esc_attr($position); ?>" class="widefat" />
-            </p>
-            <p>
-                <label for="mt_linkedin"><?php _e('LinkedIn URL', 'mobility-trailblazers'); ?></label>
-                <input type="url" id="mt_linkedin" name="mt_linkedin" value="<?php echo esc_url($linkedin); ?>" class="widefat" />
-            </p>
-            <p>
-                <label for="mt_website"><?php _e('Website URL', 'mobility-trailblazers'); ?></label>
-                <input type="url" id="mt_website" name="mt_website" value="<?php echo esc_url($website); ?>" class="widefat" />
-            </p>
-        </div>
-        <?php
-    }
+    public function render_candidate_details_meta_box($post) { /* removed */ }
     
     /**
      * Render jury member details meta box
@@ -274,34 +214,7 @@ class MT_Post_Types {
             return;
         }
         
-        // Check permissions
-        if (isset($_POST['post_type']) && 'mt_candidate' === $_POST['post_type']) {
-            if (!current_user_can('edit_mt_candidate', $post_id)) {
-                return;
-            }
-            
-            // Save candidate data
-            if (isset($_POST['mt_organization'])) {
-                update_post_meta($post_id, '_mt_organization', sanitize_text_field($_POST['mt_organization']));
-            }
-            if (isset($_POST['mt_position'])) {
-                update_post_meta($post_id, '_mt_position', sanitize_text_field($_POST['mt_position']));
-            }
-            if (isset($_POST['mt_linkedin'])) {
-                update_post_meta($post_id, '_mt_linkedin_url', esc_url_raw($_POST['mt_linkedin']));
-            }
-            if (isset($_POST['mt_website'])) {
-                update_post_meta($post_id, '_mt_website_url', esc_url_raw($_POST['mt_website']));
-            }
-            
-            // Log candidate update
-            MT_Audit_Logger::log('candidate_updated', 'candidate', $post_id, [
-                'organization' => sanitize_text_field($_POST['mt_organization'] ?? ''),
-                'position' => sanitize_text_field($_POST['mt_position'] ?? ''),
-                'linkedin' => esc_url_raw($_POST['mt_linkedin'] ?? ''),
-                'website' => esc_url_raw($_POST['mt_website'] ?? '')
-            ]);
-        }
+        // Candidate CPT removed; no candidate meta processing
         
         if (isset($_POST['post_type']) && 'mt_jury_member' === $_POST['post_type']) {
             if (!current_user_can('edit_mt_jury_member', $post_id)) {

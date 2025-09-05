@@ -12,7 +12,13 @@ if (!defined('ABSPATH')) {
 }
 
 // Get statistics
-$candidate_count = wp_count_posts('mt_candidate')->publish;
+$candidate_count = 0;
+// Use repository count since candidate CPT is removed
+if (file_exists(MT_PLUGIN_DIR . 'includes/repositories/class-mt-candidate-repository.php')) {
+    require_once MT_PLUGIN_DIR . 'includes/repositories/class-mt-candidate-repository.php';
+    $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+    $candidate_count = (int) $candidate_repo->count();
+}
 $jury_count = wp_count_posts('mt_jury_member')->publish;
 
 // Get evaluation statistics using the same method as main dashboard

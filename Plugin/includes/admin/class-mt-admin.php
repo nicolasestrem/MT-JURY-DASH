@@ -44,8 +44,10 @@ class MT_Admin {
             $this->init_elementor_templates();
         }
         
-        // Initialize Candidate Editor
-        require_once MT_PLUGIN_DIR . 'includes/admin/class-mt-candidate-editor.php';
+        // Initialize Candidates Admin (replaces CPT)
+        require_once MT_PLUGIN_DIR . 'includes/admin/class-mt-candidates-admin.php';
+        $candidates_admin = new MT_Candidates_Admin();
+        $candidates_admin->init();
     }
     
     /**
@@ -140,7 +142,15 @@ class MT_Admin {
 
         // Profile Migration and other admin-only menus
         if (current_user_can('manage_options')) {
-            
+            // Data Migration Tools
+            add_submenu_page(
+                'mobility-trailblazers',
+                __('Data Migration', 'mobility-trailblazers'),
+                __('Data Migration', 'mobility-trailblazers'),
+                'manage_options',
+                'mt-data-migration',
+                [$this, 'render_data_migration_page']
+            );
             
             // Audit Log
             add_submenu_page(
@@ -445,6 +455,40 @@ class MT_Admin {
         // Deprecated - redirect to debug center with diagnostics tab
         wp_redirect(admin_url('admin.php?page=mt-debug-center&tab=diagnostics'));
         exit;
+    }
+    
+    /**
+     * Render data migration page
+     *
+     * @return void
+     */
+    public function render_data_migration_page() {
+        // Check if migration has been requested
+        if (isset($_POST['mt_migrate_candidates']) && check_admin_referer('mt_data_migration', 'mt_migration_nonce')) {
+            require_once plugin_dir_path(__FILE__) . '../migrations/class-mt-cpt-to-table-migration.php';
+            
+            $migration = new \MobilityTrailblazers\Migrations\MT_CPT_To_Table_Migration();
+            $dry_run = isset($_POST['dry_run']) && $_POST['dry_run'] === '1';
+            
+            $results = $migration->run(['dry_run' => $dry_run]);
+            
+            if ($results['failed'] == 0) {
+                echo '<div class="notice notice-success"><p>' . __('Migration completed successfully!', 'mobility-trailblazers') . '</p></div>';
+            } else {
+                echo '<div class="notice notice-warning"><p>' . sprintf(__('Migration completed with %d errors.', 'mobility-trailblazers'), $results['failed']) . '</p></div>';
+            }
+        }
+        
+        // Check if verification has been requested
+        if (isset($_POST['mt_verify_migration']) && check_admin_referer('mt_data_migration', 'mt_migration_nonce')) {
+            require_once plugin_dir_path(__FILE__) . '../migrations/class-mt-cpt-to-table-migration.php';
+            
+            $migration = new \MobilityTrailblazers\Migrations\MT_CPT_To_Table_Migration();
+            $verification = $migration->verify_migration();
+        }
+        
+        // Include the migration template
+        require_once plugin_dir_path(__FILE__) . '../../templates/admin/data-migration.php';
     }
     
     /**

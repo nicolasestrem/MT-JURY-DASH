@@ -130,7 +130,7 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        if (!$candidate_id || !get_post($candidate_id)) {
+        if (!$candidate_id || !mt_get_candidate($candidate_id)) {
             $this->error(__('Invalid candidate selected.', 'mobility-trailblazers'));
             return;
         }
@@ -484,13 +484,9 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
             return;
         }
         
-        // Get candidates
-        $candidate_args = [
-            'post_type' => 'mt_candidate',
-            'post_status' => 'publish',
-            'numberposts' => -1
-        ];
-        $candidates = get_posts($candidate_args);
+        // Get candidates from repository
+        $candidate_repo = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
+        $candidates = $candidate_repo->find_all();
         
         MT_Logger::debug('Auto-assignment candidates loaded', ['count' => count($candidates)]);
         
@@ -551,7 +547,8 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
             // Create an array to track how many times each candidate is assigned
             $candidate_assignment_count = [];
             foreach ($candidates as $candidate) {
-                $candidate_assignment_count[$candidate->ID] = 0;
+                $candidate_id_key = $candidate->post_id ?: $candidate->id;
+                $candidate_assignment_count[$candidate_id_key] = 0;
             }
             
             // Track existing assignments if we're not clearing them
@@ -583,7 +580,9 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
                 // Sort candidates by assignment count (ascending) to prioritize those with fewer assignments
                 $sorted_candidates = $candidates;
                 usort($sorted_candidates, function($a, $b) use ($candidate_assignment_count) {
-                    return $candidate_assignment_count[$a->ID] - $candidate_assignment_count[$b->ID];
+                    $a_id = $a->post_id ?: $a->id;
+                    $b_id = $b->post_id ?: $b->id;
+                    return $candidate_assignment_count[$a_id] - $candidate_assignment_count[$b_id];
                 });
                 
                 // Assign candidates to this jury member
@@ -593,34 +592,36 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
                         break;
                     }
                     
-                    // Skip if this assignment already exists
-                    if (isset($existing_for_jury[$candidate->ID])) {
+                    // Skip if this assignment already exists (use post_id for backward compatibility)
+                    $candidate_id_val = $candidate->post_id ?: $candidate->id;
+                    if (isset($existing_for_jury[$candidate_id_val])) {
                         continue;
                     }
                     
-                    // Create the assignment
+                    // Create the assignment (use post_id for backward compatibility)
+                    $candidate_id_val = $candidate->post_id ?: $candidate->id;
                     $result = $assignment_repo->create([
                         'jury_member_id' => $jury_member->ID,
-                        'candidate_id' => $candidate->ID
+                        'candidate_id' => $candidate_id_val
                     ]);
                     
                     if ($result) {
                         $assignments_created++;
                         $jury_assignments++;
-                        $candidate_assignment_count[$candidate->ID]++;
+                        $candidate_assignment_count[$candidate_id_val]++;
                         
                         MT_Logger::debug('Auto-assignment: candidate assigned', [
-                            'candidate_id' => $candidate->ID,
+                            'candidate_id' => $candidate_id_val,
                             'jury_member_id' => $jury_member->ID
                         ]);
                     } else {
                         $errors[] = sprintf(
                             __('Failed to assign %s to %s', 'mobility-trailblazers'),
-                            $candidate->post_title,
+                            $candidate->name,
                             $jury_member->post_title
                         );
                         MT_Logger::warning('Auto-assignment: failed to assign candidate', [
-                            'candidate_id' => $candidate->ID,
+                            'candidate_id' => $candidate_id_val,
                             'jury_member_id' => $jury_member->ID
                         ]);
                     }
@@ -674,15 +675,17 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
                         break;
                     }
                     
-                    // Skip if this assignment already exists
-                    if (isset($existing_for_jury[$candidate->ID])) {
+                    // Skip if this assignment already exists (use post_id for backward compatibility)
+                    $candidate_id_val = $candidate->post_id ?: $candidate->id;
+                    if (isset($existing_for_jury[$candidate_id_val])) {
                         continue;
                     }
                     
-                    // Create the assignment
+                    // Create the assignment (use post_id for backward compatibility)
+                    $candidate_id_val = $candidate->post_id ?: $candidate->id;
                     $result = $assignment_repo->create([
                         'jury_member_id' => $jury_member->ID,
-                        'candidate_id' => $candidate->ID
+                        'candidate_id' => $candidate_id_val
                     ]);
                     
                     if ($result) {
@@ -690,17 +693,17 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
                         $jury_assignments++;
                         
                         MT_Logger::debug('Auto-assignment: random candidate assigned', [
-                            'candidate_id' => $candidate->ID,
+                            'candidate_id' => $candidate_id_val,
                             'jury_member_id' => $jury_member->ID
                         ]);
                     } else {
                         $errors[] = sprintf(
                             __('Failed to assign %s to %s', 'mobility-trailblazers'),
-                            $candidate->post_title,
+                            $candidate->name,
                             $jury_member->post_title
                         );
                         MT_Logger::warning('Auto-assignment: random assignment failed', [
-                            'candidate_id' => $candidate->ID,
+                            'candidate_id' => $candidate_id_val,
                             'jury_member_id' => $jury_member->ID
                         ]);
                     }
@@ -1004,7 +1007,7 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
             }
             
             $jury = get_post($assignment->jury_member_id);
-            $candidate = get_post($assignment->candidate_id);
+            $candidate = mt_get_candidate($assignment->candidate_id);
             $user = get_user_by('ID', get_post_meta($assignment->jury_member_id, '_mt_user_id', true));
             
             // Get categories safely
@@ -1043,7 +1046,7 @@ class MT_Assignment_Ajax extends MT_Base_Ajax {
                 $assignment_id,
                 $jury ? $jury->post_title : '',
                 $user ? $user->user_email : '',
-                $candidate ? $candidate->post_title : '',
+                $candidate ? $candidate->name : '',
                 $category_name,
                 $assigned_date,
                 $status,

@@ -86,9 +86,17 @@ class MT_Candidate_Columns {
      * @return void
      */
     public function render_custom_columns($column, $post_id) {
+        // Get candidate from repository
+        $candidate = mt_get_candidate($post_id);
+        
+        // If not found by ID, try by post_id
+        if (!$candidate) {
+            $candidate = mt_get_candidate_by_post_id($post_id);
+        }
+        
         switch ($column) {
             case 'import_id':
-                $import_id = get_post_meta($post_id, '_mt_candidate_id', true);
+                $import_id = $candidate ? $candidate->import_id : '';
                 if ($import_id) {
                     echo '<code style="background: #f0f0f0; padding: 2px 5px; border-radius: 3px;">' . esc_html($import_id) . '</code>';
                 } else {
@@ -97,17 +105,24 @@ class MT_Candidate_Columns {
                 break;
                 
             case 'organization':
-                $organization = get_post_meta($post_id, '_mt_organization', true);
+                $organization = $candidate ? $candidate->organization : '';
                 echo esc_html($organization ?: '—');
                 break;
                 
             case 'position':
-                $position = get_post_meta($post_id, '_mt_position', true);
+                $position = $candidate ? $candidate->position : '';
                 echo esc_html($position ?: '—');
                 break;
                 
             case 'category_type':
-                $category = get_post_meta($post_id, '_mt_category_type', true);
+                $category = '';
+                if ($candidate && !empty($candidate->description_sections)) {
+                    $sections = is_string($candidate->description_sections) 
+                        ? json_decode($candidate->description_sections, true) 
+                        : $candidate->description_sections;
+                    $category = isset($sections['category']) ? $sections['category'] : '';
+                }
+                
                 if ($category) {
                     $color = '';
                     $icon = '';
@@ -140,7 +155,15 @@ class MT_Candidate_Columns {
                 break;
                 
             case 'top_50':
-                $top_50 = get_post_meta($post_id, '_mt_top_50_status', true);
+                // Check in description_sections for top_50_status
+                $top_50 = '';
+                if ($candidate && !empty($candidate->description_sections)) {
+                    $sections = is_string($candidate->description_sections) 
+                        ? json_decode($candidate->description_sections, true) 
+                        : $candidate->description_sections;
+                    $top_50 = isset($sections['top_50_status']) ? $sections['top_50_status'] : '';
+                }
+                
                 if ($top_50 === 'yes' || $top_50 === '1' || $top_50 === true) {
                     echo '<span style="color: #00736C; font-size: 20px;" title="' . esc_attr__('Top 50', 'mobility-trailblazers') . '">✓</span>';
                 } else {
@@ -149,9 +172,9 @@ class MT_Candidate_Columns {
                 break;
                 
             case 'links':
-                $linkedin = get_post_meta($post_id, '_mt_linkedin_url', true);
-                $website = get_post_meta($post_id, '_mt_website_url', true);
-                $article = get_post_meta($post_id, '_mt_article_url', true);
+                $linkedin = $candidate ? $candidate->linkedin_url : '';
+                $website = $candidate ? $candidate->website_url : '';
+                $article = $candidate ? $candidate->article_url : '';
                 
                 echo '<div style="display: flex; gap: 8px; align-items: center;">';
                 

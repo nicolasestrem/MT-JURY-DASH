@@ -362,17 +362,22 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             $this->error(__('Invalid candidate ID.', 'mobility-trailblazers'));
         }
         
-        // Get candidate
-        $candidate = get_post($candidate_id);
-        if (!$candidate || $candidate->post_type !== 'mt_candidate') {
+        // Get candidate using repository
+        $candidate = mt_get_candidate($candidate_id);
+        if (!$candidate) {
+            // Try by post_id for backward compatibility
+            $candidate = mt_get_candidate_by_post_id($candidate_id);
+        }
+        
+        if (!$candidate) {
             $this->error(__('Candidate not found.', 'mobility-trailblazers'));
         }
         
-        // Get candidate meta
-        $organization = get_post_meta($candidate_id, '_mt_organization', true) ?: '';
-        $position = get_post_meta($candidate_id, '_mt_position', true) ?: '';
-        $linkedin = get_post_meta($candidate_id, '_mt_linkedin_url', true) ?: '';
-        $website = get_post_meta($candidate_id, '_mt_website_url', true) ?: '';
+        // Get candidate data from repository object
+        $organization = $candidate->organization ?: '';
+        $position = $candidate->position ?: '';
+        $linkedin = $candidate->linkedin_url ?: '';
+        $website = $candidate->website_url ?: '';
         
         // Get categories
         $categories = wp_get_post_terms($candidate_id, 'mt_award_category', [
@@ -388,14 +393,31 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             $categories = [];
         }
         
-        // Get featured image
-        $photo_url = get_the_post_thumbnail_url($candidate_id, 'large');
+        // Get featured image using attachment ID
+        $photo_url = '';
+        if (!empty($candidate->photo_attachment_id)) {
+            $photo_url = wp_get_attachment_image_url($candidate->photo_attachment_id, 'large');
+        } elseif (!empty($candidate->post_id)) {
+            // Fallback to post thumbnail for backward compatibility
+            $photo_url = get_the_post_thumbnail_url($candidate->post_id, 'large');
+        }
+        
+        // Get description from sections
+        $bio = '';
+        $excerpt = '';
+        if (!empty($candidate->description_sections)) {
+            $sections = is_string($candidate->description_sections) 
+                ? json_decode($candidate->description_sections, true) 
+                : $candidate->description_sections;
+            $bio = isset($sections['description']) ? $sections['description'] : '';
+            $excerpt = wp_trim_words($bio, 55);
+        }
         
         $this->success([
-            'id' => $candidate->ID,
-            'name' => $candidate->post_title,
-            'bio' => $candidate->post_content,
-            'excerpt' => $candidate->post_excerpt,
+            'id' => $candidate->id,
+            'name' => $candidate->name,
+            'bio' => $bio,
+            'excerpt' => $excerpt,
             'organization' => $organization,
             'position' => $position,
             'linkedin' => $linkedin,
@@ -976,15 +998,19 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
         
         // Get related data
         $jury_member = get_post($evaluation->jury_member_id);
-        $candidate = get_post($evaluation->candidate_id);
+        $candidate = mt_get_candidate($evaluation->candidate_id);
+        if (!$candidate) {
+            // Try by post_id for backward compatibility
+            $candidate = mt_get_candidate_by_post_id($evaluation->candidate_id);
+        }
         
         // Check if posts exist to avoid fatal errors
         $jury_member_title = ($jury_member && is_object($jury_member) && isset($jury_member->post_title)) 
             ? $jury_member->post_title 
             : __('Unknown (Deleted)', 'mobility-trailblazers');
             
-        $candidate_title = ($candidate && is_object($candidate) && isset($candidate->post_title)) 
-            ? $candidate->post_title 
+        $candidate_title = ($candidate && is_object($candidate) && isset($candidate->name)) 
+            ? $candidate->name 
             : __('Unknown (Deleted)', 'mobility-trailblazers');
         
         // Get categories - only if candidate exists
@@ -1008,7 +1034,7 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             'id' => $evaluation->id,
             'jury_member' => $jury_member_title,
             'candidate' => $candidate_title,
-            'organization' => get_post_meta($evaluation->candidate_id, '_mt_organization', true),
+            'organization' => $candidate ? $candidate->organization : '',
             'categories' => implode(', ', $categories),
             'scores' => [
                 'courage' => [

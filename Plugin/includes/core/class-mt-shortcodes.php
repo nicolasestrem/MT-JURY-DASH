@@ -48,6 +48,10 @@ class MT_Shortcodes {
         add_shortcode('mt_candidates_grid', [$this, 'render_candidates_grid']);
         add_shortcode('mt_evaluation_stats', [$this, 'render_evaluation_stats']);
         add_shortcode('mt_winners_display', [$this, 'render_winners_display']);
+        
+        // Register candidate profile shortcode
+        require_once MT_PLUGIN_DIR . 'includes/shortcodes/class-mt-candidate-profile-shortcode.php';
+        \MobilityTrailblazers\Shortcodes\MT_Candidate_Profile_Shortcode::register();
     }
     
     /**
