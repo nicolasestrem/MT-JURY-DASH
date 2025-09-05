@@ -1,0 +1,209 @@
+{
+  "candidates": [
+    {
+      "name": "Dr. Sarah Mitchell",
+      "email": "sarah.mitchell@techmobility.de",
+      "organization": "Tech Mobility Solutions",
+      "position": "CEO & Founder",
+      "country": "Germany",
+      "description": "Leading innovation in urban mobility with AI-powered traffic optimization systems.",
+      "linkedin": "https://linkedin.com/in/sarahmitchell",
+      "website": "https://techmobility.de",
+      "category": "tech"
+    },
+    {
+      "name": "Michael Schmidt",
+      "email": "m.schmidt@greentransport.eu",
+      "organization": "Green Transport Initiative",
+      "position": "Director of Innovation",
+      "country": "Austria",
+      "description": "Pioneering sustainable transportation solutions for European cities.",
+      "linkedin": "https://linkedin.com/in/michaelschmidt",
+      "website": "https://greentransport.eu",
+      "category": "sustainability"
+    },
+    {
+      "name": "Anna Weber",
+      "email": "anna.weber@smartcity.ch",
+      "organization": "SmartCity Hub Zurich",
+      "position": "Head of Mobility",
+      "country": "Switzerland",
+      "description": "Integrating mobility solutions into smart city infrastructure.",
+      "linkedin": "https://linkedin.com/in/annaweber",
+      "website": "https://smartcity.ch",
+      "category": "government"
+    },
+    {
+      "name": "Thomas Müller",
+      "email": "t.mueller@futuredrive.de",
+      "organization": "FutureDrive Systems",
+      "position": "CTO",
+      "country": "Germany",
+      "description": "Developing autonomous vehicle technology for last-mile delivery.",
+      "linkedin": "https://linkedin.com/in/thomasmueller",
+      "website": "https://futuredrive.de",
+      "category": "startup"
+    },
+    {
+      "name": "Julia Fischer",
+      "email": "julia.fischer@urbanmobility.at",
+      "organization": "Urban Mobility Labs",
+      "position": "Research Director",
+      "country": "Austria",
+      "description": "Researching next-generation public transportation systems.",
+      "linkedin": "https://linkedin.com/in/juliafischer",
+      "website": "https://urbanmobility.at",
+      "category": "research"
+    }
+  ],
+  "juryMembers": [
+    {
+      "name": "Prof. Dr. Klaus Wagner",
+      "email": "klaus.wagner@uni-mobility.de",
+      "expertise": "Sustainable Transportation",
+      "organization": "University of Mobility Studies",
+      "bio": "Professor of Sustainable Transportation with 20+ years of research experience in urban mobility solutions."
+    },
+    {
+      "name": "Lisa Chen",
+      "email": "lisa.chen@venturemobility.com",
+      "expertise": "Mobility Investments",
+      "organization": "Venture Mobility Capital",
+      "bio": "Partner at Venture Mobility Capital, focusing on early-stage mobility startups across Europe."
+    },
+    {
+      "name": "Dr. Robert Klein",
+      "email": "robert.klein@mobilityinstitute.eu",
+      "expertise": "Policy & Regulation",
+      "organization": "European Mobility Institute",
+      "bio": "Policy advisor specializing in mobility regulation and sustainable transport initiatives."
+    }
+  ],
+  "evaluationCriteria": {
+    "courage": {
+      "name": "Mut & Pioniergeist",
+      "description": "Courage and Pioneer Spirit - Willingness to take risks and break new ground",
+      "weight": 20,
+      "maxScore": 10
+    },
+    "innovation": {
+      "name": "Innovationsgrad",
+      "description": "Degree of Innovation - Novelty and uniqueness of the solution",
+      "weight": 20,
+      "maxScore": 10
+    },
+    "implementation": {
+      "name": "Umsetzungskraft & Wirkung",
+      "description": "Implementation Power & Impact - Ability to execute and create real impact",
+      "weight": 20,
+      "maxScore": 10
+    },
+    "relevance": {
+      "name": "Relevanz für Mobilitätswende",
+      "description": "Relevance for Mobility Transformation - Contribution to sustainable mobility",
+      "weight": 20,
+      "maxScore": 10
+    },
+    "visibility": {
+      "name": "Vorbildfunktion & Sichtbarkeit",
+      "description": "Role Model & Visibility - Influence and thought leadership",
+      "weight": 20,
+      "maxScore": 10
+    }
+  },
+  "sampleEvaluations": [
+    {
+      "juryMember": "Prof. Dr. Klaus Wagner",
+      "candidate": "Dr. Sarah Mitchell",
+      "scores": {
+        "courage": 8.5,
+        "innovation": 9.0,
+        "implementation": 7.5,
+        "relevance": 9.5,
+        "visibility": 8.0
+      },
+      "comments": {
+        "courage": "Shows exceptional courage in challenging established transportation paradigms.",
+        "innovation": "Highly innovative AI-powered approach with clear technical advantages.",
+        "implementation": "Good progress in implementation, though scaling challenges remain.",
+        "relevance": "Extremely relevant to current urban mobility challenges.",
+        "visibility": "Strong thought leadership and media presence.",
+        "general": "Dr. Mitchell is a standout candidate with exceptional potential to transform urban mobility."
+      },
+      "status": "final"
+    },
+    {
+      "juryMember": "Lisa Chen",
+      "candidate": "Michael Schmidt",
+      "scores": {
+        "courage": 7.0,
+        "innovation": 7.5,
+        "implementation": 8.5,
+        "relevance": 10.0,
+        "visibility": 7.0
+      },
+      "comments": {
+        "courage": "Solid approach with calculated risks.",
+        "innovation": "Good innovation in sustainable transport solutions.",
+        "implementation": "Excellent execution track record with multiple successful projects.",
+        "relevance": "Perfect alignment with sustainability goals.",
+        "visibility": "Growing influence in the sustainability sector.",
+        "general": "Strong candidate with proven impact in sustainable transportation."
+      },
+      "status": "final"
+    },
+    {
+      "juryMember": "Dr. Robert Klein",
+      "candidate": "Anna Weber",
+      "scores": {
+        "courage": 6.5,
+        "innovation": 8.0,
+        "implementation": 9.0,
+        "relevance": 8.5,
+        "visibility": 6.0
+      },
+      "comments": {
+        "courage": "Takes measured approach within government framework.",
+        "innovation": "Innovative integration of mobility into smart city infrastructure.",
+        "implementation": "Exceptional implementation capabilities with government backing.",
+        "relevance": "Highly relevant for urban transformation.",
+        "visibility": "Could benefit from increased public visibility.",
+        "general": "Excellent execution within government context."
+      },
+      "status": "draft"
+    }
+  ],
+  "testAccounts": {
+    "admin": {
+      "username": "testadmin",
+      "password": "TestAdmin2025!@#",
+      "email": "testadmin@test.example.com",
+      "role": "administrator",
+      "displayName": "Test Admin"
+    },
+    "juryMember": {
+      "username": "jurytester1",
+      "password": "JuryTest2025!@#",
+      "email": "jury1@test.example.com",
+      "role": "mt_jury_member",
+      "displayName": "Maria Schmidt"
+    },
+    "juryAdmin": {
+      "username": "juryadmintester",
+      "password": "JuryAdmin2025!@#",
+      "email": "juryadmin@test.example.com",
+      "role": "mt_jury_admin",
+      "displayName": "Anna Weber"
+    }
+  },
+  "testUrls": {
+    "local": "http://localhost:8080",
+    "staging": "https://staging.mobilitytrailblazers.de",
+    "production": "https://mobilitytrailblazers.de",
+    "adminDashboard": "/wp-admin/admin.php?page=mt-award-system",
+    "juryDashboard": "/jury-dashboard",
+    "candidatesPage": "/wp-admin/edit.php?post_type=mt_candidate",
+    "evaluationsPage": "/wp-admin/admin.php?page=mt-award-system&tab=evaluations",
+    "assignmentsPage": "/wp-admin/admin.php?page=mt-award-system&tab=assignments"
+  }
+}

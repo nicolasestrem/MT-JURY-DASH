@@ -107,8 +107,14 @@ tests/reports/
 tests/.auth/
 tests/**/*.webm
 tests/**/*.png
-tests/config/.env.test
 tests/config/.env.test.local
+tests/.setup-info.json
+tests/**/*credential*
+tests/**/*password*
+scripts/setup-test-users*.ps1
+scripts/setup-test-users*.sh
+scripts/*credential*
+scripts/*password*
 
 # Test result files
 
@@ -161,7 +167,7 @@ playwright-report/
 /.internal/
 /node_modules/
 /screenshots/
-/tests/
+# /tests/ # Restored - tests are now functional
 nul
 
 # ===== Auto-generated minified files =====
