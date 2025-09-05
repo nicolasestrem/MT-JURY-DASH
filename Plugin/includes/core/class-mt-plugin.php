@@ -182,10 +182,7 @@ class MT_Plugin {
                     if (class_exists($provider_class)) {
                         $this->container->register_provider(new $provider_class($this->container));
                         
-                        // Debug logging for development
-                        if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
-                            error_log("MT Container: Registered provider {$provider_class}");
-                        }
+                        // Provider registered successfully
                     } else {
                         // Log missing provider class
                         if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
@@ -203,10 +200,7 @@ class MT_Plugin {
             // Mark services as registered
             $this->services_registered = true;
             
-            // Debug logging
-            if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
-                error_log("MT Container: All services registered successfully");
-            }
+            // All services registered successfully
             
         } catch (\Exception $e) {
             // Log the error but don't break the application
@@ -337,6 +331,12 @@ class MT_Plugin {
             }
         }
         
+        // Initialize CPT-free candidate router and template loader
+        if (file_exists(MT_PLUGIN_DIR . 'includes/core/class-mt-candidate-router.php')) {
+            require_once MT_PLUGIN_DIR . 'includes/core/class-mt-candidate-router.php';
+            \MobilityTrailblazers\Core\MT_Candidate_Router::init();
+        }
+
         // Initialize template loader for enhanced candidate profiles
         MT_Template_Loader::init();
         
@@ -782,7 +782,7 @@ class MT_Plugin {
         // Scripts
         wp_enqueue_script(
             'mt-admin',
-            MT_PLUGIN_URL . 'assets/js/admin.js',
+            MT_PLUGIN_URL . 'assets/js/mt-admin.js',
             ['jquery', 'wp-util'],
             MT_VERSION,
             true

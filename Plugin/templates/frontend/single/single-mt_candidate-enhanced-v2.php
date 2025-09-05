@@ -20,48 +20,88 @@ wp_enqueue_style('mt-candidate-profile-override', MT_PLUGIN_URL . 'assets/css/ca
 get_header();
 
 // Get candidate data
-if (have_posts()) : 
-    while (have_posts()) : the_post();
-    
-    $candidate_id = get_the_ID();
-    
-    // Try to get data from new candidates table first
-    global $wpdb;
-    $candidates_table = $wpdb->prefix . 'mt_candidates';
-    $candidate_data = $wpdb->get_row($wpdb->prepare(
-        "SELECT * FROM {$candidates_table} WHERE post_id = %d",
-        $candidate_id
-    ));
-    
-    // Decode description sections if from new table
+$candidate_data = null;
+$candidate_id = 0;
+
+// Prefer router-provided candidate; otherwise map current post to repo
+if (isset($GLOBALS['mt_current_candidate'])) {
+    $candidate_data = $GLOBALS['mt_current_candidate'];
+    $candidate_id = $candidate_data->post_id ?? 0;
+    if ($candidate_id && have_posts()) {
+        the_post();
+    }
+} else {
+    if (have_posts()) {
+        the_post();
+        $candidate_id = get_the_ID();
+        $candidate_data = mt_get_candidate_by_post_id($candidate_id);
+        if (!$candidate_data) {
+            $candidate_data = mt_get_candidate($candidate_id);
+        }
+    }
+}
+
+// Now process the candidate data regardless of how we got it
+if ($candidate_data) :
+
+    // Decode description sections if from repository
     $description_sections = null;
-    if ($candidate_data && !empty($candidate_data->description_sections)) {
-        $description_sections = json_decode($candidate_data->description_sections, true);
+    if (!empty($candidate_data->description_sections)) {
+        $description_sections = is_string($candidate_data->description_sections)
+            ? json_decode($candidate_data->description_sections, true)
+            : $candidate_data->description_sections;
     }
     
-    // Fallback to post meta
-    $organization = $candidate_data ? $candidate_data->organization : get_post_meta($candidate_id, '_mt_organization', true);
-    $position = $candidate_data ? $candidate_data->position : get_post_meta($candidate_id, '_mt_position', true);
-    $display_name = get_the_title();
-    $linkedin = $candidate_data ? $candidate_data->linkedin_url : get_post_meta($candidate_id, '_mt_linkedin_url', true);
-    $website = $candidate_data ? $candidate_data->website_url : get_post_meta($candidate_id, '_mt_website_url', true);
+    // Extract data from candidate object
+    $organization = $candidate_data->organization ?? '';
+    $position = $candidate_data->position ?? '';
+    $display_name = $candidate_data->name ?? get_the_title();
+    $linkedin = $candidate_data->linkedin_url ?? '';
+    $website = $candidate_data->website_url ?? '';
+    $article = $candidate_data->article_url ?? '';
     
-    // Get category from meta field instead of taxonomy
-    $category_meta = get_post_meta($candidate_id, '_mt_category_type', true);
-    $categories = $category_meta ? array((object)array('name' => $category_meta)) : array();
-    
-    // Get overview (Überblick) - prioritize meta field (from editor) over database table
-    $overview = get_post_meta($candidate_id, '_mt_overview', true);
-    if (empty($overview) && $description_sections && !empty($description_sections['ueberblick'])) {
-        $overview = $description_sections['ueberblick'];
+    // Get category from description_sections
+    $categories = array();
+    if ($description_sections && isset($description_sections['category'])) {
+        $categories = array((object)array('name' => $description_sections['category']));
     }
     
+    // Get overview (Überblick) from description_sections
+    $overview = '';
+    if ($description_sections) {
+        $overview_keys = ['overview', 'ueberblick', 'überblick', 'uberblick', 'description', 'summary'];
+        foreach ($overview_keys as $ok) {
+            if (!empty($description_sections[$ok])) { $overview = $description_sections[$ok]; break; }
+        }
+    }
     
-    // Parse evaluation criteria - prioritize meta fields over database
+    // Parse evaluation criteria from description_sections
     $parsed_criteria = [];
     
-    // First check if we have the combined criteria field from editor
-    $eval_criteria_meta = get_post_meta($candidate_id, '_mt_evaluation_criteria', true);
+    // Check if we have evaluation criteria in description_sections
+    $eval_criteria_meta = '';
+    if ($description_sections && isset($description_sections['evaluation_criteria'])) {
+        $eval_criteria_meta = $description_sections['evaluation_criteria'];
+    }
+
+    // Prefer structured keys if present
+    if ($description_sections) {
+        $criteria_map = [
+            'mut_pioniergeist' => ['key' => 'courage', 'label' => 'Mut & Pioniergeist'],
+            'innovationsgrad' => ['key' => 'innovation', 'label' => 'Innovationsgrad'],
+            'umsetzungskraft_wirkung' => ['key' => 'implementation', 'label' => 'Umsetzungskraft & Wirkung'],
+            'relevanz_mobilitaetswende' => ['key' => 'relevance', 'label' => 'Relevanz f&uuml;r die Mobilit&auml;tswende'],
+            'vorbild_sichtbarkeit' => ['key' => 'visibility', 'label' => 'Vorbildfunktion & Sichtbarkeit'],
+        ];
+        foreach ($criteria_map as $section_key => $meta) {
+            if (!empty($description_sections[$section_key])) {
+                $parsed_criteria[$meta['key']] = [
+                    'label' => $meta['label'],
+                    'content' => nl2br($description_sections[$section_key])
+                ];
+            }
+        }
+    }
     
     if ($eval_criteria_meta && !empty(trim($eval_criteria_meta))) {
         // Parse the meta field for sections - handle both ** and <strong> formats
@@ -176,7 +216,7 @@ if (have_posts()) :
 
                     
                     <!-- Social Links -->
-                    <?php if ($linkedin || $website) : ?>
+                    <?php if ($linkedin || $website || $article) : ?>
                         <div class="mt-hero-social">
                             <?php if ($linkedin) : ?>
                                 <a href="<?php echo esc_url($linkedin); ?>" target="_blank" rel="noopener" class="mt-social-link linkedin">
@@ -188,6 +228,12 @@ if (have_posts()) :
                                 <a href="<?php echo esc_url($website); ?>" target="_blank" rel="noopener" class="mt-social-link website">
                                     <i class="dashicons dashicons-admin-links"></i>
                                     <span><?php _e('Website', 'mobility-trailblazers'); ?></span>
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($article) : ?>
+                                <a href="<?php echo esc_url($article); ?>" target="_blank" rel="noopener" class="mt-social-link article">
+                                    <i class="dashicons dashicons-media-document"></i>
+                                    <span><?php _e('Article', 'mobility-trailblazers'); ?></span>
                                 </a>
                             <?php endif; ?>
                         </div>
@@ -349,8 +395,7 @@ if (have_posts()) :
 </div>
 
 <?php
-    endwhile;
-endif;
+endif; // End if ($candidate_data)
 
 get_footer();
 ?>

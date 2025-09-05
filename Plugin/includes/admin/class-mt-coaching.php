@@ -61,7 +61,7 @@ class MT_Coaching {
         }
         
         wp_enqueue_style('mt-admin-style', MT_PLUGIN_URL . 'assets/css/admin.css', [], MT_VERSION);
-        wp_enqueue_script('mt-coaching', MT_PLUGIN_URL . 'assets/js/coaching.js', ['jquery'], MT_VERSION, true);
+        wp_enqueue_script('mt-coaching', MT_PLUGIN_URL . 'assets/js/mt-coaching.js', ['jquery'], MT_VERSION, true);
         
         wp_localize_script('mt-coaching', 'mt_coaching', [
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -148,9 +148,9 @@ class MT_Coaching {
         }
         
         // Get statistics for each jury member
-        $jury_member_ids_str = implode(',', array_map('intval', $jury_member_ids));
+        $placeholders = implode(',', array_fill(0, count($jury_member_ids), '%d'));
         
-        $stats = $wpdb->get_results("
+        $stats = $wpdb->get_results($wpdb->prepare("
             SELECT 
                 a.jury_member_id,
                 COUNT(DISTINCT a.candidate_id) as assigned,
@@ -164,9 +164,9 @@ class MT_Coaching {
                 MAX(e.updated_at) as last_activity
             FROM {$wpdb->prefix}mt_jury_assignments a
             LEFT JOIN {$wpdb->prefix}mt_evaluations e ON a.jury_member_id = e.jury_member_id AND a.candidate_id = e.candidate_id
-            WHERE a.jury_member_id IN ({$jury_member_ids_str})
+            WHERE a.jury_member_id IN ({$placeholders})
             GROUP BY a.jury_member_id
-        ");
+        ", $jury_member_ids));
         
         // Merge jury member data with statistics
         $final_stats = [];

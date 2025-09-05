@@ -274,10 +274,6 @@ class MT_Maintenance_Tools {
         $tables = [
             $wpdb->prefix . 'mt_evaluations',
             $wpdb->prefix . 'mt_jury_assignments',
-            $wpdb->prefix . 'mt_votes',
-            $wpdb->prefix . 'mt_candidate_scores',
-            $wpdb->prefix . 'mt_vote_backups',
-            $wpdb->prefix . 'vote_reset_logs',
             $wpdb->prefix . 'mt_error_log'
         ];
         
@@ -287,7 +283,7 @@ class MT_Maintenance_Tools {
         foreach ($tables as $table) {
             // Check if table exists
             if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) === $table) {
-                $result = $wpdb->query("OPTIMIZE TABLE `$table`");
+                $result = $wpdb->query("OPTIMIZE TABLE `" . esc_sql($table) . "`");
                 $results[$table] = $result !== false;
                 
                 if ($result === false) {
@@ -317,10 +313,6 @@ class MT_Maintenance_Tools {
         $tables = [
             $wpdb->prefix . 'mt_evaluations',
             $wpdb->prefix . 'mt_jury_assignments',
-            $wpdb->prefix . 'mt_votes',
-            $wpdb->prefix . 'mt_candidate_scores',
-            $wpdb->prefix . 'mt_vote_backups',
-            $wpdb->prefix . 'vote_reset_logs',
             $wpdb->prefix . 'mt_error_log'
         ];
         
@@ -330,10 +322,10 @@ class MT_Maintenance_Tools {
         foreach ($tables as $table) {
             // Check if table exists
             if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) === $table) {
-                $check = $wpdb->get_row("CHECK TABLE `$table`");
+                $check = $wpdb->get_row("CHECK TABLE `" . esc_sql($table) . "`");
                 
                 if ($check && $check->Msg_text !== 'OK') {
-                    $repair = $wpdb->query("REPAIR TABLE `$table`");
+                    $repair = $wpdb->query("REPAIR TABLE `" . esc_sql($table) . "`");
                     $results[$table] = [
                         'status' => $repair !== false ? 'repaired' : 'failed',
                         'message' => $check->Msg_text
@@ -368,34 +360,23 @@ class MT_Maintenance_Tools {
         
         // Find and delete orphaned evaluations
         $orphaned_evaluations = $wpdb->query(
-            "DELETE e FROM {$wpdb->prefix}mt_evaluations e
-             WHERE NOT EXISTS (
-                 SELECT 1 FROM {$wpdb->prefix}mt_jury_assignments a 
-                 WHERE a.jury_member_id = e.jury_member_id 
-                 AND a.candidate_id = e.candidate_id
-             )"
+            $wpdb->prepare(
+                "DELETE e FROM {$wpdb->prefix}mt_evaluations e LEFT JOIN {$wpdb->prefix}mt_jury_assignments a ON e.jury_member_id = a.jury_member_id AND e.candidate_id = a.candidate_id WHERE a.id IS NULL"
+            )
         );
         
         // Find and delete orphaned assignments (jury member doesn't exist)
         $orphaned_assignments = $wpdb->query(
-            "DELETE a FROM {$wpdb->prefix}mt_jury_assignments a
-             WHERE NOT EXISTS (
-                 SELECT 1 FROM {$wpdb->posts} p 
-                 WHERE p.ID = a.jury_member_id 
-                 AND p.post_type = 'mt_jury_member'
-                 AND p.post_status = 'publish'
-             )"
+            $wpdb->prepare(
+                "DELETE a FROM {$wpdb->prefix}mt_jury_assignments a LEFT JOIN {$wpdb->posts} p ON a.jury_member_id = p.ID WHERE p.ID IS NULL"
+            )
         );
         
         // Find and delete orphaned assignments (candidate doesn't exist)
         $orphaned_candidates = $wpdb->query(
-            "DELETE a FROM {$wpdb->prefix}mt_jury_assignments a
-             WHERE NOT EXISTS (
-                 SELECT 1 FROM {$wpdb->posts} p 
-                 WHERE p.ID = a.candidate_id 
-                 AND p.post_type = 'mt_candidate'
-                 AND p.post_status = 'publish'
-             )"
+            $wpdb->prepare(
+                "DELETE a FROM {$wpdb->prefix}mt_jury_assignments a LEFT JOIN {$wpdb->posts} p ON a.candidate_id = p.ID WHERE p.ID IS NULL"
+            )
         );
         
         $total_deleted = $orphaned_evaluations + $orphaned_assignments + $orphaned_candidates;
@@ -452,7 +433,7 @@ class MT_Maintenance_Tools {
         if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name) {
             $deleted['error_logs'] = $wpdb->query(
                 $wpdb->prepare(
-                    "DELETE FROM $table_name WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)",
+                    "DELETE FROM `$table_name` WHERE created_at < DATE_SUB(NOW(), INTERVAL %d DAY)",
                     $days_old
                 )
             );
@@ -460,9 +441,7 @@ class MT_Maintenance_Tools {
         
         // Clean old transients
         $deleted['transients'] = $wpdb->query(
-            "DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE '_transient_mt_%' 
-             OR option_name LIKE '_transient_timeout_mt_%'"
+            $wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", '\_transient\_mt\_%', '\_transient\_timeout\_mt\_%')
         );
         
         // Clean old audit logs
@@ -495,24 +474,24 @@ class MT_Maintenance_Tools {
         $table = $wpdb->prefix . 'mt_evaluations';
         if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) === $table) {
             // Drop and recreate indexes
-            $wpdb->query("ALTER TABLE `$table` DROP INDEX IF EXISTS idx_jury_candidate");
-            $wpdb->query("ALTER TABLE `$table` ADD INDEX idx_jury_candidate (jury_member_id, candidate_id)");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` DROP INDEX IF EXISTS idx_jury_candidate");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` ADD INDEX idx_jury_candidate (jury_member_id, candidate_id)");
             $indexes_rebuilt++;
             
-            $wpdb->query("ALTER TABLE `$table` DROP INDEX IF EXISTS idx_status");
-            $wpdb->query("ALTER TABLE `$table` ADD INDEX idx_status (status)");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` DROP INDEX IF EXISTS idx_status");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` ADD INDEX idx_status (status)");
             $indexes_rebuilt++;
         }
         
         // Rebuild indexes for assignments table
         $table = $wpdb->prefix . 'mt_jury_assignments';
         if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) === $table) {
-            $wpdb->query("ALTER TABLE `$table` DROP INDEX IF EXISTS idx_jury_member");
-            $wpdb->query("ALTER TABLE `$table` ADD INDEX idx_jury_member (jury_member_id)");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` DROP INDEX IF EXISTS idx_jury_member");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` ADD INDEX idx_jury_member (jury_member_id)");
             $indexes_rebuilt++;
             
-            $wpdb->query("ALTER TABLE `$table` DROP INDEX IF EXISTS idx_candidate");
-            $wpdb->query("ALTER TABLE `$table` ADD INDEX idx_candidate (candidate_id)");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` DROP INDEX IF EXISTS idx_candidate");
+            $wpdb->query("ALTER TABLE `" . esc_sql($table) . "` ADD INDEX idx_candidate (candidate_id)");
             $indexes_rebuilt++;
         }
         
@@ -692,12 +671,9 @@ class MT_Maintenance_Tools {
         );
         
         // Export candidates
-        $candidates = get_posts([
-            'post_type' => 'mt_candidate',
-            'posts_per_page' => -1,
-            'post_status' => 'any'
-        ]);
-        $export_data['data']['candidates'] = $candidates;
+        $export_data['data']['candidates'] = $wpdb->get_results(
+            "SELECT * FROM {$wpdb->prefix}mt_candidates"
+        );
         
         // Export jury members
         $jury_members = get_posts([
@@ -814,10 +790,10 @@ class MT_Maintenance_Tools {
         global $wpdb;
         
         // Delete all evaluations
-        $wpdb->query("TRUNCATE TABLE {$wpdb->prefix}mt_evaluations");
+        $wpdb->query("TRUNCATE TABLE `{$wpdb->prefix}mt_evaluations`");
         
         // Delete all assignments
-        $wpdb->query("TRUNCATE TABLE {$wpdb->prefix}mt_jury_assignments");
+        $wpdb->query("TRUNCATE TABLE `{$wpdb->prefix}mt_jury_assignments`");
         
         // Delete all candidates
         $candidates = get_posts([
@@ -856,9 +832,7 @@ class MT_Maintenance_Tools {
         
         // Clear all transients
         $wpdb->query(
-            "DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE '_transient_mt_%' 
-             OR option_name LIKE '_transient_timeout_mt_%'"
+            $wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", '\_transient\_mt\_%', '\_transient\_timeout\_mt\_%')
         );
         
         return [

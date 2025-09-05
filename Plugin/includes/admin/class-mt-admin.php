@@ -44,8 +44,10 @@ class MT_Admin {
             $this->init_elementor_templates();
         }
         
-        // Initialize Candidate Editor
-        require_once MT_PLUGIN_DIR . 'includes/admin/class-mt-candidate-editor.php';
+        // Initialize Candidates Admin (replaces CPT)
+        require_once MT_PLUGIN_DIR . 'includes/admin/class-mt-candidates-admin.php';
+        $candidates_admin = new MT_Candidates_Admin();
+        $candidates_admin->init();
     }
     
     /**
@@ -140,7 +142,15 @@ class MT_Admin {
 
         // Profile Migration and other admin-only menus
         if (current_user_can('manage_options')) {
-            
+            // Data Migration Tools
+            add_submenu_page(
+                'mobility-trailblazers',
+                __('Data Migration', 'mobility-trailblazers'),
+                __('Data Migration', 'mobility-trailblazers'),
+                'manage_options',
+                'mt-data-migration',
+                [$this, 'render_data_migration_page']
+            );
             
             // Audit Log
             add_submenu_page(
@@ -448,6 +458,40 @@ class MT_Admin {
     }
     
     /**
+     * Render data migration page
+     *
+     * @return void
+     */
+    public function render_data_migration_page() {
+        // Check if migration has been requested
+        if (isset($_POST['mt_migrate_candidates']) && check_admin_referer('mt_data_migration', 'mt_migration_nonce')) {
+            require_once plugin_dir_path(__FILE__) . '../migrations/class-mt-cpt-to-table-migration.php';
+            
+            $migration = new \MobilityTrailblazers\Migrations\MT_CPT_To_Table_Migration();
+            $dry_run = isset($_POST['dry_run']) && $_POST['dry_run'] === '1';
+            
+            $results = $migration->run(['dry_run' => $dry_run]);
+            
+            if ($results['failed'] == 0) {
+                echo '<div class="notice notice-success"><p>' . __('Migration completed successfully!', 'mobility-trailblazers') . '</p></div>';
+            } else {
+                echo '<div class="notice notice-warning"><p>' . sprintf(__('Migration completed with %d errors.', 'mobility-trailblazers'), $results['failed']) . '</p></div>';
+            }
+        }
+        
+        // Check if verification has been requested
+        if (isset($_POST['mt_verify_migration']) && check_admin_referer('mt_data_migration', 'mt_migration_nonce')) {
+            require_once plugin_dir_path(__FILE__) . '../migrations/class-mt-cpt-to-table-migration.php';
+            
+            $migration = new \MobilityTrailblazers\Migrations\MT_CPT_To_Table_Migration();
+            $verification = $migration->verify_migration();
+        }
+        
+        // Include the migration template
+        require_once plugin_dir_path(__FILE__) . '../../templates/admin/data-migration.php';
+    }
+    
+    /**
      * Render audit log page
      *
      * @return void
@@ -621,46 +665,33 @@ class MT_Admin {
             return;
         }
         
-        // Enqueue admin CSS and JS
-        wp_enqueue_style(
-            'mt-admin',
-            MT_PLUGIN_URL . 'assets/css/admin.css',
-            [],
-            MT_VERSION
-        );
-        
-        wp_enqueue_script(
-            'mt-admin',
-            MT_PLUGIN_URL . 'assets/js/admin.js',
-            ['jquery'],
-            MT_VERSION,
-            true
-        );
+        // Decide whether to use bundled assets (prod) or individual (dev)
+        $use_bundles = apply_filters('mt_use_asset_bundles', !(defined('WP_DEBUG') && WP_DEBUG));
+        $bundle_css = MT_PLUGIN_DIR . 'assets/bundles/mt-admin.bundle.min.css';
+        $bundle_js  = MT_PLUGIN_DIR . 'assets/bundles/mt-admin.bundle.min.js';
+
+        if ($use_bundles && file_exists($bundle_css) && file_exists($bundle_js)) {
+            wp_enqueue_style('mt-admin-bundle', MT_PLUGIN_URL . 'assets/bundles/mt-admin.bundle.min.css', [], MT_VERSION);
+            wp_enqueue_script('mt-admin-bundle', MT_PLUGIN_URL . 'assets/bundles/mt-admin.bundle.min.js', ['jquery'], MT_VERSION, true);
+        } else {
+            // Enqueue admin CSS and JS (development)
+            wp_enqueue_style('mt-admin', MT_PLUGIN_URL . 'assets/css/admin.css', [], MT_VERSION);
+            wp_enqueue_script('mt-admin', MT_PLUGIN_URL . 'assets/js/mt-admin.js', ['jquery'], MT_VERSION, true);
+        }
         
         // Enqueue Evaluations page assets
         if (isset($_GET['page']) && $_GET['page'] === 'mt-evaluations') {
-            wp_enqueue_style(
-                'mt-evaluations-admin',
-                MT_PLUGIN_URL . 'assets/css/mt-evaluations-admin.css',
-                ['mt-admin'],
-                MT_VERSION
-            );
-            
-            wp_enqueue_script(
-                'mt-evaluations-admin',
-                MT_PLUGIN_URL . 'assets/js/mt-evaluations-admin.js',
-                ['jquery', 'mt-admin'],
-                MT_VERSION,
-                true
-            );
-            
-            // Localize script for evaluations
-            wp_localize_script('mt-evaluations-admin', 'mt_evaluations_vars', [
+            if (!($use_bundles && file_exists($bundle_js))) {
+                wp_enqueue_style('mt-evaluations-admin', MT_PLUGIN_URL . 'assets/css/mt-evaluations-admin.css', ['mt-admin'], MT_VERSION);
+                wp_enqueue_script('mt-evaluations-admin', MT_PLUGIN_URL . 'assets/js/mt-evaluations-admin.js', ['jquery', 'mt-admin'], MT_VERSION, true);
+            }
+            // Localize into whichever handle is active
+            $eval_handle = ($use_bundles && file_exists($bundle_js)) ? 'mt-admin-bundle' : 'mt-evaluations-admin';
+            wp_localize_script($eval_handle, 'mt_evaluations_vars', [
                 'nonce' => wp_create_nonce('mt_admin_nonce'),
                 'ajax_url' => admin_url('admin-ajax.php')
             ]);
-            
-            wp_localize_script('mt-evaluations-admin', 'mt_evaluations_i18n', [
+            wp_localize_script($eval_handle, 'mt_evaluations_i18n', [
                 'loading' => __('Loading...', 'mobility-trailblazers'),
                 'close' => __('Close', 'mobility-trailblazers'),
                 'delete' => __('Delete Evaluation', 'mobility-trailblazers'),
@@ -689,16 +720,12 @@ class MT_Admin {
         if (isset($_GET['page']) && $_GET['page'] === 'mt-debug-center' && (defined('WP_DEBUG') && WP_DEBUG)) {
             // Debug Center styles are now included in admin.css
             
-            wp_enqueue_script(
-                'mt-debug-center',
-                MT_PLUGIN_URL . 'assets/js/debug-center.js',
-                ['jquery', 'mt-admin'],
-                MT_VERSION,
-                true
-            );
-            
+            if (!($use_bundles && file_exists($bundle_js))) {
+                wp_enqueue_script('mt-debug-center', MT_PLUGIN_URL . 'assets/js/mt-debug-center.js', ['jquery', 'mt-admin'], MT_VERSION, true);
+            }
+            $debug_handle = ($use_bundles && file_exists($bundle_js)) ? 'mt-admin-bundle' : 'mt-debug-center';
             // Localize script for Debug Center
-            wp_localize_script('mt-debug-center', 'mt_debug', [
+            wp_localize_script($debug_handle, 'mt_debug', [
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('mt_debug_nonce'),
                 'i18n' => [
@@ -727,7 +754,8 @@ class MT_Admin {
         }
         
         // Always localize script for AJAX and internationalization on our pages
-        wp_localize_script('mt-admin', 'mt_admin', array(
+        $admin_handle = ($use_bundles && file_exists($bundle_js)) ? 'mt-admin-bundle' : 'mt-admin';
+        wp_localize_script($admin_handle, 'mt_admin', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('mt_admin_nonce'),
             'admin_url' => admin_url(),

@@ -79,15 +79,32 @@ class MT_Candidate_Repository implements MT_Repository_Interface {
         
         $args = wp_parse_args($args, $defaults);
         
-        $sql = "SELECT * FROM {$this->table}";
-        
+                $sql = "SELECT * FROM {$this->table}";
+        $params = [];
+
         // Add WHERE conditions if needed
         $where = [];
         if (!empty($args['organization'])) {
-            $where[] = $wpdb->prepare("organization = %s", $args['organization']);
+            $where[] = "organization = %s";
+            $params[] = $args['organization'];
         }
         if (!empty($args['country'])) {
-            $where[] = $wpdb->prepare("country = %s", $args['country']);
+            $where[] = "country = %s";
+            $params[] = $args['country'];
+        }
+        // Support additional simple where clauses (restricted to safe columns)
+        if (!empty($args['where']) && is_array($args['where'])) {
+            foreach ($args['where'] as $column => $condition) {
+                // Only allow filtering on description_sections via LIKE for safety
+                if ($column === 'description_sections' && is_array($condition) && count($condition) === 2) {
+                    list($op, $val) = $condition;
+                    $op = strtoupper(trim($op));
+                    if ($op === 'LIKE') {
+                        $where[] = "description_sections LIKE %s";
+                        $params[] = $val;
+                    }
+                }
+            }
         }
         
         if (!empty($where)) {
@@ -96,17 +113,24 @@ class MT_Candidate_Repository implements MT_Repository_Interface {
         
         // Add ORDER BY
         $allowed_orderby = ['id', 'name', 'organization', 'created_at', 'updated_at'];
-        if (in_array($args['orderby'], $allowed_orderby)) {
+        if (in_array($args['orderby'], $allowed_orderby, true)) {
             $order = strtoupper($args['order']) === 'DESC' ? 'DESC' : 'ASC';
-            $sql .= " ORDER BY {$args['orderby']} {$order}";
+            $sql .= " ORDER BY " . esc_sql($args['orderby']) . " {$order}";
         }
         
         // Add LIMIT
         if ($args['limit'] > 0) {
-            $sql .= $wpdb->prepare(" LIMIT %d OFFSET %d", $args['limit'], $args['offset']);
+            $sql .= " LIMIT %d OFFSET %d";
+            $params[] = $args['limit'];
+            $params[] = $args['offset'];
         }
         
-        $results = $wpdb->get_results($sql);
+        // Only use prepare if we have parameters, otherwise execute directly
+        if (!empty($params)) {
+            $results = $wpdb->get_results($wpdb->prepare($sql, $params));
+        } else {
+            $results = $wpdb->get_results($sql);
+        }
         
         // Decode JSON fields
         foreach ($results as &$result) {
@@ -350,7 +374,9 @@ class MT_Candidate_Repository implements MT_Repository_Interface {
     public function truncate() {
         global $wpdb;
         
-        $result = $wpdb->query("TRUNCATE TABLE {$this->table}");
+        // Direct query is used here because TRUNCATE cannot be used with prepared statements.
+        // The table name is sanitized internally and not subject to user input.
+        $result = $wpdb->query("TRUNCATE TABLE `{$this->table}`");
         
         return $result !== false;
     }
@@ -363,6 +389,6 @@ class MT_Candidate_Repository implements MT_Repository_Interface {
     public function count() {
         global $wpdb;
         
-        return (int) $wpdb->get_var("SELECT COUNT(*) FROM {$this->table}");
+        return (int) $wpdb->get_var("SELECT COUNT(*) FROM `{$this->table}`");
     }
 }

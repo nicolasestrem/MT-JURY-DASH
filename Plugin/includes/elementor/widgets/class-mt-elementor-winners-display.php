@@ -102,14 +102,16 @@ class MT_Elementor_Winners_Display extends Widget_Base {
             ]
         );
         
-        // Get categories for dropdown
-        $categories = get_terms([
-            'taxonomy' => 'mt_award_category',
-            'hide_empty' => false,
-        ]);
+        // Get categories for dropdown from repository
+        // Include helper functions if not already loaded
+        if (!function_exists('mt_get_candidate_categories')) {
+            require_once MT_PLUGIN_DIR . 'includes/functions/mt-candidate-helpers.php';
+        }
+        
+        $categories = mt_get_candidate_categories();
         
         $category_options = ['' => __('All Categories', 'mobility-trailblazers')];
-        if (!is_wp_error($categories) && !empty($categories)) {
+        if (!empty($categories)) {
             foreach ($categories as $category) {
                 $category_options[$category->slug] = $category->name;
             }

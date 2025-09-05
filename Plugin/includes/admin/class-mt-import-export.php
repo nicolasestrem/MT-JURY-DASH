@@ -69,10 +69,10 @@ class MT_Import_Export {
                     delete_transient($export_key);
                     
                     if ($specific_candidates && is_array($specific_candidates)) {
-                        // Validate all IDs are integers and belong to mt_candidate post type
+                        // Validate all IDs are integers
                         $specific_candidates = array_map('intval', $specific_candidates);
                         $specific_candidates = array_filter($specific_candidates, function($id) {
-                            return $id > 0 && get_post_type($id) === 'mt_candidate';
+                            return $id > 0;
                         });
                         
                         if (!empty($specific_candidates)) {
@@ -104,22 +104,28 @@ class MT_Import_Export {
                 }
             }
             
-            // Build query arguments
-            $query_args = [
-                'post_type' => 'mt_candidate',
-                'posts_per_page' => -1,
-                'orderby' => 'title',
-                'order' => 'ASC',
-                'post_status' => 'any'
-            ];
+            // Use repository to get candidates
+            $repository = new \MobilityTrailblazers\Repositories\MT_Candidate_Repository();
             
-            // If specific candidates were requested, filter by them
+            // Get candidates based on selection
             if (!empty($specific_candidates)) {
-                $query_args['post__in'] = $specific_candidates;
-            }
+                // Get specific candidates by post IDs
+                $candidates = [];
+                foreach ($specific_candidates as $post_id) {
+                    // Get candidate by post_id from custom table
+                    $candidate = $wpdb->get_row($wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}mt_candidates WHERE post_id = %d",
+                        $post_id
+                    ));
+                    if ($candidate) {
+                        $candidates[] = $candidate;
+                    }
+                }
+            } else {
+                // Get all candidates from repository
+                $candidates = $repository->find_all();
             
-            // Get candidates
-            $candidates = get_posts($query_args);
+            }
             
             if (empty($candidates)) {
                 MT_Logger::warning('No candidates found for export');
@@ -140,84 +146,62 @@ class MT_Import_Export {
                 wp_die(__('Export failed: Unable to create output file.', 'mobility-trailblazers'));
             }
         
-        // Write headers with consistent structure
-        fputcsv($output, [
-            'ID',
-            'Name',
-            'Company',
-            'Category',
-            'Description',
-            'Innovation',
-            'Website',
-            'LinkedIn',
-            'Email',
-            'Status',
-            'Created Date',
-            'Modified Date'
-        ]);
-        
-        // Optimize meta data fetching - get all meta at once
-        $candidate_ids = wp_list_pluck($candidates, 'ID');
-        if (!empty($candidate_ids)) {
-            // SECURITY FIX: Properly handle IN clause to prevent SQL injection
-            // Ensure all IDs are integers
-            $candidate_ids = array_map('intval', $candidate_ids);
+            // Write headers with consistent structure
+            fputcsv($output, [
+                'ID',
+                'Name',
+                'Organization',
+                'Position',
+                'Country',
+                'Description',
+                'Category',
+                'Website',
+                'LinkedIn',
+                'Article URL',
+                'Created Date',
+                'Updated Date'
+            ]);
             
-            // Build the query with proper placeholders
-            $placeholders = array_fill(0, count($candidate_ids), '%d');
-            $in_placeholders = implode(',', $placeholders);
-            
-            // Build the complete query with all parameters
-            $query = "SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta} 
-                     WHERE post_id IN ({$in_placeholders}) 
-                     AND meta_key IN (%s, %s, %s, %s, %s, %s, %s, %s)";
-            
-            // Merge all parameters for prepare
-            $query_params = array_merge(
-                $candidate_ids,
-                [
-                    '_mt_candidate_name',
-                    '_mt_organization', 
-                    '_mt_category_type',
-                    '_mt_description_full',
-                    '_mt_innovation',
-                    '_mt_website_url',
-                    '_mt_linkedin_url',
-                    '_mt_email'
-                ]
-            );
-            
-            $meta_query = $wpdb->prepare($query, $query_params);
-            $all_meta = $wpdb->get_results($meta_query);
-            
-            // Organize meta by post ID
-            $meta_by_post = [];
-            foreach ($all_meta as $meta) {
-                if (!isset($meta_by_post[$meta->post_id])) {
-                    $meta_by_post[$meta->post_id] = [];
+            // Write data using repository data structure
+            if (!empty($candidates)) {
+                foreach ($candidates as $candidate) {
+                    // Decode description sections safely (repo already decodes to array)
+                    $description_sections = [];
+                    if (!empty($candidate->description_sections)) {
+                        if (is_array($candidate->description_sections)) {
+                            $description_sections = $candidate->description_sections;
+                        } elseif (is_string($candidate->description_sections)) {
+                            $decoded = json_decode($candidate->description_sections, true);
+                            $description_sections = is_array($decoded) ? $decoded : [];
+                        }
+                    }
+                    
+                    // Extract category from description sections if available
+                    $category = isset($description_sections['category']) ? $description_sections['category'] : 
+                               (isset($description_sections['award_category']) ? $description_sections['award_category'] : '');
+                    
+                    // Get main description (fallbacks for robustness)
+                    $description = $description_sections['description']
+                        ?? ($description_sections['overview']
+                            ?? ($description_sections['ueberblick']
+                                ?? ($description_sections['überblick'] ?? '')));
+                    
+                    fputcsv($output, [
+                        $candidate->id,
+                        $candidate->name,
+                        $candidate->organization,
+                        $candidate->position ?? '',
+                        $candidate->country ?? 'Germany',
+                        $description,
+                        $category,
+                        $candidate->website_url ?? '',
+                        $candidate->linkedin_url ?? '',
+                        $candidate->article_url ?? '',
+                        self::format_date_iso8601($candidate->created_at),
+                        self::format_date_iso8601($candidate->updated_at)
+                    ]);
                 }
-                $meta_by_post[$meta->post_id][$meta->meta_key] = $meta->meta_value;
             }
-            
-            // Write data using cached meta
-            foreach ($candidates as $candidate) {
-                $meta = isset($meta_by_post[$candidate->ID]) ? $meta_by_post[$candidate->ID] : [];
-                fputcsv($output, [
-                    $candidate->ID,
-                    isset($meta['_mt_candidate_name']) ? $meta['_mt_candidate_name'] : $candidate->post_title,
-                    isset($meta['_mt_organization']) ? $meta['_mt_organization'] : '',
-                    isset($meta['_mt_category_type']) ? $meta['_mt_category_type'] : '',
-                    isset($meta['_mt_description_full']) ? $meta['_mt_description_full'] : $candidate->post_content,
-                    isset($meta['_mt_innovation']) ? $meta['_mt_innovation'] : '',
-                    isset($meta['_mt_website_url']) ? $meta['_mt_website_url'] : '',
-                    isset($meta['_mt_linkedin_url']) ? $meta['_mt_linkedin_url'] : '',
-                    isset($meta['_mt_email']) ? $meta['_mt_email'] : '',
-                    $candidate->post_status,
-                    self::format_date_iso8601($candidate->post_date),
-                    self::format_date_iso8601($candidate->post_modified)
-                ]);
-            }
-        }
         
             fclose($output);
             
@@ -446,196 +430,7 @@ class MT_Import_Export {
         exit;
     }
     
-    /**
-     * Export candidates with streaming for memory optimization
-     * DEPRECATED - Use export_candidates() instead
-     *
-     * @param array $args Export arguments
-     * @return void Outputs CSV directly
-     * @since 2.2.28
-     * @deprecated 2.5.41
-     */
-    private static function export_candidates_stream_deprecated($args = []) {
-        // Set headers for CSV download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="candidates-' . date('Y-m-d-His') . '.csv"');
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-        
-        // Open output stream
-        $output = fopen('php://output', 'w');
-        
-        // Remove BOM - causes parsing issues
-        
-        // Write headers
-        $headers = [
-            'ID',
-            'Name',
-            'Organisation',
-            'Position',
-            'Category',
-            'Status',
-            'LinkedIn',
-            'Website',
-            'Description',
-            'Created Date',
-            'Modified Date'
-        ];
-        fputcsv($output, $headers);
-        
-        // Query in batches to avoid memory issues
-        $offset = 0;
-        $batch_size = 100;
-        
-        while (true) {
-            $candidates = get_posts([
-                'post_type' => 'mt_candidate',
-                'posts_per_page' => $batch_size,
-                'offset' => $offset,
-                'post_status' => 'any',
-                'orderby' => 'ID',
-                'order' => 'ASC'
-            ]);
-            
-            if (empty($candidates)) {
-                break;
-            }
-            
-            foreach ($candidates as $candidate) {
-                $row = [
-                    $candidate->ID,
-                    $candidate->post_title,
-                    get_post_meta($candidate->ID, '_mt_organization', true),
-                    get_post_meta($candidate->ID, '_mt_position', true),
-                    get_post_meta($candidate->ID, '_mt_category_type', true),
-                    $candidate->post_status,
-                    get_post_meta($candidate->ID, '_mt_linkedin_url', true),
-                    get_post_meta($candidate->ID, '_mt_website_url', true),
-                    wp_strip_all_tags($candidate->post_content),
-                    $candidate->post_date,
-                    $candidate->post_modified
-                ];
-                fputcsv($output, $row);
-                
-                // Free memory
-                unset($row);
-            }
-            
-            $offset += $batch_size;
-            
-            // Clear WordPress object cache
-            wp_cache_flush();
-            
-            // Prevent timeout on large exports
-            if (function_exists('set_time_limit')) {
-                set_time_limit(30);
-            }
-        }
-        
-        fclose($output);
-        exit;
-    }
-    
-    /**
-     * Export evaluations with streaming for memory optimization
-     * DEPRECATED - Use export_evaluations() instead
-     *
-     * @param array $args Export arguments
-     * @return void Outputs CSV directly
-     * @since 2.2.28
-     * @deprecated 2.5.41
-     */
-    private static function export_evaluations_stream_deprecated($args = []) {
-        global $wpdb;
-        
-        // Set headers for CSV download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="evaluations-' . date('Y-m-d-His') . '.csv"');
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-        
-        // Open output stream
-        $output = fopen('php://output', 'w');
-        
-        // Remove BOM - causes parsing issues
-        
-        // Write headers
-        $headers = [
-            'Evaluation ID',
-            'Jury Member',
-            'Candidate',
-            'Criterion 1',
-            'Criterion 2',
-            'Criterion 3',
-            'Criterion 4',
-            'Criterion 5',
-            'Total Score',
-            'Comments',
-            'Status',
-            'Created Date'
-        ];
-        fputcsv($output, $headers);
-        
-        // Query in batches using direct SQL for efficiency
-        $table_name = $wpdb->prefix . 'mt_evaluations';
-        $offset = 0;
-        $batch_size = 100;
-        
-        while (true) {
-            $evaluations = $wpdb->get_results($wpdb->prepare(
-                "SELECT e.*, 
-                        u.display_name as jury_name,
-                        p.post_title as candidate_name
-                 FROM {$table_name} e
-                 LEFT JOIN {$wpdb->users} u ON e.jury_member_id = u.ID
-                 LEFT JOIN {$wpdb->posts} p ON e.candidate_id = p.ID
-                 ORDER BY e.id ASC
-                 LIMIT %d OFFSET %d",
-                $batch_size,
-                $offset
-            ));
-            
-            if (empty($evaluations)) {
-                break;
-            }
-            
-            foreach ($evaluations as $eval) {
-                $total_score = $eval->courage_score + $eval->innovation_score + 
-                              $eval->implementation_score + $eval->relevance_score + $eval->visibility_score;
-                
-                $row = [
-                    $eval->id,
-                    $eval->jury_name,
-                    $eval->candidate_name,
-                    $eval->courage_score,
-                    $eval->innovation_score,
-                    $eval->implementation_score,
-                    $eval->relevance_score,
-                    $eval->visibility_score,
-                    $total_score,
-                    $eval->comments,
-                    $eval->status,
-                    $eval->created_at
-                ];
-                fputcsv($output, $row);
-                
-                // Free memory
-                unset($row);
-            }
-            
-            $offset += $batch_size;
-            
-            // Prevent timeout on large exports
-            if (function_exists('set_time_limit')) {
-                set_time_limit(30);
-            }
-        }
-        
-        fclose($output);
-        exit;
-    }
+    // Deprecated streaming exporters removed in Phase 3 cleanup (use export_* methods above)
     
     /**
      * Format date to ISO 8601 standard (Y-m-d H:i:s)

@@ -84,8 +84,27 @@ class MT_Migration_Add_Indexes {
     private static function add_index($table, $index_name, $columns) {
         global $wpdb;
         
-        // Check if index already exists
-        $existing = $wpdb->get_results("SHOW INDEX FROM $table WHERE Key_name = '$index_name'");
+        // Whitelist known tables and sanitize identifiers
+        $allowed_tables = [
+            $wpdb->prefix . 'mt_evaluations',
+            $wpdb->prefix . 'mt_jury_assignments',
+        ];
+        if (!in_array($table, $allowed_tables, true)) {
+            MT_Logger::security_event('Blocked index operation on unexpected table', [
+                'table' => $table,
+                'index_name' => $index_name,
+            ]);
+            return false;
+        }
+
+        $index_name_safe = sanitize_key($index_name);
+        // Check if index already exists (prepare only the value; identifiers validated + backticked)
+        $existing = $wpdb->get_results(
+            $wpdb->prepare(
+                'SHOW INDEX FROM `' . esc_sql($table) . '` WHERE Key_name = %s',
+                $index_name_safe
+            )
+        );
         
         if (!empty($existing)) {
             MT_Logger::debug("Database index already exists", [
@@ -95,13 +114,22 @@ class MT_Migration_Add_Indexes {
             return true;
         }
         
-        // Build column list
-        $column_list = implode(', ', array_map(function($col) {
-            return "`$col`";
-        }, $columns));
+        // Build column list (sanitize each identifier)
+        $column_list = implode(
+            ', ',
+            array_map(function ($col) {
+                $col = sanitize_key($col);
+                return '`' . $col . '`';
+            }, $columns)
+        );
         
-        // Add the index
-        $query = "ALTER TABLE $table ADD INDEX $index_name ($column_list)";
+        // Add the index (identifiers validated and backticked)
+        $query = sprintf(
+            'ALTER TABLE `%s` ADD INDEX `%s` (%s)',
+            esc_sql($table),
+            esc_sql($index_name_safe),
+            $column_list
+        );
         $result = $wpdb->query($query);
         
         if ($result === false) {
@@ -158,11 +186,21 @@ class MT_Migration_Add_Indexes {
         // Remove each index
         foreach ($indexes as $table => $index_list) {
             foreach ($index_list as $index_name) {
-                // Check if index exists
-                $existing = $wpdb->get_results("SHOW INDEX FROM $table WHERE Key_name = '$index_name'");
+                // Check if index exists (sanitize index name)
+                $index_name_safe = sanitize_key($index_name);
+                $existing = $wpdb->get_results(
+                    $wpdb->prepare(
+                        'SHOW INDEX FROM `' . esc_sql($table) . '` WHERE Key_name = %s',
+                        $index_name_safe
+                    )
+                );
                 
                 if (!empty($existing)) {
-                    $query = "ALTER TABLE $table DROP INDEX $index_name";
+                    $query = sprintf(
+                        'ALTER TABLE `%s` DROP INDEX `%s`',
+                        esc_sql($table),
+                        esc_sql($index_name_safe)
+                    );
                     $result = $wpdb->query($query);
                     
                     if ($result === false) {

@@ -119,4 +119,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-For detailed security information about version 2.5.42, see [SECURITY-PATCHES.md](docs/SECURITY-PATCHES.md)
+For detailed security information about version 2.5.42, see [SECURITY-PATCHES.md](docs/SECURITY-PATCHES.md)## [2.6.0] - 2025-09-05
+
+### Added
+- CPT-free candidate router and template loader integration for /candidate/{slug}/.
+- Candidates admin (CRUD) in plugin menu using repository (no CPT UI).
+- WP-CLI mt migrate-candidates command and migration instructions.
+- Cross-platform asset build script scripts/build-assets.js and 
+pm run build:win.
+
+### Changed
+- Register hidden mt_candidate CPT (no UI/public) to support migration and legacy APIs.
+- Renamed assets to follow mt-* convention; ensured minified names match enqueues.
+- Evaluations admin: removed Approve/Reject/Reset; removed Status filter/column.
+- Removed development-only debug section on assignments admin page.
+- Jury dashboard images: improved default framing; public candidate page shows overview/criteria with robust parsing.
+
+### Removed
+- Deprecated streaming exporters from Import/Export.
+- Redundant Elementor integration under includes/integrations/elementor/.
+
+### Fixed
+- Export: prevent double JSON decode of description_sections.
+- CSS: fixed frontend.css selector/escaping causing minify warnings.
+- Build: ensured production loads mt-*.min.js files.

@@ -17,21 +17,46 @@ get_header();
 
 while (have_posts()) : the_post();
     $candidate_id = get_the_ID();
-    $organization = get_post_meta($candidate_id, '_mt_organization', true);
-    $position = get_post_meta($candidate_id, '_mt_position', true);
-    $display_name = get_post_meta($candidate_id, '_mt_display_name', true) ?: get_the_title();
-    $overview = get_post_meta($candidate_id, '_mt_overview', true);
-    $eval_criteria = get_post_meta($candidate_id, '_mt_evaluation_criteria', true);
-    $linkedin = get_post_meta($candidate_id, '_mt_linkedin_url', true);
-    $website = get_post_meta($candidate_id, '_mt_website_url', true);
     
-    // Get category from meta field instead of taxonomy
-    $category_meta = get_post_meta($candidate_id, '_mt_category_type', true);
-    $categories = $category_meta ? array((object)array('name' => $category_meta)) : array();
+    // Get candidate from repository
+    $candidate = mt_get_candidate_by_post_id($candidate_id);
+    if (!$candidate) {
+        $candidate = mt_get_candidate($candidate_id);
+    }
+    
+    // Extract data from candidate object
+    $organization = $candidate ? $candidate->organization : '';
+    $position = $candidate ? $candidate->position : '';
+    $display_name = $candidate ? $candidate->name : get_the_title();
+    $linkedin = $candidate ? $candidate->linkedin_url : '';
+    $website = $candidate ? $candidate->website_url : '';
+    
+    $overview = '';
+    $eval_criteria = '';
+    $categories = array();
+    
+    // Get data from description_sections
+    if ($candidate && !empty($candidate->description_sections)) {
+        $sections = is_string($candidate->description_sections) 
+            ? json_decode($candidate->description_sections, true) 
+            : $candidate->description_sections;
+        
+        $overview = isset($sections['overview']) ? $sections['overview'] : (isset($sections['description']) ? $sections['description'] : '');
+        $eval_criteria = isset($sections['evaluation_criteria']) ? $sections['evaluation_criteria'] : '';
+        
+        // Get category
+        if (isset($sections['category'])) {
+            $categories = array((object)array('name' => $sections['category']));
+        }
+    }
     
     // Parse evaluation criteria into structured format
     $parsed_criteria = [];
-    if ($eval_criteria) {
+    if ($candidate && !empty($candidate->description_sections)) {
+        $sections = is_string($candidate->description_sections) 
+            ? json_decode($candidate->description_sections, true) 
+            : $candidate->description_sections;
+            
         $criteria_fields = [
             'courage' => __('Mut & Pioniergeist', 'mobility-trailblazers'),
             'innovation' => __('Innovationsgrad', 'mobility-trailblazers'),
@@ -41,7 +66,8 @@ while (have_posts()) : the_post();
         ];
         
         foreach ($criteria_fields as $key => $label) {
-            $value = get_post_meta($candidate_id, '_mt_criterion_' . $key, true);
+            $field_key = 'criterion_' . $key;
+            $value = isset($sections[$field_key]) ? $sections[$field_key] : '';
             if ($value) {
                 $parsed_criteria[$key] = [
                     'label' => $label,

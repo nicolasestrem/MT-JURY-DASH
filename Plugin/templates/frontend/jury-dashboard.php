@@ -16,8 +16,13 @@ if (isset($_GET['evaluate']) && is_numeric($_GET['evaluate'])) {
     $candidate_id = intval($_GET['evaluate']);
     
     // Verify candidate exists and is valid
-    $candidate = get_post($candidate_id);
-    if (!$candidate || $candidate->post_type !== 'mt_candidate') {
+    $candidate = mt_get_candidate($candidate_id);
+    if (!$candidate) {
+        // Try by post_id for backward compatibility
+        $candidate = mt_get_candidate_by_post_id($candidate_id);
+    }
+    
+    if (!$candidate) {
         echo '<div class="mt-notice mt-notice-error">' . 
              __('Invalid candidate.', 'mobility-trailblazers') . 
              '</div>';
@@ -84,6 +89,12 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
 
 <div class="mt-root">
 <div class="mt-jury-dashboard mt-dashboard-v3">
+    <style>
+    /* Improve candidate card image framing to reduce head cropping */
+    .mt-card-image-wrap { overflow: hidden; border-radius: 10px; }
+    .mt-card__image { width: 100%; height: 180px; object-fit: cover; object-position: 50% 20%; display: block; }
+    @media (max-width: 768px) { .mt-card__image { height: 200px; } }
+    </style>
     <?php if ($progress['completion_rate'] == 100) : ?>
         <div class="mt-completion-status-banner">
             <div class="mt-completion-status-content">
@@ -209,7 +220,11 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
     <?php if (!empty($assignments)) : ?>
         <div class="mt-candidates-list <?php echo esc_attr($layout_class); ?> mt-candidates-v3" id="mt-candidates-list">
             <?php foreach ($assignments as $assignment) : 
-                $candidate = get_post($assignment->candidate_id);
+                $candidate = mt_get_candidate($assignment->candidate_id);
+                if (!$candidate) {
+                    // Try by post_id for backward compatibility
+                    $candidate = mt_get_candidate_by_post_id($assignment->candidate_id);
+                }
                 if (!$candidate) continue;
                 
                 // Get evaluation status
@@ -222,11 +237,23 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
                 }
                 
                 $status = $evaluation ? $evaluation['status'] : 'draft';
-                $organization = get_post_meta($candidate->ID, '_mt_organization', true);
-                $categories = wp_get_post_terms($candidate->ID, 'mt_award_category');
+                $organization = $candidate->organization;
                 
-                // Get the category from post meta
-                $category_type = get_post_meta($candidate->ID, '_mt_category_type', true);
+                // Get categories from description sections
+                $category_type = '';
+                if (!empty($candidate->description_sections)) {
+                    $sections = is_string($candidate->description_sections) 
+                        ? json_decode($candidate->description_sections, true) 
+                        : $candidate->description_sections;
+                    $category_type = isset($sections['category']) ? $sections['category'] : 
+                                   (isset($sections['award_category']) ? $sections['award_category'] : '');
+                }
+                
+                // Get categories from taxonomy if we have post_id
+                $categories = [];
+                if (!empty($candidate->post_id)) {
+                    $categories = wp_get_post_terms($candidate->post_id, 'mt_award_category');
+                }
                 $category_slug = '';
                 if ($category_type) {
                     // Map category names to slugs - exact matching for German categories
@@ -240,15 +267,31 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
                     }
                 }
             ?>
-                <div class="mt-candidate-card" data-status="<?php echo esc_attr($status); ?>" data-name="<?php echo esc_attr(strtolower($candidate->post_title)); ?>" data-category="<?php echo esc_attr($category_slug); ?>">
+                <div class="mt-candidate-card" data-status="<?php echo esc_attr($status); ?>" data-name="<?php echo esc_attr(strtolower($candidate->name)); ?>" data-category="<?php echo esc_attr($category_slug); ?>">
                     <div class="mt-candidate-header">
-                        <h3 class="mt-candidate-name"><?php echo esc_html($candidate->post_title); ?></h3>
+                        <h3 class="mt-candidate-name"><?php echo esc_html($candidate->name); ?></h3>
                         <?php if ($organization) : ?>
                             <p class="mt-candidate-org"><?php echo esc_html($organization); ?></p>
                         <?php endif; ?>
                     </div>
-                    
+
                     <div class="mt-candidate-body">
+                        <?php
+                        // Candidate card image (photo_attachment_id -> post thumbnail -> placeholder)
+                        $card_img = '';
+                        if (!empty($candidate->photo_attachment_id)) {
+                            $card_img = wp_get_attachment_image($candidate->photo_attachment_id, 'medium', false, ['class' => 'mt-card__image']);
+                        } elseif (!empty($candidate->post_id) && has_post_thumbnail($candidate->post_id)) {
+                            $card_img = get_the_post_thumbnail($candidate->post_id, 'medium', ['class' => 'mt-card__image']);
+                        }
+                        ?>
+                        <div class="mt-card-image-wrap" style="width:100%;max-height:180px;overflow:hidden;border-radius:10px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+                            <?php if ($card_img) : ?>
+                                <?php echo $card_img; ?>
+                            <?php else : ?>
+                                <span class="dashicons dashicons-businessperson" style="font-size:48px;color:#cbd5e1;"></span>
+                            <?php endif; ?>
+                        </div>
                         <?php 
                         // Display category badge - prioritize category_type from meta, fallback to taxonomy
                         $category_display_name = '';
@@ -285,7 +328,7 @@ $layout_class = 'mt-candidates-' . (isset($dashboard_settings['card_layout']) ? 
                         
                         <a href="#" 
                            class="mt-evaluate-btn" 
-                           data-candidate-id="<?php echo esc_attr($candidate->ID); ?>">
+                           data-candidate-id="<?php echo esc_attr($candidate->post_id ?: $candidate->id); ?>">
                             <?php
                             if ($status === 'completed') {
                                 _e('View/Edit Evaluation', 'mobility-trailblazers');

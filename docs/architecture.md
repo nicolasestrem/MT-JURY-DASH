@@ -32,6 +32,14 @@ Service providers are used to bootstrap services and their dependencies. They ar
 The main service providers are:
 
 *   `MobilityTrailblazers\Providers\MT_Repository_Provider`: Registers the plugin's repositories.
+
+## Candidate Routing (CPT‑free)
+
+- Router: `MobilityTrailblazers\Core\MT_Candidate_Router`
+  - Adds rewrite rule for `/candidate/{slug}/` and query var `mt_candidate_slug`.
+  - Loads candidate via repository and prepares a fake `WP_Post` to satisfy templates/themes.
+  - Template selection is handled by `MT_Template_Loader`, which prefers in‑plugin enhanced templates.
+  - CPT `mt_candidate` is not required for front‑end pages.
 *   `MobilityTrailblazers\Providers\MT_Services_Provider`: Registers the plugin's services.
 
 This pattern allows for a centralized and organized way to manage the plugin's dependencies.

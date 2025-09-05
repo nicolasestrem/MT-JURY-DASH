@@ -73,6 +73,115 @@ class MT_CLI_Commands {
     }
     
     /**
+     * Migrate candidates from CPT to custom table
+     *
+     * ## OPTIONS
+     *
+     * [--batch-size=<size>]
+     * : Number of candidates to process per batch. Default: 100
+     *
+     * [--dry-run]
+     * : Run migration without making changes
+     *
+     * [--verify]
+     * : Only verify migration integrity without migrating
+     *
+     * ## EXAMPLES
+     *
+     *     wp mt migrate-candidates
+     *     wp mt migrate-candidates --dry-run
+     *     wp mt migrate-candidates --batch-size=50
+     *     wp mt migrate-candidates --verify
+     *
+     * @when after_wp_load
+     */
+    public function migrate_candidates($args, $assoc_args) {
+        require_once plugin_dir_path(__FILE__) . '../migrations/class-mt-cpt-to-table-migration.php';
+        
+        $migration = new \MobilityTrailblazers\Migrations\MT_CPT_To_Table_Migration();
+        
+        // Check if we're only verifying
+        if (isset($assoc_args['verify'])) {
+            WP_CLI::log('Verifying migration integrity...');
+            $results = $migration->verify_migration();
+            
+            if ($results['success']) {
+                WP_CLI::success('Migration verification passed!');
+            } else {
+                WP_CLI::warning('Migration verification found issues:');
+            }
+            
+            // Display verification results
+            foreach ($results['checks'] as $check_name => $check_data) {
+                WP_CLI::log('');
+                WP_CLI::log(ucfirst(str_replace('_', ' ', $check_name)) . ':');
+                
+                if (is_array($check_data)) {
+                    foreach ($check_data as $key => $value) {
+                        if (is_array($value)) {
+                            WP_CLI::log('  ' . $key . ': ' . json_encode($value));
+                        } else {
+                            WP_CLI::log('  ' . $key . ': ' . $value);
+                        }
+                    }
+                }
+            }
+            
+            return;
+        }
+        
+        // Prepare migration arguments
+        $migration_args = [
+            'batch_size' => isset($assoc_args['batch-size']) ? intval($assoc_args['batch-size']) : 100,
+            'dry_run' => isset($assoc_args['dry-run'])
+        ];
+        
+        if ($migration_args['dry_run']) {
+            WP_CLI::log('Running migration in DRY RUN mode - no changes will be made');
+        }
+        
+        WP_CLI::log('Starting candidate migration from CPT to custom table...');
+        WP_CLI::log('Batch size: ' . $migration_args['batch_size']);
+        
+        // Run migration
+        $results = $migration->run($migration_args);
+        
+        // Display results
+        WP_CLI::log('');
+        WP_CLI::log('Migration Results:');
+        WP_CLI::log('  Total candidates: ' . $results['total']);
+        WP_CLI::log('  Successfully migrated: ' . $results['migrated']);
+        WP_CLI::log('  Skipped (already migrated): ' . $results['skipped']);
+        WP_CLI::log('  Failed: ' . $results['failed']);
+        
+        if (!empty($results['errors'])) {
+            WP_CLI::log('');
+            WP_CLI::warning('Errors encountered:');
+            foreach ($results['errors'] as $error) {
+                WP_CLI::log('  - ' . $error);
+            }
+        }
+        
+        if ($results['failed'] == 0) {
+            WP_CLI::success('Migration completed successfully!');
+            
+            if (!$migration_args['dry_run']) {
+                WP_CLI::log('');
+                WP_CLI::log('Running verification...');
+                $verify_results = $migration->verify_migration();
+                
+                if ($verify_results['success']) {
+                    WP_CLI::success('Migration verification passed!');
+                } else {
+                    WP_CLI::warning('Migration completed but verification found issues. Please review.');
+                }
+            }
+        } else {
+            WP_CLI::error('Migration completed with errors. Please review and retry failed items.');
+        }
+    }
+    
+    /**
      * List all candidates
      *
      * ## OPTIONS
