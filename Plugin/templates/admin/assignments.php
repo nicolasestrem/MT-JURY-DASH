@@ -479,7 +479,7 @@ wp_enqueue_style(
 jQuery(document).ready(function($) {
     console.log('MT Assignments: Inline fallback script loaded');
     
-    // Check if main admin.js loaded correctly
+    // Check if main mt-admin.js loaded correctly
     if (typeof mt_admin !== 'undefined') {
         console.log('MT Assignments: mt_admin object available');
     } else {
