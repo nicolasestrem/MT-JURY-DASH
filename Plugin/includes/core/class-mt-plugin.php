@@ -182,10 +182,7 @@ class MT_Plugin {
                     if (class_exists($provider_class)) {
                         $this->container->register_provider(new $provider_class($this->container));
                         
-                        // Debug logging for development
-                        if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
-                            error_log("MT Container: Registered provider {$provider_class}");
-                        }
+                        // Provider registered successfully
                     } else {
                         // Log missing provider class
                         if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
@@ -203,10 +200,7 @@ class MT_Plugin {
             // Mark services as registered
             $this->services_registered = true;
             
-            // Debug logging
-            if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
-                error_log("MT Container: All services registered successfully");
-            }
+            // All services registered successfully
             
         } catch (\Exception $e) {
             // Log the error but don't break the application

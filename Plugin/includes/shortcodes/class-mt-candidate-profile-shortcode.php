@@ -15,8 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Debug log
-error_log('MT: Loading candidate profile shortcode class');
+// Shortcode class loaded
 
 /**
  * Class MT_Candidate_Profile_Shortcode
@@ -45,10 +44,10 @@ class MT_Candidate_Profile_Shortcode {
      * @return void
      */
     public static function register() {
-        error_log('MT: Registering mt_candidate_profile shortcode');
+        // Register shortcode
         $instance = new self();
         add_shortcode('mt_candidate_profile', [$instance, 'render']);
-        error_log('MT: mt_candidate_profile shortcode registered');
+        // Shortcode registered
     }
     
     /**
