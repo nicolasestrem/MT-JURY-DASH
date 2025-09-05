@@ -1,6 +1,6 @@
 {
   "name": "mobility-trailblazers",
-  "version": "2.5.41",
+  "version": "2.6.0",
   "description": "E2E tests for Mobility Trailblazers WordPress plugin",
   "scripts": {
     "test": "playwright test",
@@ -13,9 +13,10 @@
     "test:headed": "playwright test --headed",
     "test:auth": "playwright test tests/e2e/auth.setup.ts --project=setup",
     "show-report": "playwright show-report tests/reports/playwright-report",
-    "build": "bash scripts/minify-assets.sh",
-    "build:css": "bash scripts/minify-assets.sh css",
-    "build:js": "bash scripts/minify-assets.sh js",
+    "build": "node scripts/build-assets.js",
+    "build:css": "node scripts/build-assets.js",
+    "build:js": "node scripts/build-assets.js",
+    "build:win": "node scripts/build-assets.js",
     "build:clean": "find assets -name '*.min.css' -o -name '*.min.js' -o -name '*.min.js.map' | xargs rm -f",
     "build:prod": "npm run build:clean && npm run build && echo 'Production assets built successfully'",
     "build:watch": "echo 'Use WP_DEBUG=true for development (loads unminified files)'",

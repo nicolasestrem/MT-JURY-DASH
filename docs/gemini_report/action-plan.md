@@ -48,36 +48,19 @@ This phase resolves the core architectural problem of having two data sources fo
      3.  Delete the `german-translation-compatibility.php` file.
      4.  Fix any non-translatable strings, such as the one in `uninstall.php`.
 
-#### **Phase 3: Performance and Reliability Optimization**
 
-This phase focuses on making the plugin more robust and performant, especially under load.
 
-**3.1. Implement Batch Processing for Data Exports (Ref: MT-008)**
-   - **Objective:** Prevent memory exhaustion and timeouts during the export of large datasets.
-   - **Action Items:** 
-     1.  Refactor the `export_candidates`, `export_evaluations`, and `export_assignments` methods in `C:\Users\nicol\Desktop\MT-JURY-DASH\Plugin\includes\admin\class-mt-import-export.php`.
-     2.  Modify the logic to query the database in batches (e.g., 100-200 records at a time) within a loop.
-     3.  Write each batch to the CSV file stream instead of fetching all records into a single large array.
-
-**3.2. Introduce Caching for Heavy Queries**
-   - **Objective:** Reduce database load and improve frontend and backend responsiveness.
-   - **Action Items:** 
-     1.  Identify expensive or frequently-run queries, particularly in the repositories (`MT_Evaluation_Repository`, `MT_Assignment_Repository`).
-     2.  Wrap the results of these queries in the WordPress Transients API.
-     3.  For example, jury ranking calculations and dashboard statistics are excellent candidates for caching.
-     4.  Ensure that robust cache invalidation is implemented. When data changes (e.g., an evaluation is submitted), the relevant transients must be deleted. The existing code in `class-mt-evaluation-ajax.php` already does this, and this pattern should be applied more broadly.
-
-#### **Phase 4: Code Cleanup and Maintainability**
+#### **Phase 3: Code Cleanup and Maintainability**
 
 This phase addresses the remaining P2 findings to improve the developer experience and reduce future technical debt.
 
-**4.1. Remove Redundant and Deprecated Code (Ref: MT-007)**
+**3.1. Remove Redundant and Deprecated Code (Ref: MT-007)**
    - **Objective:** Simplify the codebase by removing unused code.
    - **Action Items:** 
      1.  Delete the deprecated streaming methods (`export_candidates_stream_deprecated`, `export_evaluations_stream_deprecated`) from `class-mt-import-export.php`.
      2.  Audit and remove unused template files like `evaluations-inline-fix.php`.
 
-**4.2. Enforce Naming and Structural Conventions (Ref: MT-006)**
+**3.2. Enforce Naming and Structural Conventions (Ref: MT-006)**
    - **Objective:** Ensure the entire codebase follows a single, predictable set of rules.
    - **Action Items:** 
      1.  Rename files like `mt_candidate_rollback.css` to `mt-candidate-rollback.css`.

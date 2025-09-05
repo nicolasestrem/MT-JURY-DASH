@@ -61,7 +61,7 @@ class MT_Coaching {
         }
         
         wp_enqueue_style('mt-admin-style', MT_PLUGIN_URL . 'assets/css/admin.css', [], MT_VERSION);
-        wp_enqueue_script('mt-coaching', MT_PLUGIN_URL . 'assets/js/coaching.js', ['jquery'], MT_VERSION, true);
+        wp_enqueue_script('mt-coaching', MT_PLUGIN_URL . 'assets/js/mt-coaching.js', ['jquery'], MT_VERSION, true);
         
         wp_localize_script('mt-coaching', 'mt_coaching', [
             'ajax_url' => admin_url('admin-ajax.php'),

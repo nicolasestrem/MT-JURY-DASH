@@ -67,94 +67,7 @@ if (isset($_POST['action']) && isset($_POST['_wpnonce']) && wp_verify_nonce($_PO
 }
 ?>
 
-<?php if (defined('WP_DEBUG') && WP_DEBUG) : ?>
-<!-- Debug Section (Development Only) -->
-<div style="background: #f0f0f0; padding: 10px; margin: 20px 0; border: 1px solid #ccc;">
-    <h3><?php _e('Debug Information', 'mobility-trailblazers'); ?></h3>
-    <p>Page: <?php echo esc_html($_GET['page'] ?? 'unknown'); ?></p>
-    <p>Current User Can Manage: <?php echo current_user_can('manage_options') ? __('Yes', 'mobility-trailblazers') : __('No', 'mobility-trailblazers'); ?></p>
-    <p>AJAX URL: <?php echo esc_url(admin_url('admin-ajax.php')); ?></p>
-    <p>Nonce: <?php echo esc_attr(wp_create_nonce('mt_admin_nonce')); ?></p>
-    
-    <!-- Assignment Distribution Diagnostic -->
-    <h4><?php _e('Assignment Distribution Analysis', 'mobility-trailblazers'); ?></h4>
-    <?php 
-    $assignment_repo = new \MobilityTrailblazers\Repositories\MT_Assignment_Repository();
-    $all_assignments = $assignment_repo->find_all(['limit' => 1000]);
-    $distribution = [];
-    foreach ($all_assignments as $assignment) {
-        if (!isset($distribution[$assignment->jury_member_id])) {
-            $distribution[$assignment->jury_member_id] = 0;
-        }
-        $distribution[$assignment->jury_member_id]++;
-    }
-    ?>
-    <table style="border-collapse: collapse; margin: 10px 0;">
-        <tr style="background: #ddd;">
-            <th style="padding: 5px; border: 1px solid #999;">Jury Member ID</th>
-            <th style="padding: 5px; border: 1px solid #999;">Assignments Count</th>
-        </tr>
-        <?php foreach ($distribution as $jury_id => $count) : ?>
-        <tr>
-            <td style="padding: 5px; border: 1px solid #999;"><?php echo esc_html($jury_id); ?></td>
-            <td style="padding: 5px; border: 1px solid #999;"><?php echo esc_html($count); ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </table>
-    <p>Total Assignments: <?php echo count($all_assignments); ?></p>
-    <p>Average per Jury: <?php echo $distribution ? round(array_sum($distribution) / count($distribution), 2) : 0; ?></p>
-    <p>Min/Max: <?php echo $distribution ? min($distribution) . '/' . max($distribution) : 'N/A'; ?></p>
-    
-    <button onclick="testAjax()">Test AJAX</button>
-    <button onclick="testDistribution()">Test Distribution Algorithm</button>
-</div>
-<?php endif; ?>
-
-<script>
-// Get localized strings
-var mt_assignments_i18n = window.mt_assignments_i18n || {};
-var debug_strings = mt_assignments_i18n.debug || {};
-
-function testDistribution() {
-    if (!confirm(debug_strings.test_distribution || 'This will run a test distribution simulation. Continue?')) return;
-    
-    const method = prompt(debug_strings.enter_method || 'Enter distribution method (balanced/random):', 'balanced');
-    const candidatesPerJury = prompt(debug_strings.enter_candidates || 'Enter candidates per jury member:', '10');
-    const seed = Math.floor(Math.random() * 10000);
-    
-    console.log('Testing distribution with:', {
-        method: method,
-        candidatesPerJury: candidatesPerJury,
-        seed: seed
-    });
-    
-    var seedMsg = (debug_strings.test_seed || 'Distribution test seed:') + ' ' + seed + '\n' + (debug_strings.check_console || 'Check console for results after running auto-assignment.');
-    alert(seedMsg);
-}
-
-function testAjax() {
-    if (!confirm(debug_strings.debug_function || 'This is a debug function. Continue?')) return;
-    console.log('Testing AJAX...');
-    jQuery.ajax({
-        url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
-        type: 'POST',
-        data: {
-            action: 'mt_auto_assign',
-            nonce: '<?php echo esc_js(wp_create_nonce('mt_admin_nonce')); ?>',
-            method: 'balanced',
-            candidates_per_jury: 5
-        },
-        success: function(response) {
-            console.log('AJAX Success:', response);
-            alert((debug_strings.ajax_success || 'AJAX Success:') + ' ' + JSON.stringify(response));
-        },
-        error: function(xhr, status, error) {
-            console.log('AJAX Error:', {xhr, status, error});
-            alert((debug_strings.ajax_error || 'AJAX Error:') + ' ' + xhr.responseText);
-        }
-    });
-}
-</script>
+<?php /* Debug section removed in Phase 3 cleanup */ ?>
 
 <div class="wrap">
     <h1><?php _e('Assignment Management', 'mobility-trailblazers'); ?></h1>
@@ -479,7 +392,7 @@ wp_enqueue_style(
 jQuery(document).ready(function($) {
     console.log('MT Assignments: Inline fallback script loaded');
     
-    // Check if main admin.js loaded correctly
+    // Check if main mt-admin.js loaded correctly
     if (typeof mt_admin !== 'undefined') {
         console.log('MT Assignments: mt_admin object available');
     } else {

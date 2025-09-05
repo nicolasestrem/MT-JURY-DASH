@@ -3315,15 +3315,14 @@ body.page .mt-candidates-grid {
 .mt-candidate-grid-item {
     position: relative !important;
 }
-}
 
 /* Fix for numbered candidate cards with dark backgrounds - Added 2025-08-17 */
-.elementor-widget-container [style*='background: linear-gradient'],
+.elementor-widget-container [style*="background:linear-gradient"],
 .elementor-widget-container [style*='background-color: #003C3D'],
 .elementor-widget-container [style*='background-color: #004C5F'],
-div[style*='background: linear-gradient'] {
-    background: #f8f9fa \!important;
-    border: 2px solid #dee2e6 \!important;
+div[style*="background:linear-gradient"] {
+    background: #f8f9fa !important;
+    border: 2px solid #dee2e6 !important;
 }
 
 .elementor-widget-container [style*='color: white'] h1,
@@ -3332,12 +3331,12 @@ div[style*='background: linear-gradient'] {
 .elementor-widget-container [style*='color: white'] h4,
 .elementor-widget-container [style*='color: white'] strong,
 div[style*='color: white'] {
-    color: #212529 \!important;
+    color: #212529 !important;
 }
 
 .elementor-widget-container [style*='color: white'] p,
 .elementor-widget-container [style*='color: white'] span {
-    color: #495057 \!important;
+    color: #495057 !important;
 }
 
 
