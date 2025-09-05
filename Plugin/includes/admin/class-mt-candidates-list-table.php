@@ -87,6 +87,10 @@ class MT_Candidates_List_Table extends \WP_List_Table {
      * Prepare items
      */
     public function prepare_items() {
+        // Process any pending bulk actions early
+        // This ensures capability and nonce checks are enforced and actions execute
+        $this->process_bulk_action();
+
         $per_page = $this->get_items_per_page('candidates_per_page', 20);
         $current_page = $this->get_pagenum();
         
@@ -228,6 +232,11 @@ class MT_Candidates_List_Table extends \WP_List_Table {
      * Process bulk actions
      */
     public function process_bulk_action() {
+        // Only allow authorized users to perform bulk actions
+        if (!current_user_can('mt_manage_candidates')) {
+            return;
+        }
+
         // Security check
         if ('delete' === $this->current_action()) {
             $nonce = isset($_REQUEST['_wpnonce']) ? $_REQUEST['_wpnonce'] : '';
