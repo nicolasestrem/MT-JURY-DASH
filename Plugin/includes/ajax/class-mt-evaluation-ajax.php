@@ -624,57 +624,6 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
             $evaluation = $evaluation_repo->find($evaluation_id);
             
             switch ($action) {
-                case 'approve':
-                    $result = $evaluation_repo->update($evaluation_id, ['status' => 'approved']);
-                    if ($result) {
-                        MT_Audit_Logger::log(
-                            'evaluation_approved',
-                            'evaluation',
-                            $evaluation_id,
-                            [
-                                'jury_member_id' => $evaluation->jury_member_id ?? null,
-                                'candidate_id' => $evaluation->candidate_id ?? null,
-                                'previous_status' => $evaluation->status ?? 'unknown',
-                                'new_status' => 'approved'
-                            ]
-                        );
-                    }
-                    break;
-                    
-                case 'reject':
-                    $result = $evaluation_repo->update($evaluation_id, ['status' => 'rejected']);
-                    if ($result) {
-                        MT_Audit_Logger::log(
-                            'evaluation_rejected',
-                            'evaluation',
-                            $evaluation_id,
-                            [
-                                'jury_member_id' => $evaluation->jury_member_id ?? null,
-                                'candidate_id' => $evaluation->candidate_id ?? null,
-                                'previous_status' => $evaluation->status ?? 'unknown',
-                                'new_status' => 'rejected'
-                            ]
-                        );
-                    }
-                    break;
-                    
-                case 'reset':
-                    $result = $evaluation_repo->update($evaluation_id, ['status' => 'draft']);
-                    if ($result) {
-                        MT_Audit_Logger::log(
-                            'evaluation_reset',
-                            'evaluation',
-                            $evaluation_id,
-                            [
-                                'jury_member_id' => $evaluation->jury_member_id ?? null,
-                                'candidate_id' => $evaluation->candidate_id ?? null,
-                                'previous_status' => $evaluation->status ?? 'unknown',
-                                'new_status' => 'draft'
-                            ]
-                        );
-                    }
-                    break;
-                    
                 case 'delete':
                     // Capture evaluation details before deletion
                     $deleted_details = $evaluation ? [
@@ -734,12 +683,7 @@ class MT_Evaluation_Ajax extends MT_Base_Ajax {
      * @return string Past tense
      */
     private function get_action_past_tense($action) {
-        $past_tense = [
-            'approve' => 'approved',
-            'reject' => 'rejected',
-            'reset' => 'reset to draft',
-            'delete' => 'deleted'
-        ];
+            $past_tense = [ 'delete' => 'deleted' ];
         
         return isset($past_tense[$action]) ? $past_tense[$action] : $action;
     }

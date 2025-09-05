@@ -91,8 +91,6 @@ $candidates = get_posts([
             <label for="bulk-action-selector-top" class="screen-reader-text"><?php _e('Select bulk action', 'mobility-trailblazers'); ?></label>
             <select name="action" id="bulk-action-selector-top">
                 <option value="-1"><?php _e('Bulk Actions', 'mobility-trailblazers'); ?></option>
-                <option value="approve"><?php _e('Approve', 'mobility-trailblazers'); ?></option>
-                <option value="reject"><?php _e('Reject', 'mobility-trailblazers'); ?></option>
                 <option value="delete"><?php _e('Delete', 'mobility-trailblazers'); ?></option>
             </select>
             <input type="button" id="doaction" class="button action" value="<?php esc_attr_e('Apply', 'mobility-trailblazers'); ?>">
@@ -191,8 +189,6 @@ $candidates = get_posts([
             <label for="bulk-action-selector-bottom" class="screen-reader-text"><?php _e('Select bulk action', 'mobility-trailblazers'); ?></label>
             <select name="action2" id="bulk-action-selector-bottom">
                 <option value="-1"><?php _e('Bulk Actions', 'mobility-trailblazers'); ?></option>
-                <option value="approve"><?php _e('Approve', 'mobility-trailblazers'); ?></option>
-                <option value="reject"><?php _e('Reject', 'mobility-trailblazers'); ?></option>
                 <option value="delete"><?php _e('Delete', 'mobility-trailblazers'); ?></option>
             </select>
             <input type="button" id="doaction2" class="button action" value="<?php esc_attr_e('Apply', 'mobility-trailblazers'); ?>">
